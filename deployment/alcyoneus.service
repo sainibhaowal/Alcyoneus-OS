@@ -1,0 +1,59 @@
+[Unit]
+Description=Alcyoneus OS - Multi-agent orchestration platform
+Documentation=https://github.com/anomalyco/alcyoneus
+After=network-online.target postgresql.service redis.service kafka.service
+Wants=network-online.target postgresql.service redis.service kafka.service
+
+[Service]
+Type=notify
+User=alcyoneus
+Group=alcyoneus
+WorkingDirectory=/opt/alcyoneus
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=ALCYONEUS_CONFIG=/etc/alcyoneus/config.yaml
+Environment=ALCYONEUS_LOG_LEVEL=INFO
+EnvironmentFile=-/etc/alcyoneus/environment
+ExecStart=/opt/alcyoneus/.venv/bin/python -m alcyoneus.cli serve --host 0.0.0.0 --port 8000
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=60
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+MemoryMax=2G
+CPUQuota=200%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=alcyoneus
+
+[Install]
+WantedBy=multi-user.target

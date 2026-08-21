@@ -1,0 +1,12 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "agent": "./examples/react_stream/stream_react_agent.py:app",
+    "checkpointer": "./examples/react_stream/stream_react_agent.py:checkpointer"
+  },
+  "env": ".env",
+  "auth": {
+    "type": "Bearer",
+    "backend": "jwt"
+  }
+}

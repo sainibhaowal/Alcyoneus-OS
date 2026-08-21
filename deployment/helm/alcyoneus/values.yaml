@@ -1,0 +1,407 @@
+# Default values for Alcyoneus Helm chart
+
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+  rbac:
+    create: true
+
+# Alcyoneus API deployment
+api:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: alcyoneus/alcyoneus-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  service:
+    type: ClusterIP
+    port: 8000
+    metricsPort: 9090
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    hosts:
+      - host: alcyoneus.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: alcyoneus-tls
+        hosts:
+          - alcyoneus.example.com
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  env:
+    - name: ALCYONEUS_LOG_LEVEL
+      value: "INFO"
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: alcyoneus-secrets
+          key: database-url
+    - name: REDIS_URL
+      valueFrom:
+        secretKeyRef:
+          name: alcyoneus-secrets
+          key: redis-url
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      valueFrom:
+        secretKeyRef:
+          name: alcyoneus-secrets
+          key: kafka-servers
+    - name: JWT_ISSUER
+      valueFrom:
+        secretKeyRef:
+          name: alcyoneus-secrets
+          key: jwt-issuer
+    - name: JWT_AUDIENCE
+      value: "alcyoneus-api"
+    - name: JWT_JWKS_URI
+      valueFrom:
+        secretKeyRef:
+          name: alcyoneus-secrets
+          key: jwt-jwks-uri
+    - name: OTEL_EXPORTER_OTLP_ENDPOINT
+      value: "http://alcyoneus-otel-collector:4317"
+  configMap:
+    enabled: true
+    data:
+      config.yaml: |
+        # Alcyoneus configuration
+        graph:
+          recursion_limit: 50
+          timeout_seconds: 300
+        checkpoint:
+          type: postgres
+          interval_seconds: 60
+        store:
+          type: qdrant
+          url: http://alcyoneus-qdrant:6333
+        publisher:
+          type: composite
+          backends:
+            - type: otel
+            - type: prometheus
+        multitenancy:
+          enabled: true
+        auth:
+          enabled: true
+          jwt_validation: true
+
+# Alcyoneus Worker deployment
+worker:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: alcyoneus/alcyoneus-worker
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 60
+  env:
+    - name: ALCYONEUS_LOG_LEVEL
+      value: "INFO"
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: alcyoneus-secrets
+          key: database-url
+    - name: REDIS_URL
+      valueFrom:
+        secretKeyRef:
+          name: alcyoneus-secrets
+          key: redis-url
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      valueFrom:
+        secretKeyRef:
+          name: alcyoneus-secrets
+          key: kafka-servers
+    - name: WORKER_CONCURRENCY
+      value: "4"
+
+# PostgreSQL dependency (uses CloudNativePG or external)
+postgresql:
+  enabled: true
+  # Use CloudNativePG operator if available
+  # Otherwise deploy standalone
+  cnpg:
+    enabled: false
+  standalone:
+    image: pgvector/pgvector:pg16
+    replicas: 1
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    persistence:
+      size: 20Gi
+      storageClass: ""
+    auth:
+      postgresPassword: ""
+      username: alcyoneus
+      password: ""
+      database: alcyoneus
+    initdb:
+      scripts:
+        init-db.sql: |
+          CREATE EXTENSION IF NOT EXISTS vector;
+          CREATE EXTENSION IF NOT EXISTS pg_trgm;
+    metrics:
+      enabled: true
+      image: prometheuscommunity/postgres-exporter:v0.15.0
+
+# Redis dependency
+redis:
+  enabled: true
+  image: redis:7-alpine
+  replicas: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  persistence:
+    size: 5Gi
+    storageClass: ""
+  auth:
+    enabled: true
+    password: ""
+  metrics:
+    enabled: true
+    image: oliver006/redis_exporter:v1.57.0
+
+# Kafka dependency (Strimzi operator or external)
+kafka:
+  enabled: true
+  strimzi:
+    enabled: false
+  external:
+    bootstrapServers: "kafka:9092"
+
+# Qdrant vector store
+qdrant:
+  enabled: true
+  image: qdrant/qdrant:v1.8.0
+  replicas: 1
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  persistence:
+    size: 20Gi
+    storageClass: ""
+  service:
+    port: 6333
+    grpcPort: 6334
+
+# OpenTelemetry Collector
+otelCollector:
+  enabled: true
+  image: otel/opentelemetry-collector-contrib:0.106.0
+  replicas: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    processors:
+      batch:
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 512
+      resource:
+        attributes:
+          - key: service.name
+            value: alcyoneus
+            action: upsert
+    exporters:
+      prometheus:
+        endpoint: 0.0.0.0:8888
+      otlp:
+        endpoint: "http://tempo:4317"
+        tls:
+          insecure: true
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch, resource]
+          exporters: [otlp]
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch, resource]
+          exporters: [prometheus]
+
+# Prometheus
+prometheus:
+  enabled: true
+  prometheusSpec:
+    replicas: 1
+    retention: 30d
+    retentionSize: 50GB
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: ""
+          resources:
+            requests:
+              storage: 50Gi
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+# Grafana
+grafana:
+  enabled: true
+  adminUser: admin
+  adminPassword: ""
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://alcyoneus-prometheus:9090
+          access: proxy
+          isDefault: true
+        - name: Loki
+          type: loki
+          url: http://alcyoneus-loki:3100
+          access: proxy
+  dashboards:
+    default:
+      alcyoneus-overview:
+        json: |
+          # Dashboard JSON here
+
+# Loki for logs
+loki:
+  enabled: true
+  loki:
+    persistence:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+# Secrets (to be created externally or via sealed secrets)
+secrets:
+  create: false
+  # If create: true, these will be generated
+  databaseUrl: ""
+  redisUrl: ""
+  kafkaServers: ""
+  jwtIssuer: ""
+  jwtJwksUri: ""
+
+# Network policies
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8000
+    - from:
+        - podSelector:
+            matchLabels:
+              app: alcyoneus-worker
+      ports:
+        - protocol: TCP
+          port: 8000
+
+# Pod disruption budget
+pdb:
+  enabled: true
+  minAvailable: 1
+
+# Service accounts
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000

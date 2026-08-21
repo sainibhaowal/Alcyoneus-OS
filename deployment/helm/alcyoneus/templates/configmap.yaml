@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "alcyoneus.fullname" . }}-config
+  labels:
+    {{- include "alcyoneus.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    {{- if .Values.api.configMap.data.config }}
+    {{ .Values.api.configMap.data.config | indent 4 }}
+    {{- else }}
+    # Default Alcyoneus configuration
+    graph:
+      recursion_limit: 50
+      timeout_seconds: 300
+    checkpoint:
+      type: postgres
+      interval_seconds: 60
+    store:
+      type: qdrant
+      url: http://{{ include "alcyoneus.fullname" . }}-qdrant:6333
+    publisher:
+      type: composite
+      backends:
+        - type: otel
+        - type: prometheus
+    multitenancy:
+      enabled: true
+    auth:
+      enabled: true
+      jwt_validation: true
+    {{- end }}
