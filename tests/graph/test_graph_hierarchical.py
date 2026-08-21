@@ -3,7 +3,7 @@
 These tests emulate a supervisor-led team where synchronous nodes call into
 async helpers and vice versa. The goal is to pressure the execution pipeline
 with nested graph invocations, mixed sync/async behavior, and recursion
-pressure while verifying that TAF handles the orchestration cleanly.
+pressure while verifying that Alcyoneus OS handles the orchestration cleanly.
 """
 
 from __future__ import annotations

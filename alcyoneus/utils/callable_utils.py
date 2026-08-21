@@ -1,5 +1,5 @@
 """
-Utilities for calling sync or async functions in TAF.
+Utilities for calling sync or async functions in Alcyoneus OS.
 
 This module provides helpers to detect async callables and to invoke
 functions that may be synchronous or asynchronous, handling thread pool

@@ -1,4 +1,4 @@
-"""Streaming utility functions for TAF graph workflows.
+"""Streaming utility functions for Alcyoneus OS graph workflows.
 
 This module provides helper functions for determining whether a result from a node
 or tool execution should be treated as non-streaming (i.e., a complete result)

@@ -1,5 +1,5 @@
 """
-Unit tests for the TAF callback system.
+Unit tests for the Alcyoneus OS callback system.
 """
 
 import pytest

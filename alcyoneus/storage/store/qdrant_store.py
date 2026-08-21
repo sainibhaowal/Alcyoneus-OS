@@ -1,5 +1,5 @@
 """
-Qdrant Vector Store Implementation for TAF Framework
+Qdrant Vector Store Implementation for Alcyoneus OS Framework
 
 This module provides a modern, async-first implementation of BaseStore using Qdrant
 as the backend vector database. Supports both local and cloud Qdrant deployments

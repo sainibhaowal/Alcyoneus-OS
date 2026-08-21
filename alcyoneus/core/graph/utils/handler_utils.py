@@ -1,10 +1,10 @@
 """Core utility functions for graph execution and state management.
 
-This module provides essential utilities for TAF graph execution, including
+This module provides essential utilities for Alcyoneus OS graph execution, including
 state management, message processing, response formatting, and execution flow control.
 These functions handle the low-level operations that support graph workflow execution.
 
-The utilities in this module are designed to work with TAF's dependency injection
+The utilities in this module are designed to work with Alcyoneus OS's dependency injection
 system and provide consistent interfaces for common operations across different
 execution contexts.
 

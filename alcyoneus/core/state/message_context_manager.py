@@ -1,5 +1,5 @@
 """
-Message context management for agent state in TAF.
+Message context management for agent state in Alcyoneus OS.
 
 This module provides MessageContextManager, which trims and manages the message
 history (context) for agent interactions, ensuring efficient context window usage.

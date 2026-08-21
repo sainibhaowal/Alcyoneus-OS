@@ -1,5 +1,5 @@
 """
-Command API for AgentGraph in TAF.
+Command API for AgentGraph in Alcyoneus OS.
 
 This module provides the Command class, which allows nodes to combine state updates
 with control flow, similar to LangGraph's Command API. Nodes can update agent state

@@ -1,1 +1,1 @@
-# Tests for TAF library
+# Tests for Alcyoneus OS library

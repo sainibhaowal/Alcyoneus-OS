@@ -1,5 +1,5 @@
 """
-Simplified Async-First Base Store for TAF Framework
+Simplified Async-First Base Store for Alcyoneus OS Framework
 
 This module provides a clean, modern interface for memory stores with:
 - Async-first design for better performance
@@ -32,7 +32,7 @@ logger = logging.getLogger("alcyoneus.store")
 
 class BaseStore(ABC):
     """
-    Simplified async-first base class for memory stores in TAF.
+    Simplified async-first base class for memory stores in Alcyoneus OS.
 
     This class provides a clean interface that supports:
     - Vector stores (Qdrant, Pinecone, Chroma, etc.)

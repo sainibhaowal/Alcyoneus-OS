@@ -19,11 +19,11 @@ configure_logging(level=logging.DEBUG)
 
 
 def test_logging_across_modules():
-    """Test that logging is working across different TAF modules."""
+    """Test that logging is working across different Alcyoneus OS modules."""
 
     # Test main test logger
     logger = logging.getLogger(__name__)
-    logger.info("=== TAF Logging Comprehensive Test ===")
+    logger.info("=== Alcyoneus OS Logging Comprehensive Test ===")
 
     # Test different log levels
     logger.debug("Debug level test")
@@ -92,7 +92,7 @@ def test_logging_across_modules():
     grandchild_logger = logging.getLogger("alcyoneus.graph.compiled_graph")
     grandchild_logger.info("Grandchild 'alcyoneus.graph.compiled_graph' logger test")
 
-    logger.info("=== TAF logging system verified successfully ===")
+    logger.info("=== Alcyoneus OS logging system verified successfully ===")
 
 
 if __name__ == "__main__":

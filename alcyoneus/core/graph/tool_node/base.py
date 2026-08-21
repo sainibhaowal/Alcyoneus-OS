@@ -1,11 +1,11 @@
-"""Tool execution node for TAF graph workflows.
+"""Tool execution node for Alcyoneus OS graph workflows.
 
 This module provides the ToolNode class, which serves as a unified registry and executor
 for callable functions from various sources including local functions and MCP (Model Context
 Protocol) tools. The ToolNode is designed with a modular architecture using mixins to handle
 different tool providers.
 
-The ToolNode maintains compatibility with TAF's dependency injection system and
+The ToolNode maintains compatibility with Alcyoneus OS's dependency injection system and
 publishes execution events for monitoring and debugging purposes.
 
 Typical usage example:

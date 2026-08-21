@@ -1,4 +1,4 @@
-"""Integration tests for TAF framework."""
+"""Integration tests for Alcyoneus OS framework."""
 
 from alcyoneus.core.graph import CompiledGraph, StateGraph, ToolNode
 from alcyoneus.runtime.publisher import ConsolePublisher

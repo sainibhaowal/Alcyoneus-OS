@@ -1,8 +1,8 @@
 """
-Personalized AI Agent using TAF + Mem0 + Cloud Qdrant
+Personalized AI Agent using Alcyoneus OS + Mem0 + Cloud Qdrant
 
 This example demonstrates a sophisticated personalized AI agent that:
-1. Uses TAF framework for agent orchestration
+1. Uses Alcyoneus OS framework for agent orchestration
 2. Integrates Mem0 for advanced memory management
 3. Uses Cloud Qdrant for vector storage (768 dimensions for Gemini embeddings)
 4. Maintains conversation context and user preferences
@@ -56,7 +56,7 @@ class PersonalizedAgentState(AgentState):
 
 class PersonalizedAgent:
     """
-    A sophisticated personalized AI agent using TAF + Mem0 + Cloud Qdrant.
+    A sophisticated personalized AI agent using Alcyoneus OS + Mem0 + Cloud Qdrant.
 
     Features:
     - Maintains long-term memory across conversations
@@ -95,12 +95,12 @@ class PersonalizedAgent:
         self.memory = Memory.from_config(self.mem0_config)
         self.app_id = "personalized-agent-v1"
 
-        # Initialize TAF graph
+        # Initialize Alcyoneus OS graph
         self.checkpointer = InMemoryCheckpointer()
         self._build_agent_graph()
 
     def _build_agent_graph(self):
-        """Build the TAF agent graph with memory integration."""
+        """Build the Alcyoneus OS agent graph with memory integration."""
 
         # Create the response agent with state-interpolated system prompt
         self.response_agent = Agent(

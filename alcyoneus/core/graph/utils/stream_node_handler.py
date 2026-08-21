@@ -1,4 +1,4 @@
-"""Streaming node handler for TAF graph workflows.
+"""Streaming node handler for Alcyoneus OS graph workflows.
 
 This module provides the StreamNodeHandler class, which manages the execution of graph nodes
 that support streaming output. It handles regular function nodes, ToolNode instances,
@@ -58,7 +58,7 @@ logger = logging.getLogger("alcyoneus.graph")
 
 
 class StreamNodeHandler(BaseLoggingMixin):
-    """Handles streaming execution for graph nodes in TAF workflows.
+    """Handles streaming execution for graph nodes in Alcyoneus OS workflows.
 
     StreamNodeHandler manages the execution of nodes that can produce streaming output,
     including regular function nodes, ToolNode instances, and Agent instances. It supports

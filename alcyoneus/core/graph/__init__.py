@@ -1,7 +1,7 @@
 """Alcyoneus OS Graph Module - Core Workflow Engine.
 
 This module provides the foundational components for building and executing
-agent workflows in TAF. It implements a graph-based execution model
+agent workflows in Alcyoneus OS. It implements a graph-based execution model
 similar to LangGraph, where workflows are defined as directed graphs of
 interconnected nodes that process state and execute business logic.
 
@@ -110,7 +110,7 @@ Usage Example:
 Integration Points:
 ==================
 
-The graph module integrates with other TAF components:
+The graph module integrates with other Alcyoneus OS components:
 
 - **State Module**: Provides AgentState and context management
 - **Utils Module**: Supplies constants, messages, and helper functions

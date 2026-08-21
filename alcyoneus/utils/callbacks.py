@@ -1,5 +1,5 @@
 """
-Callback system for TAF.
+Callback system for Alcyoneus OS.
 
 This module provides a comprehensive callback framework that allows users to define
 their own validation logic and custom behavior at key points in the execution flow:

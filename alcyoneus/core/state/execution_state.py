@@ -1,5 +1,5 @@
 """
-Execution state management for graph execution in TAF.
+Execution state management for graph execution in Alcyoneus OS.
 
 This module provides the ExecutionState class and related enums to track
 progress, interruptions, and pause/resume functionality for agent graph execution.

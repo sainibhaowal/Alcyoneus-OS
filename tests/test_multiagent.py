@@ -1,4 +1,4 @@
-"""Comprehensive multiagent test suite for TAF."""
+"""Comprehensive multiagent test suite for Alcyoneus OS."""
 
 import asyncio
 

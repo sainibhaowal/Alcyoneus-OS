@@ -1,5 +1,5 @@
 """
-State management for TAF agent graphs.
+State management for Alcyoneus OS agent graphs.
 
 This package provides schemas and context managers for agent state, execution
 tracking, and message context management. All core state classes are exported

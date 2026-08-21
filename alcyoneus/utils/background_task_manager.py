@@ -1,5 +1,5 @@
 """
-Background task manager for async operations in TAF.
+Background task manager for async operations in Alcyoneus OS.
 
 This module provides BackgroundTaskManager, which tracks and manages
 asyncio background tasks, ensuring proper cleanup and error logging.

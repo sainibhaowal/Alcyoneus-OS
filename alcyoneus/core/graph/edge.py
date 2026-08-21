@@ -1,7 +1,7 @@
-"""Graph edge representation and routing logic for TAF workflows.
+"""Graph edge representation and routing logic for Alcyoneus OS workflows.
 
 This module defines the Edge class, which represents connections between nodes
-in a TAF graph workflow. Edges can be either static (always followed) or
+in a Alcyoneus OS graph workflow. Edges can be either static (always followed) or
 conditional (followed only when certain conditions are met), enabling complex
 routing logic and decision-making within graph execution.
 

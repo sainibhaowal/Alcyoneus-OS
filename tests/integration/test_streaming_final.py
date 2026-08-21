@@ -1,4 +1,4 @@
-"""Comprehensive streaming integration tests for TAF framework."""
+"""Comprehensive streaming integration tests for Alcyoneus OS framework."""
 
 import asyncio
 

@@ -1,5 +1,5 @@
 """
-InvokeNodeHandler utilities for TAF agent graph execution.
+InvokeNodeHandler utilities for Alcyoneus OS agent graph execution.
 
 This module provides the InvokeNodeHandler class, which manages the invocation of node functions,
 tool nodes, and agent instances within the agent graph. It supports dependency injection,

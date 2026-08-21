@@ -1,1 +1,1 @@
-"""TAF tests package."""
+"""Alcyoneus OS tests package."""

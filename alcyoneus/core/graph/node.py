@@ -1,13 +1,13 @@
-"""Node execution and management for TAF graph workflows.
+"""Node execution and management for Alcyoneus OS graph workflows.
 
 This module defines the Node class, which represents executable units within
-a TAF graph workflow. Nodes encapsulate functions, ToolNode instances, or Agent instances
+a Alcyoneus OS graph workflow. Nodes encapsulate functions, ToolNode instances, or Agent instances
 that perform specific tasks, handle dependency injection, manage execution context,
 and support both synchronous and streaming execution modes.
 
 Nodes are the fundamental building blocks of graph workflows, responsible for
 processing state, executing business logic, and producing outputs that drive
-the workflow forward. They integrate seamlessly with TAF's dependency
+the workflow forward. They integrate seamlessly with Alcyoneus OS's dependency
 injection system and callback management framework.
 """
 

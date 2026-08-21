@@ -1,5 +1,5 @@
 """
-Abstract base class for context management in TAF agent graphs.
+Abstract base class for context management in Alcyoneus OS agent graphs.
 
 This module provides BaseContextManager, which defines the interface for
 trimming and managing message context in agent state objects.

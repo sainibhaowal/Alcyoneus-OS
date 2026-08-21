@@ -1,7 +1,7 @@
 """Constants and helpers for ToolNode package.
 
 This module defines constants used throughout the ToolNode implementation,
-particularly parameter names that are automatically injected by the TAF
+particularly parameter names that are automatically injected by the Alcyoneus OS
 framework during tool execution. These parameters are excluded from tool
 schema generation since they are provided by the execution context.
 
@@ -10,7 +10,7 @@ and maintain a clean public API.
 
 Parameter names that are automatically injected during tool execution.
 
-These parameters are provided by the TAF framework and should be excluded
+These parameters are provided by the Alcyoneus OS framework and should be excluded
 from tool schema generation. They represent execution context and framework
 services that are available to tool functions but not provided by the user.
 

@@ -1,5 +1,5 @@
 """
-Unified utility exports for TAF agent graphs.
+Unified utility exports for Alcyoneus OS agent graphs.
 
 This module re-exports core utility symbols for agent graph construction, message handling,
 callback management, reducers, and constants. Import from this module for a stable, unified

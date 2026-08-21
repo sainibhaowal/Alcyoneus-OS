@@ -63,7 +63,7 @@ class TestErrorCallback(OnErrorCallback):
 
 async def test_callback_system():
     """Test the callback system functionality."""
-    print("🧪 Testing TAF Callback System")
+    print("🧪 Testing Alcyoneus OS Callback System")
     print("=" * 40)
 
     # Create callback manager

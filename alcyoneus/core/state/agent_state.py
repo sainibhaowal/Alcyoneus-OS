@@ -1,5 +1,5 @@
 """
-Agent state schema for TAF agent graphs.
+Agent state schema for Alcyoneus OS agent graphs.
 
 This module provides the AgentState class, which tracks message context,
 context summaries, and internal execution metadata for agent workflows.
@@ -27,7 +27,7 @@ class AgentState(BaseModel):
     """Common state schema that includes messages, context and internal execution metadata.
 
     This class can be subclassed to add application-specific fields while maintaining
-    compatibility with the TAF framework. All internal execution metadata
+    compatibility with the Alcyoneus OS framework. All internal execution metadata
     is preserved through subclassing.
 
     Notes:

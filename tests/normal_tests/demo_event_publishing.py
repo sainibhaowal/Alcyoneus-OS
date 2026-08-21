@@ -1,5 +1,5 @@
 """
-Demonstration of the TAF Event Publishing System
+Demonstration of the Alcyoneus OS Event Publishing System
 
 This script shows how to use the publisher system to capture and publish
 all events that occur during graph execution.
@@ -80,7 +80,7 @@ async def summary_agent(state: AgentState, **kwargs) -> str:
 
 async def demo_event_publishing():
     """Demonstrate the complete event publishing system."""
-    print("🎭 TAF Event Publishing Demo")
+    print("🎭 Alcyoneus OS Event Publishing Demo")
     print("=" * 50)
 
     # Create custom publisher

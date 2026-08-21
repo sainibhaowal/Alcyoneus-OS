@@ -550,7 +550,7 @@
 #         assert count == 2
 
 #     def test_store_message(self, mock_store, sample_message):
-#         """Test storing a TAF Message."""
+#         """Test storing a Alcyoneus OS Message."""
 #         memory_id = mock_store.store_message(
 #             sample_message,
 #             user_id="user_123",
@@ -569,7 +569,7 @@
 
 #     @pytest.mark.asyncio
 #     async def test_astore_message(self, mock_store, sample_message):
-#         """Test async storing a TAF Message."""
+#         """Test async storing a Alcyoneus OS Message."""
 #         memory_id = await mock_store.astore_message(
 #             sample_message,
 #             user_id="user_123"

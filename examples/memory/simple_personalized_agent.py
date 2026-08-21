@@ -1,8 +1,8 @@
 """
-Simple Personalized Agent Example using TAF + Mem0 + Cloud Qdrant
+Simple Personalized Agent Example using Alcyoneus OS + Mem0 + Cloud Qdrant
 
 A streamlined example showing basic integration between:
-- TAF for agent framework
+- Alcyoneus OS for agent framework
 - Mem0 for memory management
 - Cloud Qdrant for vector storage
 
@@ -62,7 +62,7 @@ class SimplePersonalizedAgent:
         self._build_graph()
 
     def _build_graph(self):
-        """Build TAF graph with memory integration."""
+        """Build Alcyoneus OS graph with memory integration."""
         # Create the response agent with state-interpolated system prompt
         self.response_agent = Agent(
             model="gemini-2.0-flash",

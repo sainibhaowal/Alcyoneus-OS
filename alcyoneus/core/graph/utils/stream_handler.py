@@ -1,4 +1,4 @@
-"""Streaming graph execution handler for TAF workflows.
+"""Streaming graph execution handler for Alcyoneus OS workflows.
 
 This module provides the StreamHandler class, which manages the execution of graph workflows
 with support for streaming output, interrupts, state persistence, and event publishing.
@@ -69,7 +69,7 @@ class StreamHandler[StateT: AgentState](
     BaseLoggingMixin,
     InterruptConfigMixin,
 ):
-    """Handles streaming execution for graph workflows in TAF.
+    """Handles streaming execution for graph workflows in Alcyoneus OS.
 
     StreamHandler manages the execution of agent workflows as directed graphs,
     supporting streaming output, pause/resume via interrupts, state persistence,

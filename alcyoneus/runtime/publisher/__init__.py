@@ -1,4 +1,4 @@
-"""Publisher module for TAF events.
+"""Publisher module for Alcyoneus OS events.
 
 This package exposes publishers that handle event delivery to various outputs,
 such as console, Redis, Kafka, and RabbitMQ.

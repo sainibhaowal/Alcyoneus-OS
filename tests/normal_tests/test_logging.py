@@ -30,7 +30,7 @@ def simple_node(state, config):
 def main():
     """Test basic graph creation and logging."""
     logger = logging.getLogger(__name__)
-    logger.info("Testing TAF logging...")
+    logger.info("Testing Alcyoneus OS logging...")
 
     # Create a simple graph
     graph = StateGraph()

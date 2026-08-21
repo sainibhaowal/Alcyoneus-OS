@@ -1,5 +1,5 @@
 """
-Constants and enums for TAF agent graph execution and messaging.
+Constants and enums for Alcyoneus OS agent graph execution and messaging.
 
 This module defines special node names, message storage levels, execution states,
 and response granularity options for agent workflows.

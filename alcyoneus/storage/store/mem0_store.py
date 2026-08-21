@@ -1,7 +1,7 @@
 """Mem0 Long-Term Memory Store
 
 Async-first implementation of :class:`BaseStore` that uses the `mem0` library
-as a managed long-term memory layer. In TAF we treat the *graph state* as
+as a managed long-term memory layer. In Alcyoneus OS we treat the *graph state* as
 short-term (ephemeral per run / session) memory and a store implementation as
 long-term, durable memory. This module wires Mem0 so that:
 
