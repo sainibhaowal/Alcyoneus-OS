@@ -47,7 +47,7 @@ repos:
         args: [--fix, --show-fixes]
         exclude: ^(tests|docs|examples)/
         verbose: true
-        entry: bash -c '/home/ravi/Projects/Alcyoneus_OS/.venv/bin/python -m ruff check --fix --show-fixes . || true'
+        entry: bash -c '.venv/bin/python -m ruff check --fix --show-fixes . || true'
       # Optional: separate format-only check for CI (no --fix)
       # - id: ruff-format
       #   exclude: ^(tests|docs|examples)/
@@ -60,7 +60,7 @@ repos:
         additional_dependencies: ["bandit[toml]"]
         exclude: ^(tests|docs|examples)/
         verbose: true
-        entry: bash -c '/home/ravi/Projects/Alcyoneus_OS/.venv/bin/python -m bandit -c pyproject.toml -r . || true'
+        entry: bash -c '.venv/bin/python -m bandit -c pyproject.toml -r . || true'
 
   # Dependency vulnerability scans (non-blocking, report only).
   # Local/system hooks: upstream manifests (pycqa/pip-audit 404s,
@@ -70,7 +70,7 @@ repos:
     hooks:
       - id: pip-audit
         name: pip-audit
-        entry: bash -c '/home/ravi/Projects/Alcyoneus_OS/.venv/bin/python -m pip_audit --desc --format=columns --progress-spinner=off || true'
+        entry: bash -c '.venv/bin/python -m pip_audit --desc --format=columns --progress-spinner=off || true'
         language: system
         pass_filenames: false
         require_serial: true
@@ -78,7 +78,7 @@ repos:
 
       - id: safety
         name: safety
-        entry: bash -c '/home/ravi/Projects/Alcyoneus_OS/.venv/bin/python -m safety check --json || true'
+        entry: bash -c '.venv/bin/python -m safety check --json || true'
         language: system
         pass_filenames: false
         require_serial: true
@@ -91,7 +91,7 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: bash -c '/home/ravi/Projects/Alcyoneus_OS/.venv/bin/python -m mypy alcyoneus/ || true'
+        entry: bash -c '.venv/bin/python -m mypy alcyoneus/ || true'
         language: system
         types: [python]
         pass_filenames: false
@@ -106,7 +106,7 @@ repos:
     hooks:
       - id: pytest-fast
         name: pytest (unit only)
-        entry: bash -c '/home/ravi/Projects/Alcyoneus_OS/.venv/bin/python -m pytest tests -m "not integration and not slow" -q --no-cov || true'
+        entry: bash -c '.venv/bin/python -m pytest tests -m "not integration and not slow" -q --no-cov || true'
         language: system
         always_run: true
         pass_filenames: false
