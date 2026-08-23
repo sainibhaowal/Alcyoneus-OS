@@ -13,6 +13,11 @@ on:
           - "patch"
           - "minor"
           - "major"
+      publish_to_pypi:
+        description: "Upload built package to PyPI (requires PYPI_API_TOKEN in repo secrets)"
+        required: false
+        default: true
+        type: boolean
 
 concurrency:
   group: semantic-release
@@ -27,7 +32,7 @@ permissions:
 
 jobs:
   # =========================================================================
-  # PRE-RELEASE VERIFICATION
+  # 1. PRE-RELEASE VERIFICATION
   # =========================================================================
   verify-build:
     name: 🔍 Pre-Release Validation
@@ -48,13 +53,15 @@ jobs:
           twine check dist/*
 
   # =========================================================================
-  # SEMANTIC RELEASE: TAG & GITHUB RELEASE PUBLISH
+  # 2. SEMANTIC RELEASE: TAG & GITHUB RELEASE PUBLISH
   # =========================================================================
   release:
     name: 🚀 Alcyoneus OS Release & Tagging
     needs: [verify-build]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    outputs:
+      released: ${{ steps.check_release.outputs.released }}
     steps:
       - name: Checkout Full Git History & Tags
         uses: actions/checkout@v4
@@ -93,3 +100,44 @@ jobs:
           semantic-release publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check If New Version Released
+        id: check_release
+        run: echo "released=true" >> $GITHUB_OUTPUT
+
+  # =========================================================================
+  # 3. AUTOMATED PYPI PUBLISH (When token is configured)
+  # =========================================================================
+  pypi-publish:
+    name: 📦 Publish Package to PyPI
+    needs: [release]
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && inputs.publish_to_pypi }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build Distribution Packages
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          if [ -n "$TWINE_PASSWORD" ]; then
+            echo "🚀 Publishing built wheels and sdist to PyPI..."
+            twine upload --skip-existing dist/*
+          else
+            echo "⚠️ PYPI_API_TOKEN secret not set in GitHub repository settings. Skipping PyPI upload."
+            echo "👉 Add your PyPI token to Settings -> Secrets and variables -> Actions to enable 1-click PyPI publishing."
+          fi
