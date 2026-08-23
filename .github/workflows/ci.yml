@@ -33,12 +33,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
-      - name: Install Package
+      - name: Install Package in Editable Mode
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install .
+          pip install -e .
 
       - name: Verify Core Imports & CLI Smoke Test
         run: |
@@ -68,7 +67,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: AST Security Scan (Bandit)
         run: |
@@ -89,7 +87,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: Install Ruff
         run: pip install ruff
@@ -114,13 +111,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: Install SDK & Type Stubs
         run: |
           python -m pip install --upgrade pip
-          pip install .
-          pip install mypy types-PyYAML
+          pip install -e .
+          pip install mypy types-PyYAML types-requests
 
       - name: Run Mypy Typecheck
         run: mypy alcyoneus/
@@ -134,8 +130,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.12"]
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -144,12 +140,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist hypothesis
 
       - name: Run Core & Graph Tests (Parallel xdist)
@@ -162,8 +157,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.12"]
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -172,12 +167,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
 
       - name: Run Storage & Checkpointer Tests (Parallel xdist)
@@ -190,8 +184,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.12"]
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -200,12 +194,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
 
       - name: Run Multimodal Tests (Parallel xdist)
@@ -218,8 +211,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.12"]
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -228,12 +221,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
 
       - name: Run Integration & Chaos Tests (Parallel xdist)
