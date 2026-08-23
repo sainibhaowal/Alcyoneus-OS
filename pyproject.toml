@@ -61,11 +61,13 @@ keywords = [
 license = {file = "LICENSE"}
 requires-python = ">=3.12"
 dependencies = [
+    "aiohttp>=3.9.0",
     "injectq>=0.4.0",
     "pillow>=12.2.0",
     "pydantic>=2.0,<3",
     "PyYAML>=6.0",
     "python-dotenv>=1.0",
+    "requests>=2.31.0",
 ]
 authors = [
     {name = "Alcyoneus Authors", email = "contact@alcyoneus.ai"}
@@ -154,7 +156,9 @@ lint.ignore = [
     "S105",
     "S106",
     "S107",
+    "S108",
     "S310",
+    "S607",
     "S608",
     "E501",
 ]

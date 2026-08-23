@@ -19,12 +19,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-
-try:
-    import yaml
-except ImportError:
-    yaml = None
-
+import yaml
 
 from .models import SkillMeta
 
