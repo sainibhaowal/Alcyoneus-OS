@@ -17,7 +17,11 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from typing import Any
 
-import numpy as np
+
+try:
+    import numpy as np
+except ImportError:
+    np = None  # type: ignore[assignment]
 
 from alcyoneus.core.realtime.base import (
     AudioDeltaEvent,
@@ -217,7 +221,7 @@ class LocalWhisperTTSClient:
         else:
             logger.debug("VAD: no speech detected")
 
-    async def _run_vad(self, audio: np.ndarray) -> bool:
+    async def _run_vad(self, audio: Any) -> bool:
         if self._vad is None:
             return True  # No VAD = treat as speech
         try:
