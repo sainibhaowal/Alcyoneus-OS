@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/svg/alcyoneus-logo.svg" alt="Alcyoneus OS Banner" style="width: 100%; max-width: 100%; display: block; border-radius: 12px; margin-bottom: 16px;" />
+  <img src="https://raw.githubusercontent.com/sainibhaowal/Alcyoneus-OS/main/assets/png/alcyoneus_banner_1200x320.png" alt="Alcyoneus OS Banner" width="100%" />
   <p>
     <a href="https://pypi.org/project/alcyoneus/"><img src="https://img.shields.io/badge/PyPI-v1.0.0-00F0FF?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>&nbsp;
     <a href="https://github.com/sainibhaowal/Alcyoneus-OS/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/Release-v1.0.0-38BDF8?style=flat-square&logo=github" alt="Release" /></a>&nbsp;
