@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       force_bump:
-        description: "Force version bump (patch, minor, major, or leave empty for auto-detect)"
+        description: "Force version bump (patch, minor, major, or leave empty for auto-detect from commits)"
         required: false
         default: ""
         type: choice
@@ -15,7 +15,7 @@ on:
           - "major"
 
 concurrency:
-  group: release
+  group: semantic-release
   cancel-in-progress: false
 
 permissions:
@@ -26,12 +26,37 @@ permissions:
   id-token: write
 
 jobs:
+  # =========================================================================
+  # PRE-RELEASE VERIFICATION
+  # =========================================================================
+  verify-build:
+    name: 🔍 Pre-Release Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify Clean Build
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+          twine check dist/*
+
+  # =========================================================================
+  # SEMANTIC RELEASE: TAG & GITHUB RELEASE PUBLISH
+  # =========================================================================
   release:
-    name: 🚀 Publish Semantic Release
+    name: 🚀 Alcyoneus OS Release & Tagging
+    needs: [verify-build]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout Code (Full History & Tags)
+      - name: Checkout Full Git History & Tags
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -42,27 +67,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Python Semantic Release
+      - name: Install Release Tools
         run: |
           python -m pip install --upgrade pip
           pip install python-semantic-release build
 
-      - name: Auto-detect and Run Release (Standard)
-        if: ${{ inputs.force_bump == '' }}
+      - name: Configure Git Bot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          semantic-release version --print
-          semantic-release publish
+
+      - name: Calculate Version & Generate Changelog
+        id: release_step
+        run: |
+          if [ -n "${{ inputs.force_bump }}" ]; then
+            semantic-release version --force ${{ inputs.force_bump }}
+          else
+            semantic-release version
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Forced Version Release
-        if: ${{ inputs.force_bump != '' }}
+      - name: Publish Alcyoneus OS Release to GitHub
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          semantic-release version --force ${{ inputs.force_bump }}
           semantic-release publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

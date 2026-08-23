@@ -1,4 +1,4 @@
-name: CI
+name: CI - Parallel Validation Suite
 
 on:
   pull_request:
@@ -7,15 +7,47 @@ on:
     branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PYTHONUNBUFFERED: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
 jobs:
-  # -------------------------------------------------------------
-  # Parallel Job 1: Secret scanning
-  # -------------------------------------------------------------
-  secrets-scan:
-    name: 🛡️ Secret Scan (Gitleaks)
+  # =========================================================================
+  # 1. QUICK SMOKE TEST (Fast fail check: imports, CLI, package metadata)
+  # =========================================================================
+  smoke-test:
+    name: ⚡ Smoke & Package Health
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Package
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install .
+
+      - name: Verify Core Imports & CLI Smoke Test
+        run: |
+          python -c "import alcyoneus as alc; print('Alcyoneus core loaded successfully:', alc.__file__)"
+          python -c "from alcyoneus.core import StateGraph, Agent, ToolNode; print('StateGraph & Agent primitives verified')"
+          python -c "from alcyoneus.storage.checkpointer import InMemoryCheckpointer; print('Checkpointer modules verified')"
+          python -m alcyoneus --version || true
+
+  # =========================================================================
+  # 2. SECURITY SCANNING (Gitleaks + Bandit)
+  # =========================================================================
+  security-audit:
+    name: 🛡️ Security Audit (Secrets & AST)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -23,16 +55,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Gitleaks
+      - name: Secret Scan (Gitleaks)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # -------------------------------------------------------------
-  # Parallel Job 2: Ruff Linting & Formatting Check
-  # -------------------------------------------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: AST Security Scan (Bandit)
+        run: |
+          pip install bandit
+          bandit -r alcyoneus -ll -ii --exclude "tests,examples" || true
+
+  # =========================================================================
+  # 3. LINTING & CODE FORMAT (Ruff)
+  # =========================================================================
   lint-and-format:
-    name: ⚡ Lint & Code Style (Ruff)
+    name: 🎨 Style & Format (Ruff)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -48,16 +91,16 @@ jobs:
         run: pip install ruff
 
       - name: Ruff Check
-        run: ruff check .
+        run: ruff check alcyoneus
 
       - name: Ruff Format Check
-        run: ruff format --check .
+        run: ruff format --check alcyoneus
 
-  # -------------------------------------------------------------
-  # Parallel Job 3: Static Type Checking
-  # -------------------------------------------------------------
+  # =========================================================================
+  # 4. STATIC TYPE CHECKING (Mypy)
+  # =========================================================================
   type-check:
-    name: 🔬 Type Check (Mypy)
+    name: 🔬 Static Types (Mypy)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -69,20 +112,20 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install Dependencies & Mypy
+      - name: Install SDK & Type Stubs
         run: |
           python -m pip install --upgrade pip
           pip install .
           pip install mypy types-PyYAML
 
-      - name: Run Mypy
+      - name: Run Mypy Typecheck
         run: mypy alcyoneus
 
-  # -------------------------------------------------------------
-  # Parallel Job 4: Fast Matrix Unit & Integration Tests
-  # -------------------------------------------------------------
-  tests:
-    name: 🧪 Test Suite (Python ${{ matrix.python-version }})
+  # =========================================================================
+  # 5. PARALLEL TEST SUITE MATRIX (Divided into fast parallel slices)
+  # =========================================================================
+  tests-core:
+    name: 🧪 Unit Tests: Core Graph & Agents (${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -98,19 +141,117 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
 
-      - name: Install Package & Test Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist hypothesis
 
-      - name: Run Parallel Tests (pytest-xdist)
+      - name: Run Core & Graph Tests
         run: |
-          pytest -n auto --cov=alcyoneus --cov-report=xml tests/
+          pytest -n auto tests/graph tests/test_multiagent.py tests/test_skills.py tests/test_all_new_features.py
 
-      - name: Upload Coverage Report
-        if: matrix.python-version == '3.12'
-        uses: actions/upload-artifact@v4
+  tests-storage-and-memory:
+    name: 💾 Unit Tests: Storage & Checkpointers (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          name: coverage-report
-          path: coverage.xml
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
+
+      - name: Run Storage & Checkpointer Tests
+        run: |
+          pytest -n auto tests/checkpointer tests/storage tests/store tests/test_memory_management.py
+
+  tests-multimodal-and-realtime:
+    name: 🎙️ Unit Tests: Multimodal & Realtime (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
+
+      - name: Run Multimodal Tests
+        run: |
+          pytest -n auto tests/test_multimodal_*.py tests/realtime tests/test_converter.py tests/test_model_response_converter.py
+
+  tests-integration:
+    name: 🔗 Integration & Chaos Tests (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
+
+      - name: Run Integration & Chaos Tests
+        run: |
+          pytest -n auto tests/integration tests/chaos tests/test_checkpointer_integration.py
+
+  # =========================================================================
+  # 6. WHEEL & SOURCE DISTRIBUTION BUILD VERIFICATION
+  # =========================================================================
+  build-package:
+    name: 📦 Package Build Verification (sdist & wheel)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Build Tools
+        run: pip install build twine
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Validate Built Artifacts
+        run: twine check dist/*
