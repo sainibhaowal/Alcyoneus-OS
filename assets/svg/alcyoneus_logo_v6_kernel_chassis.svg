@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Matte Dark Obsidian Canvas -->
+    <linearGradient id="cyberBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c0e12"/>
+      <stop offset="100%" stop-color="#020304"/>
+    </linearGradient>
+
+    <!-- Industrial Platinum Anodized Steel -->
+    <linearGradient id="anodizedSteel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="50%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+
+    <linearGradient id="darkArmor" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+
+    <linearGradient id="cyberCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="800" rx="160" fill="url(#cyberBg)"/>
+
+  <!-- Precision Technical Hexagon Chassis -->
+  <polygon points="400,100 660,250 660,550 400,700 140,550 140,250"
+           fill="none"
+           stroke="#1e293b"
+           stroke-width="8"
+           stroke-linejoin="miter"/>
+
+  <!-- Secondary Inner Bevel Ring -->
+  <polygon points="400,130 635,265 635,535 400,670 165,535 165,265"
+           fill="none"
+           stroke="#334155"
+           stroke-width="2"
+           stroke-dasharray="12 8"/>
+
+  <!-- Precision Multi-Agent Neural Nodes (The State Machine Geometry) -->
+  <g>
+    <!-- Core 'A' Intersecting Vector Beams -->
+    <!-- Left Stanchion -->
+    <polygon points="400,190 400,260 270,520 220,520"
+             fill="url(#anodizedSteel)"/>
+    
+    <!-- Right Stanchion -->
+    <polygon points="400,190 400,260 530,520 580,520"
+             fill="url(#darkArmor)"
+             stroke="#334155"
+             stroke-width="1.5"/>
+
+    <!-- Central Micro-Kernel Processor Core -->
+    <rect x="330" y="380" width="140" height="40" rx="4"
+          fill="#0f172a"
+          stroke="url(#cyberCyan)"
+          stroke-width="2.5"/>
+
+    <circle cx="400" cy="400" r="8" fill="url(#cyberCyan)"/>
+    <circle cx="400" cy="400" r="3" fill="#ffffff"/>
+
+    <!-- State Transit Channels -->
+    <line x1="280" y1="400" x2="330" y2="400" stroke="#00f2fe" stroke-width="3"/>
+    <line x1="470" y1="400" x2="520" y2="400" stroke="#00f2fe" stroke-width="3"/>
+    <line x1="400" y1="260" x2="400" y2="380" stroke="#00f2fe" stroke-width="3"/>
+    <line x1="400" y1="420" x2="400" y2="580" stroke="#00f2fe" stroke-width="3"/>
+
+    <!-- Base Data Bus Anchor -->
+    <polygon points="400,580 430,620 370,620" fill="url(#cyberCyan)"/>
+  </g>
+
+  <!-- Technical Axis Coordinate Markings -->
+  <g fill="#64748b" font-family="monospace" font-size="14" font-weight="700" letter-spacing="3">
+    <text x="400" y="70" text-anchor="middle">ALCYONEUS // OS</text>
+    <text x="400" y="745" text-anchor="middle">SYS.CORE.v1.0</text>
+    <circle cx="400" cy="100" r="6" fill="#00f2fe"/>
+    <circle cx="660" cy="250" r="6" fill="#94a3b8"/>
+    <circle cx="660" cy="550" r="6" fill="#94a3b8"/>
+    <circle cx="400" cy="700" r="6" fill="#00f2fe"/>
+    <circle cx="140" cy="550" r="6" fill="#94a3b8"/>
+    <circle cx="140" cy="250" r="6" fill="#94a3b8"/>
+  </g>
+</svg>

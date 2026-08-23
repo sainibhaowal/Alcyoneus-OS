@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bg-glow" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0e1726" />
+      <stop offset="60%" stop-color="#070a12" />
+      <stop offset="100%" stop-color="#03060a" />
+    </radialGradient>
+
+    <!-- Core Hyper-Electric Gradients -->
+    <linearGradient id="cyber-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF" />
+      <stop offset="50%" stop-color="#0088FF" />
+      <stop offset="100%" stop-color="#0044CC" />
+    </linearGradient>
+
+    <linearGradient id="primary-glow-beam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38E8FF" />
+      <stop offset="100%" stop-color="#0055FF" />
+    </linearGradient>
+
+    <linearGradient id="titanium-facet-left" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#223046" />
+      <stop offset="100%" stop-color="#0C1322" />
+    </linearGradient>
+
+    <linearGradient id="titanium-facet-right" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334763" />
+      <stop offset="100%" stop-color="#141E30" />
+    </linearGradient>
+
+    <linearGradient id="titanium-pillar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#CBD5E1" />
+      <stop offset="100%" stop-color="#64748B" />
+    </linearGradient>
+
+    <!-- Dynamic Neon & Ambient Glow Filters -->
+    <filter id="neon-core-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="7" result="blur1" />
+      <feGaussianBlur stdDeviation="15" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="subtle-bloom" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="40" result="blur" />
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="800" rx="48" fill="url(#bg-glow)" />
+
+  <!-- Ambient Backdrop Energy -->
+  <circle cx="400" cy="400" r="160" fill="#0070F3" opacity="0.22" filter="url(#subtle-bloom)" />
+  <circle cx="400" cy="380" r="80" fill="#00F0FF" opacity="0.30" filter="url(#subtle-bloom)" />
+
+  <!-- Precision Kernel Architecture Grid (Zero Text - Pure Geometric Mark) -->
+  <g opacity="0.16" stroke="#38BDF8" stroke-width="1.2">
+    <circle cx="400" cy="400" r="330" fill="none" stroke-dasharray="6 10" />
+    <circle cx="400" cy="400" r="240" fill="none" stroke-dasharray="4 8" />
+    <line x1="90" y1="400" x2="710" y2="400" stroke-dasharray="6 8" />
+    <line x1="400" y1="90" x2="400" y2="710" stroke-dasharray="6 8" />
+  </g>
+
+  <!-- ==================== OUTER HEAVYWEIGHT TITANIUM SHIELD ==================== -->
+  <!-- Left Shield Bevel -->
+  <path d="M 400 100
+           L 150 245
+           L 150 555
+           L 400 700
+           L 400 635
+           L 215 525
+           L 215 285
+           L 400 175 Z"
+        fill="url(#titanium-facet-left)"
+        stroke="#3B4E6B"
+        stroke-width="2" />
+
+  <!-- Right Shield Bevel -->
+  <path d="M 400 100
+           L 650 245
+           L 650 555
+           L 400 700
+           L 400 635
+           L 585 525
+           L 585 285
+           L 400 175 Z"
+        fill="url(#titanium-facet-right)"
+        stroke="#4B638A"
+        stroke-width="2" />
+
+  <!-- Outer Anchor Hardened Pins (Kernel Verification Pins) -->
+  <g fill="#00F0FF" filter="url(#neon-core-glow)">
+    <circle cx="400" cy="100" r="6" />
+    <circle cx="150" cy="245" r="6" />
+    <circle cx="150" cy="555" r="6" />
+    <circle cx="400" cy="700" r="6" />
+    <circle cx="650" cy="555" r="6" />
+    <circle cx="650" cy="245" r="6" />
+  </g>
+
+  <!-- ==================== INTERLOCKING ISOMETRIC 'A' NEXUS CORE ==================== -->
+  <!-- Left Main Wing Chevron of the 'A' Monogram -->
+  <path d="M 400 195
+           L 230 555
+           L 310 555
+           L 365 435
+           L 440 435
+           L 400 355
+           L 380 395
+           L 335 395
+           L 400 255 Z"
+        fill="url(#cyber-cyan)"
+        filter="url(#neon-core-glow)" />
+
+  <!-- Right Main Wing Chevron of the 'A' Monogram -->
+  <path d="M 400 195
+           L 570 555
+           L 490 555
+           L 435 435
+           L 360 435
+           L 400 355
+           L 420 395
+           L 465 395
+           L 400 255 Z"
+        fill="url(#primary-glow-beam)" />
+
+  <!-- Monolithic Upper Pillar Core -->
+  <polygon points="400,210 330,360 375,360 400,310 400,210" fill="url(#titanium-pillar)" opacity="0.9" />
+
+  <!-- Central Multi-Agent Orchestration Nucleus (StateGraph Core Engine) -->
+  <g transform="translate(400, 435)">
+    <!-- Central Node Diamond Core -->
+    <polygon points="0,-40 36,0 0,40 -36,0"
+             fill="#00F0FF"
+             stroke="#FFFFFF"
+             stroke-width="3"
+             filter="url(#neon-core-glow)" />
+
+    <!-- Pure Energy Core Nucleus -->
+    <circle cx="0" cy="0" r="10" fill="#FFFFFF" />
+
+    <!-- Synchronized Agent Bus Links -->
+    <line x1="-100" y1="120" x2="-36" y2="0" stroke="#00F0FF" stroke-width="4" stroke-linecap="round" filter="url(#neon-core-glow)" />
+    <line x1="100" y1="120" x2="36" y2="0" stroke="#0072FF" stroke-width="4" stroke-linecap="round" filter="url(#neon-core-glow)" />
+    <line x1="0" y1="-155" x2="0" y2="-40" stroke="#38E8FF" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Sub-Agent Satellite Node 1 (Left) -->
+    <circle cx="-100" cy="120" r="11" fill="#09101D" stroke="#00F0FF" stroke-width="3.5" />
+    <circle cx="-100" cy="120" r="4.5" fill="#00F0FF" />
+
+    <!-- Sub-Agent Satellite Node 2 (Right) -->
+    <circle cx="100" cy="120" r="11" fill="#09101D" stroke="#0072FF" stroke-width="3.5" />
+    <circle cx="100" cy="120" r="4.5" fill="#0072FF" />
+
+    <!-- Heavy Titanium Kernel Foundation Base -->
+    <path d="M -140 180 L 140 180 L 160 200 L -160 200 Z"
+          fill="url(#titanium-facet-right)"
+          stroke="#475569"
+          stroke-width="1.5" />
+    <line x1="-120" y1="190" x2="120" y2="190" stroke="#00F0FF" stroke-width="2.5" opacity="0.85" />
+  </g>
+</svg>
