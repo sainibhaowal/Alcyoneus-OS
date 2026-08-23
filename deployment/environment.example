@@ -1,0 +1,28 @@
+# Alcyoneus OS Environment Configuration
+# Copy to /etc/alcyoneus/environment and adjust values
+
+# Database
+DATABASE_URL=postgresql://alcyoneus:password@localhost:5432/alcyoneus
+
+# Redis
+REDIS_URL=redis://localhost:6379/0
+
+# Kafka
+KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+
+# Authentication
+JWT_ISSUER=https://auth.example.com
+JWT_AUDIENCE=alcyoneus-api
+JWT_JWKS_URI=https://auth.example.com/.well-known/jwks.json
+
+# OpenTelemetry
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+
+# Feature flags
+ALCYONEUS_MULTITENANCY_ENABLED=true
+ALCYONEUS_AUTH_ENABLED=true
+ALCYONEUS_RATE_LIMITING_ENABLED=true
+
+# Worker settings
+WORKER_CONCURRENCY=4
+WORKER_PREFETCH_COUNT=10

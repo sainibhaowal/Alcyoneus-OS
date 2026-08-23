@@ -1,0 +1,123 @@
+# ============================================================================
+# Portable pre-commit configuration - copy into ANY project as:
+#   .pre-commit-config.yaml
+#
+# Setup (once per project):
+#   1. python -m venv .venv && .venv/bin/pip install <your deps>
+#      ruff bandit mypy pytest          # tools used by local hooks below
+#   2. pip install pre-commit
+#   3. pre-commit install && pre-commit install-hooks
+#
+# Customize:
+#   - Replace <YOUR_PACKAGE> with your source folder name.
+#   - Uncomment the pip-audit / safety / pytest blocks if wanted.
+#
+# Privacy: every hook runs locally on your machine. Your code/files NEVER
+# leave the computer. The optional pip-audit/safety hooks send only
+# dependency NAMES+VERSIONS to public vulnerability databases - delete
+# those blocks if you want a strictly offline setup.
+#
+# Blocking vs report-only:
+#   - gitleaks BLOCKS commits containing secrets.
+#   - everything else reports problems but never blocks ("|| true").
+# ============================================================================
+
+repos:
+  # --- basic file hygiene ---------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        exclude: ^(tests|docs|examples)/
+      - id: trailing-whitespace
+        exclude: ^(tests|docs|examples)/
+      - id: check-added-large-files
+        args: [--maxkb=100]
+        exclude: ^(tests|docs|examples)/
+      - id: check-ast
+        exclude: ^(tests|docs|examples)/
+      - id: check-builtin-literals
+        exclude: ^(tests|docs|examples)/
+      - id: check-case-conflict
+      - id: check-docstring-first
+        exclude: ^(tests|docs|examples)/
+      - id: check-merge-conflict
+      - id: debug-statements
+        exclude: ^(tests|docs|examples)/
+      - id: detect-private-key
+        exclude: ^(tests|docs|examples)/
+
+  # --- secret scanning (BLOCKING) -------------------------------------------
+  # Catches API keys, tokens, passwords before they are committed.
+  # False positives can be allowlisted in .gitleaksignore.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # --- modernize python syntax ----------------------------------------------
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.2
+    hooks:
+      - id: pyupgrade
+        args: [--py312-plus]
+        exclude: ^(tests|docs|examples)/
+
+  # --- project-local tools (use the project's own .venv, relative paths) ----
+  - repo: local
+    hooks:
+      # Lint + auto-fix (report-only)
+      - id: ruff
+        name: ruff (report only)
+        entry: bash -c '.venv/bin/python -m ruff check --fix --show-fixes . || true'
+        language: system
+        pass_filenames: false
+        require_serial: true
+        verbose: true
+
+      # Security pattern scan (report-only)
+      - id: bandit
+        name: bandit (report only)
+        entry: bash -c '.venv/bin/python -m bandit -c pyproject.toml -r . || true'
+        language: system
+        pass_filenames: false
+        require_serial: true
+        verbose: true
+
+      # Type checking (report-only)
+      - id: mypy
+        name: mypy (report only)
+        entry: bash -c '.venv/bin/python -m mypy <YOUR_PACKAGE> || true'
+        language: system
+        pass_filenames: false
+        require_serial: true
+        verbose: true
+
+      # OPTIONAL - dependency vulnerability scans (ONLINE).
+      # Requires: .venv/bin/pip install pip-audit safety[toml]
+      # - id: pip-audit
+      #   name: pip-audit (report only)
+      #   entry: bash -c '.venv/bin/python -m pip_audit --desc || true'
+      #   language: system
+      #   pass_filenames: false
+      #   require_serial: true
+      #   verbose: true
+      #
+      # - id: safety
+      #   name: safety (report only)
+      #   entry: bash -c '.venv/bin/python -m safety check --json || true'
+      #   language: system
+      #   pass_filenames: false
+      #   require_serial: true
+      #   verbose: true
+
+      # OPTIONAL - fast unit tests on push (report-only).
+      # - id: pytest-fast
+      #   name: pytest (unit)
+      #   entry: bash -c '.venv/bin/python -m pytest tests -q --no-cov || true'
+      #   language: system
+      #   always_run: true
+      #   pass_filenames: false
+      #   require_serial: true
+      #   stages: [pre-push]
+      #   verbose: true

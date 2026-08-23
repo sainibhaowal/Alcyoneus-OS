@@ -1,0 +1,31 @@
+# Full-history secret scan. Local pre-commit hooks only see new commits;
+# this job re-scans the entire git history and also catches commits made
+# with --no-verify. Run manually from the Actions tab ("Run workflow"),
+# plus a weekly scheduled sweep.
+#
+# Fingerprints for known-benign findings live in .gitleaksignore at repo root.
+
+name: gitleaks-history-scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1" # weekly, Mondays 04:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Scan full git history
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gitleaks/gitleaks:v8.30.1 # keep in sync with .pre-commit-config.yaml
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks detect (all commits)
+        run: gitleaks detect --source . --log-opts="--all" --redact --verbose

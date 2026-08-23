@@ -1,0 +1,283 @@
+version: '3.8'
+
+services:
+  # Main Alcyoneus API server
+  alcyoneus-api:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    image: alcyoneus/alcyoneus-api:latest
+    container_name: alcyoneus-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "9090:9090"  # Prometheus metrics
+    environment:
+      - ALCYONEUS_LOG_LEVEL=INFO
+      - ALCYONEUS_CONFIG=/app/config.yaml
+      # Database
+      - DATABASE_URL=postgresql://alcyoneus:password@postgres:5432/alcyoneus
+      # Redis
+      - REDIS_URL=redis://redis:6379/0
+      # Kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      # OTEL
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      # Auth
+      - JWT_ISSUER=https://auth.example.com
+      - JWT_AUDIENCE=alcyoneus-api
+      - JWT_JWKS_URI=https://auth.example.com/.well-known/jwks.json
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - alcyoneus-data:/app/data
+      - alcyoneus-logs:/app/logs
+      - alcyoneus-checkpoints:/app/checkpoints
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Graph execution workers (horizontal scaling)
+  alcyoneus-worker:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    image: alcyoneus/alcyoneus-worker:latest
+    container_name: alcyoneus-worker
+    restart: unless-stopped
+    environment:
+      - ALCYONEUS_LOG_LEVEL=INFO
+      - ALCYONEUS_CONFIG=/app/config.yaml
+      - DATABASE_URL=postgresql://alcyoneus:password@postgres:5432/alcyoneus
+      - REDIS_URL=redis://redis:6379/0
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - WORKER_CONCURRENCY=4
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - alcyoneus-data:/app/data
+      - alcyoneus-logs:/app/logs
+      - alcyoneus-checkpoints:/app/checkpoints
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # PostgreSQL with pgvector for checkpoints and vector store
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: alcyoneus-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=alcyoneus
+      - POSTGRES_USER=alcyoneus
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alcyoneus -d alcyoneus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  # Redis for caching, rate limiting, pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: alcyoneus-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Kafka for event streaming
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: alcyoneus-kafka
+    restart: unless-stopped
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_LOG_RETENTION_HOURS=168
+      - KAFKA_LOG_SEGMENT_BYTES=1073741824
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: alcyoneus-zookeeper
+    restart: unless-stopped
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.106.0
+    container_name: alcyoneus-otel
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"  # OTLP gRPC
+      - "4318:4318"  # OTLP HTTP
+      - "8888:8888"  # Prometheus metrics
+    depends_on:
+      - alcyoneus-api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: alcyoneus-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9091:9090"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: alcyoneus-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  # Nginx reverse proxy with TLS termination
+  nginx:
+    image: nginx:alpine
+    container_name: alcyoneus-nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - alcyoneus-api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  postgres-data:
+  redis-data:
+  kafka-data:
+  zookeeper-data:
+  zookeeper-logs:
+  prometheus-data:
+  grafana-data:
+  alcyoneus-data:
+  alcyoneus-logs:
+  alcyoneus-checkpoints:
+
+networks:
+  default:
+    name: alcyoneus-network

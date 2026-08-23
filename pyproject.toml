@@ -1,0 +1,519 @@
+[project]
+name = "alcyoneus"
+version = "1.0.0"
+description = "Alcyoneus OS: Production-grade Python operating system & framework for building, orchestrating, and deploying multi-agent LLM systems."
+readme = "README.md"
+keywords = [
+    "agent",
+    "agents",
+    "ai-agent",
+    "ai-agents",
+    "multi-agent",
+    "multi-agent-systems",
+    "agentic",
+    "agentic-ai",
+    "agentic-workflow",
+    "agent-framework",
+    "agent-orchestration",
+    "orchestration",
+    "workflow",
+    "workflow-engine",
+    "state-machine",
+    "stategraph",
+    "graph",
+    "llm",
+    "llm-agent",
+    "llm-framework",
+    "llm-orchestration",
+    "llmops",
+    "genai",
+    "generative-ai",
+    "ai",
+    "artificial-intelligence",
+    "openai",
+    "anthropic",
+    "claude",
+    "gemini",
+    "google-genai",
+    "mcp",
+    "model-context-protocol",
+    "tool-use",
+    "function-calling",
+    "rag",
+    "memory",
+    "vector-store",
+    "qdrant",
+    "mem0",
+    "alcyoneus",
+    "alcyoneus-os",
+    "alcyoneus-sdk",
+    "sandboxing",
+    "voice-pipeline",
+    "guardrails",
+    "pydantic-ai",
+    "fastapi",
+    "react-agent",
+    "reasoning",
+    "chatbot",
+    "assistant",
+    "a2a",
+]
+license = {file = "LICENSE"}
+requires-python = ">=3.12"
+dependencies = [
+    "injectq>=0.4.0",
+    "pillow>=12.2.0",
+    "pydantic>=2.0,<3",
+    "PyYAML>=6.0",
+    "python-dotenv>=1.0",
+]
+authors = [
+    {name = "Alcyoneus Authors", email = "contact@alcyoneus.ai"}
+]
+maintainers = [
+    {name = "Ravinder Singh", email = "contact@alcyoneus.ai"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+
+[project.urls]
+Homepage = "https://alcyoneus.alcyoneus.ai"
+Repository = "https://github.com/alcyoneus-os/alcyoneus"
+Issues = "https://github.com/alcyoneus-os/alcyoneus/issues"
+Documentation = "https://alcyoneus.alcyoneus.ai"
+
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+alc = "alcyoneus.cli:cli"
+
+[project.optional-dependencies]
+google-genai = ["google-genai>=1.56.0"]
+realtime = ["google-genai>=1.56.0"]
+openai = ["openai>=1.77.0"]
+pg_checkpoint = ["asyncpg>=0.29.0","redis>=4.2"]
+mcp = ["fastmcp>=2.11.3","mcp>=1.13.0"]
+images = ["Pillow>=10.0.0"]
+cloud-storage = ["cloud-storage-manager>=0.1.2"]
+redis = ["redis>=4.2"]
+kafka = ["aiokafka>=0.8.0"]
+rabbitmq = ["aio-pika>=9.0.0"]
+qdrant = ["qdrant-client>=1.7.0"]
+mem0 = ["mem0ai>=0.1.117"]
+a2a_sdk = ["a2a-sdk>=0.2.7", "httpx>=0.27.0", "uvicorn>=0.30.0", "sse-starlette>=2.0"]
+browser = ["playwright>=1.50.0"]
+otel = [
+    "opentelemetry-api>=1.20.0",
+    "opentelemetry-sdk>=1.20.0",
+]
+cli = ["click>=8.1.0", "rich>=13.0.0", "pyyaml>=6.0"]
+
+all_publishers = [
+    "redis>=4.2",
+    "aiokafka>=0.8.0",
+    "aio-pika>=9.0.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["alcyoneus*"]
+exclude = ["normal_tests*", "tests*", "examples*", "docs*"]
+
+[tool.setuptools.package-data]
+alcyoneus = ["py.typed"]
+
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+lint.fixable = ["ALL"]
+lint.select = [
+    "E",   # pycodestyle
+    "W",   # pycodestyle
+    "F",   # Pyflakes
+    "PL",  # pylint
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "A",   # flake8-builtins
+    "S",   # flake8-bandit
+    "ISC", # flake8-implicit-str-concat
+    "ICN", # flake8-import-conventions
+    "PIE", # flake8-pie
+    "Q",   # flake8-quotes
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "TID", # flake8-tidy-imports
+    "RUF", # Ruff-specific rules
+    "YTT", # flake8-2020
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+    "PTH", # flake8-use-pathlib
+    "G",   # flake8-logging-format
+    "INP", # flake8-no-pep420
+    "T20", # flake8-print
+]
+lint.ignore = [
+    "UP006", # https://github.com/charliermarsh/ruff/pull/4427
+    "UP007", # https://github.com/charliermarsh/ruff/pull/4427
+    # Mutable class attributes should be annotated with `typing.ClassVar`
+    # Too many violations
+    "RUF012",
+    # Logging statement uses f-string
+    "G004",
+    #B904 Within an `except` clause, raise exceptions with
+    #`raise ... from err` or `raise ... from None` to distinguish
+    #them from errors in exception handling
+    "B904",
+    #Do not perform function call `Injected` in argument defaults
+    "B008",
+    "ISC001",# flake8-implicit-str-concat
+]
+# Allow unused variables when underscore-prefixed.
+lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+exclude = [
+    "migrations/*",  # Exclude the migrations folder
+    "venv/*",
+    "example/*",
+    "tests/*",
+    "docs/*",
+]
+
+
+[tool.ruff.lint.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"bin/*.py" = ["E402", "S603", "T201", "S101"]
+"*/tests/*.py" = ["E402", "S603", "T201", "S101", "PLR2004"]
+"*/test/*.py" = ["E402", "S603", "T201", "S101"]
+"scripts/*.py" = ["E402", "S603", "T201", "S101", "INP001"]
+"*/__init__.py" = ["E402", "S603", "T201", "S101"]
+"*/migrations/*.py" = ["E402", "S603", "T201", "S101"]
+"examples/*" = [
+    "E402", "E501", "E721", "S101", "T201",
+    "PLC0415", "INP001", "PLR2004", "PTH100", "PTH105", "PTH108", "PTH110", "PTH118", "PTH120",
+    "SIM102", "SIM108", "SIM115", "TID252", "UP042", "RUF002", "RUF003", "RUF100"
+]
+"alcyoneus/utils/interactive.py" = ["T201"]
+"alcyoneus/storage/checkpointer/conformance/*" = ["S101"]
+"alcyoneus/adapters/llm/openai_converter.py" = ["PLR0912"]
+"alcyoneus/adapters/llm/openai_responses_converter.py" = ["PLR0912", "PLR0915"]
+"alcyoneus/graph/agent.py" = ["PLR0912", "PLR0913"]
+"alcyoneus/runtime/publisher/otel_publisher.py" = ["PLR0912"]
+"alcyoneus/qa/evaluation/reporters/_html_css.py" = ["E501"]
+"alcyoneus/qa/evaluation/reporters/_html_js.py" = ["E501"]
+"alcyoneus/qa/evaluation/reporters/_html_template.py" = ["E501", "PLR0913"]
+"alcyoneus/qa/evaluation/reporters/_html_render.py" = ["PLR0912"]
+
+
+"alcyoneus/storage/sessions/*" = ["PLC0415", "E402", "E501"]
+"alcyoneus/storage/store/embedding/*" = ["PLC0415", "E402", "E501"]
+"alcyoneus/storage/store/qdrant_store.py" = ["PLC0415", "E402", "E501"]
+"alcyoneus/storage/store/long_term_memory.py" = ["PLC0415", "E402", "E501"]
+"alcyoneus/storage/store/memory_config.py" = ["PLC0415", "E402", "E501"]
+"alcyoneus/storage/persistent_dict.py" = ["PTH105", "PTH110", "PTH108"]
+"alcyoneus/utils/callbacks.py" = ["PLC0415", "E402"]
+"alcyoneus/utils/schema.py" = ["PLC0415", "E402"]
+"alcyoneus/utils/constants.py" = ["UP042"]
+"alcyoneus/utils/id_generator.py" = ["UP042"]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+known-first-party = ["src"]
+[tool.ruff.lint.pylint]
+max-args = 10
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+
+[tool.bandit]
+exclude_dirs = ["*/tests/*", "*/migrations", "*/scripts/*", "docs/*", "examples/*"]
+skips = ["B101", "B611", "B601", "B608", "B102", "B307", "B405"]
+
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+namespace_packages = true
+explicit_package_bases = true
+warn_unused_configs = true
+exclude = [
+    "normal_tests/*",
+    "tests/*",
+    "examples/*",
+    "docs/*",
+]
+
+# Phased adoption: mypy was wired into CI after the codebase already existed, so
+# it does not block on the modules that still carry pre-existing type errors.
+# These are still parsed (so downstream type info is available) but their own
+# errors are silenced. Burn the list down by cleaning a module's types and
+# deleting its entry here; everything NOT listed is already gating.
+[[tool.mypy.overrides]]
+module = [
+    "alcyoneus.cli",
+    "alcyoneus.core.audit",
+    "alcyoneus.core.auth",
+    "alcyoneus.core.graph.agent",
+    "alcyoneus.core.graph.agent_internal.execution",
+    "alcyoneus.core.graph.agent_internal.google",
+    "alcyoneus.core.graph.agent_internal.memory",
+    "alcyoneus.core.graph.agent_internal.openai",
+    "alcyoneus.core.graph.compiled_graph",
+    "alcyoneus.core.graph.dynamic_prompt",
+    "alcyoneus.core.graph.message_graph",
+    "alcyoneus.core.graph.node",
+    "alcyoneus.core.graph.node_execution_policy",
+    "alcyoneus.core.graph.remote_graph",
+    "alcyoneus.core.graph.state_graph",
+    "alcyoneus.core.graph.stream_transformers",
+    "alcyoneus.core.graph.tool_node.base",
+    "alcyoneus.core.graph.tool_node.mcp_exec",
+    "alcyoneus.core.graph.tool_node.schema",
+    "alcyoneus.core.graph.utils.handler_utils",
+    "alcyoneus.core.graph.utils.invoke_handler",
+    "alcyoneus.core.graph.utils.invoke_node_handler",
+    "alcyoneus.core.graph.utils.stream_handler",
+    "alcyoneus.core.graph.utils.stream_node_handler",
+    "alcyoneus.core.graph.utils.utils",
+    "alcyoneus.core.guardrails.tool_guardrails",
+    "alcyoneus.core.mcp.transport",
+    "alcyoneus.core.multitenancy",
+    "alcyoneus.core.ratelimit",
+    "alcyoneus.core.realtime.events",
+    "alcyoneus.core.realtime.providers.azure_realtime",
+    "alcyoneus.core.realtime.providers.local_whisper_tts",
+    "alcyoneus.core.realtime.providers.openai_realtime",
+    "alcyoneus.core.secrets",
+    "alcyoneus.core.state.channels",
+    "alcyoneus.core.state.managed_values",
+    "alcyoneus.core.state.message",
+    "alcyoneus.core.state.serde",
+    "alcyoneus.core.triggers.triggers",
+    "alcyoneus.core.voice.pipeline",
+    "alcyoneus.core.voice.providers.openai_tts",
+    "alcyoneus.extensions.experimental.codex",
+    "alcyoneus.prebuilt.agent.plan_act_reflect",
+    "alcyoneus.prebuilt.agent.rag",
+    "alcyoneus.prebuilt.agent.react",
+    "alcyoneus.prebuilt.agent.router",
+    "alcyoneus.prebuilt.agent.structured_output",
+    "alcyoneus.prebuilt.agent.supervisor_team",
+    "alcyoneus.prebuilt.agent.swarm",
+    "alcyoneus.prebuilt.tools.browser",
+    "alcyoneus.prebuilt.tools.calculator",
+    "alcyoneus.prebuilt.tools.calendar",
+    "alcyoneus.prebuilt.tools.code_interpreter",
+    "alcyoneus.prebuilt.tools.command",
+    "alcyoneus.prebuilt.tools.computer",
+    "alcyoneus.prebuilt.tools.computer_backends",
+    "alcyoneus.prebuilt.tools.directory",
+    "alcyoneus.prebuilt.tools.edit",
+    "alcyoneus.prebuilt.tools.fetch",
+    "alcyoneus.prebuilt.tools.file_search",
+    "alcyoneus.prebuilt.tools.files",
+    "alcyoneus.prebuilt.tools.finish",
+    "alcyoneus.prebuilt.tools.image",
+    "alcyoneus.prebuilt.tools.interaction",
+    "alcyoneus.prebuilt.tools.memory",
+    "alcyoneus.prebuilt.tools.registry",
+    "alcyoneus.prebuilt.tools.scheduler",
+    "alcyoneus.prebuilt.tools.search",
+    "alcyoneus.prebuilt.tools.shell_tool",
+    "alcyoneus.prebuilt.tools.subagent",
+    "alcyoneus.qa.evaluation.criteria.llm_utils",
+    "alcyoneus.qa.evaluation.evaluator",
+    "alcyoneus.qa.evaluation.quick_eval",
+    "alcyoneus.qa.evaluation.reporters._html_render",
+    "alcyoneus.qa.evaluation.reporters.console",
+    "alcyoneus.qa.evaluation.simulators.user_simulator",
+    "alcyoneus.qa.testing.in_memory_store",
+    "alcyoneus.qa.testing.mock_mcp",
+    "alcyoneus.qa.testing.mock_tools",
+    "alcyoneus.qa.testing.quick_test",
+    "alcyoneus.qa.testing.test_agent",
+    "alcyoneus.runtime.adapters.llm.anyllm_converter",
+    "alcyoneus.runtime.adapters.llm.google_genai_converter",
+    "alcyoneus.runtime.adapters.llm.litellm_converter",
+    "alcyoneus.runtime.adapters.llm.model_response_converter",
+    "alcyoneus.runtime.adapters.llm.multi_provider",
+    "alcyoneus.runtime.adapters.llm.openai_converter",
+    "alcyoneus.runtime.adapters.llm.openai_responses_converter",
+    "alcyoneus.runtime.protocols.a2a.client",
+    "alcyoneus.runtime.protocols.a2a.executor",
+    "alcyoneus.runtime.protocols.acp",
+    "alcyoneus.runtime.publisher.publish",
+    "alcyoneus.sandbox.docker",
+    "alcyoneus.sandbox.k8s_sandbox",
+    "alcyoneus.sandbox.remote_file_sync",
+    "alcyoneus.sandbox.snapshot",
+    "alcyoneus.storage.checkpointer.conformance.base",
+    "alcyoneus.storage.checkpointer.in_memory_checkpointer",
+    "alcyoneus.storage.checkpointer.pg_checkpointer",
+    "alcyoneus.storage.checkpointer.sqlite_checkpointer",
+    "alcyoneus.storage.media.processor",
+    "alcyoneus.storage.sessions.sqlalchemy_session",
+    "alcyoneus.storage.store.base_store",
+    "alcyoneus.storage.store.embedding.google_embedding",
+    "alcyoneus.storage.store.long_term_memory",
+    "alcyoneus.storage.store.mem0_store",
+    "alcyoneus.storage.store.qdrant_store",
+    "alcyoneus.storage.store.store_schema",
+    "alcyoneus.utils.callbacks",
+    "alcyoneus.utils.shutdown",
+]
+ignore_errors = true
+
+[tool.pytest.ini_options]
+env = [
+    "ENVIRONMENT=pytest",
+]
+testpaths = [
+    "tests/",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
+# Only collect tests from the tests directory
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+# Exclude other directories from test discovery
+norecursedirs = [
+    "normal_tests",
+    "examples",
+    "docs",
+    ".git",
+    ".tox",
+    "dist",
+    "build",
+    "alcyoneus.egg-info",
+    "__pycache__",
+    ".venv"
+]
+addopts = [
+    "--cov=alcyoneus",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+    "--strict-markers",
+    "-v"
+]
+markers = [
+    "asyncio: mark test as async test",
+    "integration: mark test as integration test requiring real databases",
+    "slow: mark test as slow test that takes longer to run",
+]
+
+[tool.coverage.run]
+source = ["alcyoneus"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "normal_tests/*",
+    "examples/*",
+    "docs/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.pytest-env]
+ENVIRONMENT = "pytest"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "pytest-env>=1.1.5",
+    "pytest-xdist>=3.8.0",
+    "pytest-benchmark>=5.1.0",
+    "hypothesis>=6.100.0",
+    "pre-commit>=3.8.0",
+    "mypy>=1.11.0",
+    "types-PyYAML",
+    "asyncpg>=0.30.0",
+    "redis>=6.4.0",
+    "fastmcp>=2.12.3",
+    "mcp>=1.14.1",
+    "mem0ai>=0.1.117",
+    "google-genai>=1.56.0",
+    "a2a_sdk",
+    "aiohttp",
+    "python-semantic-release>=9.8.0"
+]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+tag_format = "v{version}"
+commit_parser = "conventional"
+build_command = "pip install build && python -m build"
+
+[tool.semantic_release.changelog]
+template_dir = "templates"
+changelog_file = "CHANGELOG.md"
+exclude_commit_patterns = []
+
+[tool.semantic_release.changelog.environment]
+block_start_string = "{%"
+block_end_string = "%}"
+variable_start_string = "{{"
+variable_end_string = "}}"
+comment_start_string = "{#"
+comment_end_string = "#}"
+trim_blocks = false
+lstrip_blocks = false
+newline_sequence = "\n"
+keep_trailing_newline = false
+
+[tool.semantic_release.branches.main]
+match = "(main|master)"
+prerelease_token = "rc"
+prerelease = false
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "style",
+    "refactor",
+    "test"
+]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf", "refactor"]
+

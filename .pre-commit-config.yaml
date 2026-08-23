@@ -1,0 +1,115 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        exclude: ^(tests|docs|examples)/
+      - id: trailing-whitespace
+        exclude: ^(tests|docs|examples)/
+      - id: check-added-large-files
+        args: [--maxkb=100]
+        exclude: ^(tests|docs|examples)/
+      - id: check-ast
+        exclude: ^(tests|docs|examples)/
+      - id: check-builtin-literals
+        exclude: ^(tests|docs|examples)/
+      - id: check-case-conflict
+        exclude: ^(tests|docs|examples)/
+      - id: check-docstring-first
+        exclude: ^(tests|docs|examples|alcyoneus/runtime/protocols)/
+      - id: check-merge-conflict
+        exclude: ^(tests|docs|examples)/
+      - id: debug-statements
+        exclude: ^(tests|docs|examples)/
+      - id: detect-private-key
+        exclude: ^(tests|docs|examples)/
+
+  # Secret scanning (BLOCKING): catches API keys, tokens, passwords, connection
+  # strings that detect-private-key misses. False positives on test fixtures
+  # can be allowlisted in .gitleaksignore
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.2
+    hooks:
+      - id: pyupgrade
+        exclude: ^(tests|docs|examples)/
+        args: [--py312-plus]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.3
+    hooks:
+      # Ruff does both formatting and linting in one pass. Non-blocking (report only).
+      - id: ruff
+        args: [--fix, --show-fixes]
+        exclude: ^(tests|docs|examples)/
+        verbose: true
+        entry: bash -c '.venv/bin/python -m ruff check --fix --show-fixes . || true'
+      # Optional: separate format-only check for CI (no --fix)
+      # - id: ruff-format
+      #   exclude: ^(tests|docs|examples)/
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.4
+    hooks:
+      - id: bandit
+        args: [-c, pyproject.toml]
+        additional_dependencies: ["bandit[toml]"]
+        exclude: ^(tests|docs|examples)/
+        verbose: true
+        entry: bash -c '.venv/bin/python -m bandit -c pyproject.toml -r . || true'
+
+  # Dependency vulnerability scans (non-blocking, report only).
+  # Local/system hooks: upstream manifests (pycqa/pip-audit 404s,
+  # pyupio/safety has broken .pre-commit-hooks.yaml) are unreliable;
+  # execution already runs from the project venv regardless.
+  - repo: local
+    hooks:
+      - id: pip-audit
+        name: pip-audit
+        entry: bash -c '.venv/bin/python -m pip_audit --desc --format=columns --progress-spinner=off || true'
+        language: system
+        pass_filenames: false
+        require_serial: true
+        verbose: true
+
+      - id: safety
+        name: safety
+        entry: bash -c '.venv/bin/python -m safety check --json || true'
+        language: system
+        pass_filenames: false
+        require_serial: true
+        verbose: true
+
+  # Run mypy from the project venv so it resolves real dependencies and honours
+  # the [tool.mypy] config in pyproject.toml. Checks the whole package once
+  # (pass_filenames: false) rather than per-file. Non-blocking (report only).
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: bash -c '.venv/bin/python -m mypy alcyoneus/ || true'
+        language: system
+        types: [python]
+        pass_filenames: false
+        require_serial: true
+        exclude: ^(tests|docs|examples|normal_tests)/
+        verbose: true
+
+  # Run the fast unit suite on push (report-only, matches repo convention).
+  # To make it blocking once the suite is green locally, remove "|| true".
+  # Full suite (coverage >= 80%, integration, slow) is left to CI.
+  - repo: local
+    hooks:
+      - id: pytest-fast
+        name: pytest (unit only)
+        entry: bash -c '.venv/bin/python -m pytest tests -m "not integration and not slow" -q --no-cov || true'
+        language: system
+        always_run: true
+        pass_filenames: false
+        require_serial: true
+        stages: [pre-push]
+        verbose: true
