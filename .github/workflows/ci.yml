@@ -1,4 +1,4 @@
-name: CI - Parallel Validation Suite
+name: CI - Multi-Platform Parallel Matrix
 
 on:
   pull_request:
@@ -16,11 +16,15 @@ env:
 
 jobs:
   # =========================================================================
-  # 1. QUICK SMOKE TEST (Fast fail check: imports, CLI, package metadata)
+  # 1. LIGHTNING SMOKE TEST (Fast fail check: imports, CLI, package health)
   # =========================================================================
   smoke-test:
-    name: ⚡ Smoke & Package Health
-    runs-on: ubuntu-latest
+    name: ⚡ Smoke & CLI Health (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -122,14 +126,15 @@ jobs:
         run: mypy alcyoneus
 
   # =========================================================================
-  # 5. PARALLEL TEST SUITE MATRIX (Divided into fast parallel slices)
+  # 5. PARALLEL MULTI-THREADED TEST SLICES (Multi-OS & Multi-Core xdist)
   # =========================================================================
   tests-core:
-    name: 🧪 Unit Tests: Core Graph & Agents (${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: 🧪 Core Graph & Agents (${{ matrix.os }} - Py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest]
         python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout Code
@@ -147,16 +152,17 @@ jobs:
           pip install .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist hypothesis
 
-      - name: Run Core & Graph Tests
+      - name: Run Core & Graph Tests (Parallel xdist)
         run: |
-          pytest -n auto tests/graph tests/test_multiagent.py tests/test_skills.py tests/test_all_new_features.py
+          pytest -n auto --dist=loadscope tests/graph tests/test_multiagent.py tests/test_skills.py tests/test_all_new_features.py
 
   tests-storage-and-memory:
-    name: 💾 Unit Tests: Storage & Checkpointers (${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: 💾 Storage & Checkpointers (${{ matrix.os }} - Py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest]
         python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout Code
@@ -174,16 +180,17 @@ jobs:
           pip install .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
 
-      - name: Run Storage & Checkpointer Tests
+      - name: Run Storage & Checkpointer Tests (Parallel xdist)
         run: |
-          pytest -n auto tests/checkpointer tests/storage tests/store tests/test_memory_management.py
+          pytest -n auto --dist=loadscope tests/checkpointer tests/storage tests/store tests/test_memory_management.py
 
   tests-multimodal-and-realtime:
-    name: 🎙️ Unit Tests: Multimodal & Realtime (${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: 🎙️ Multimodal & Audio (${{ matrix.os }} - Py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest]
         python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout Code
@@ -201,16 +208,17 @@ jobs:
           pip install .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
 
-      - name: Run Multimodal Tests
+      - name: Run Multimodal Tests (Parallel xdist)
         run: |
-          pytest -n auto tests/test_multimodal_*.py tests/realtime tests/test_converter.py tests/test_model_response_converter.py
+          pytest -n auto --dist=loadscope tests/test_multimodal_*.py tests/realtime tests/test_converter.py tests/test_model_response_converter.py
 
   tests-integration:
-    name: 🔗 Integration & Chaos Tests (${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: 🔗 Integration & Chaos (${{ matrix.os }} - Py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest]
         python-version: ["3.12", "3.13"]
     steps:
       - name: Checkout Code
@@ -228,9 +236,9 @@ jobs:
           pip install .
           pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
 
-      - name: Run Integration & Chaos Tests
+      - name: Run Integration & Chaos Tests (Parallel xdist)
         run: |
-          pytest -n auto tests/integration tests/chaos tests/test_checkpointer_integration.py
+          pytest -n auto --dist=loadscope tests/integration tests/chaos tests/test_checkpointer_integration.py
 
   # =========================================================================
   # 6. WHEEL & SOURCE DISTRIBUTION BUILD VERIFICATION

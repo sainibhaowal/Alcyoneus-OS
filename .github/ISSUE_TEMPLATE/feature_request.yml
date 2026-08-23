@@ -1,0 +1,31 @@
+name: 🚀 Feature Request
+description: Propose a new feature, LLM integration, or enhancement for Alcyoneus OS
+labels: ["enhancement", "feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We are thrilled to explore new capabilities for Alcyoneus OS!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem or use-case?
+      description: A clear and concise description of the motivation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution / API Design
+      description: Describe how the new API or behavior should look like.
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any other approaches or existing frameworks you've evaluated.
