@@ -1,9 +1,10 @@
 <div align="center">
   <img src="assets/svg/alcyoneus-logo.svg" alt="Alcyoneus OS Banner" style="width: 100%; max-width: 100%; display: block; border-radius: 12px; margin-bottom: 16px;" />
   <p>
-    <a href="https://github.com/sainibhaowal/Alcyoneus-OS/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/Release-v1.0.0-00F0FF?style=flat-square&logo=github" alt="Release" /></a>&nbsp;
-    <a href="https://github.com/sainibhaowal/Alcyoneus-OS"><img src="https://img.shields.io/badge/Python-3.12%20|%203.13-38BDF8?style=flat-square&logo=python" alt="Python Versions" /></a>&nbsp;
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-3B82F6?style=flat-square" alt="License: MIT" /></a>&nbsp;
+    <a href="https://pypi.org/project/alcyoneus/"><img src="https://img.shields.io/badge/PyPI-v1.0.0-00F0FF?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>&nbsp;
+    <a href="https://github.com/sainibhaowal/Alcyoneus-OS/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/Release-v1.0.0-38BDF8?style=flat-square&logo=github" alt="Release" /></a>&nbsp;
+    <a href="https://github.com/sainibhaowal/Alcyoneus-OS"><img src="https://img.shields.io/badge/Python-3.12%20|%203.13-3B82F6?style=flat-square&logo=python" alt="Python Versions" /></a>&nbsp;
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-6366F1?style=flat-square" alt="License: MIT" /></a>&nbsp;
     <a href="https://github.com/sainibhaowal/Alcyoneus-OS/actions"><img src="https://img.shields.io/badge/CI-Passing-10B981?style=flat-square&logo=github-actions" alt="CI Status" /></a>&nbsp;
     <a href="https://github.com/sainibhaowal/Alcyoneus-OS"><img src="https://img.shields.io/badge/Coverage-80%25-10B981?style=flat-square" alt="Coverage" /></a>
   </p>
@@ -321,6 +322,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Links
 
+- **PyPI Package**: https://pypi.org/project/alcyoneus/
 - **GitHub Repository**: https://github.com/sainibhaowal/Alcyoneus-OS
 - **Documentation**: [docs/QUICKSTART.md](docs/QUICKSTART.md)
 - **Examples**: [examples/](examples/)
