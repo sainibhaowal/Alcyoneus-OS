@@ -99,9 +99,12 @@ def _vertex_ai_search_sync(
 
 
 async def _http_get_json(url: str, headers: dict | None = None, params: dict | None = None) -> dict:
-    async with aiohttp.ClientSession() as sess, sess.get(
-        url, headers=headers, params=params, timeout=aiohttp.ClientTimeout(total=30)
-    ) as resp:
+    async with (
+        aiohttp.ClientSession() as sess,
+        sess.get(
+            url, headers=headers, params=params, timeout=aiohttp.ClientTimeout(total=30)
+        ) as resp,
+    ):
         return await resp.json()
 
 
@@ -204,16 +207,19 @@ async def _tavily_search(query: str, max_results: int, safe_search: bool) -> dic
     key = os.getenv("TAVILY_API_KEY")
     if not key:
         return {"error": "TAVILY_API_KEY not set"}
-    async with aiohttp.ClientSession() as sess, sess.post(
-        "https://api.tavily.com/search",
-        json={
-            "api_key": key,
-            "query": query,
-            "max_results": max_results,
-            "safe_search": safe_search,
-        },
-        timeout=aiohttp.ClientTimeout(total=30),
-    ) as resp:
+    async with (
+        aiohttp.ClientSession() as sess,
+        sess.post(
+            "https://api.tavily.com/search",
+            json={
+                "api_key": key,
+                "query": query,
+                "max_results": max_results,
+                "safe_search": safe_search,
+            },
+            timeout=aiohttp.ClientTimeout(total=30),
+        ) as resp,
+    ):
         data = await resp.json()
     results = []
     for v in data.get("results", []):

@@ -46,7 +46,7 @@
     <!-- Left Stanchion -->
     <polygon points="400,190 400,260 270,520 220,520"
              fill="url(#anodizedSteel)"/>
-    
+
     <!-- Right Stanchion -->
     <polygon points="400,190 400,260 530,520 580,520"
              fill="url(#darkArmor)"

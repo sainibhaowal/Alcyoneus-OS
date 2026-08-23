@@ -46,9 +46,7 @@ from .traces import Trace
 
 
 @contextlib.contextmanager
-def trace(
-    name: str = "agent_trace", metadata: dict[str, Any] | None = None
-) -> Generator[Trace]:
+def trace(name: str = "agent_trace", metadata: dict[str, Any] | None = None) -> Generator[Trace]:
     """Context manager to start and finish a Trace."""
     if is_tracing_disabled():
         t = Trace(name=name, metadata=metadata)

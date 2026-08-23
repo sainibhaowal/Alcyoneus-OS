@@ -142,7 +142,9 @@ class WaylandBackend(ComputerBackend):
     async def get_screen_info(self) -> ScreenInfo:
         # Use wlr-randr or parse grim output
         info = subprocess.run(
-            ["grim", "-g", "0,0+0+0", "/tmp/_grim_test.png"], capture_output=True, timeout=5  # noqa: S108,S607
+            ["grim", "-g", "0,0+0+0", "/tmp/_grim_test.png"],
+            capture_output=True,
+            timeout=5,  # noqa: S108,S607
         )
         if info.returncode == 0:
             try:
@@ -377,7 +379,9 @@ class AccessibilityBridge:
             import subprocess
 
             result = subprocess.run(
-                ["xdotool", "search", "--name", ""], capture_output=True, timeout=2  # noqa: S607
+                ["xdotool", "search", "--name", ""],
+                capture_output=True,
+                timeout=2,  # noqa: S607
             )
             if result.returncode == 0:
                 ids = result.stdout.decode().splitlines()

@@ -159,13 +159,13 @@ class SnapshotManager:
     async def hydrate_workspace(self, template: str | None = None, **kwargs: Any) -> bool:
         """Hydrate the sandbox workspace from a template or snapshot.
 
-        Args:
-            template: Workspace template name (looked up in
-WorkspaceCapability.workspace_templates).
-            **kwargs: Additional context for workspace hydration.
+                Args:
+                    template: Workspace template name (looked up in
+        WorkspaceCapability.workspace_templates).
+                    **kwargs: Additional context for workspace hydration.
 
-        Returns:
-            True if workspace was hydrated successfully.
+                Returns:
+                    True if workspace was hydrated successfully.
         """
         # If template provided, use it; otherwise use default workspace
         workdir = Path(self.sandbox.config.workdir)

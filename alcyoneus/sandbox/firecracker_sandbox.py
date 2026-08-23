@@ -34,7 +34,9 @@ class FirecrackerSandbox(BaseSandbox):
     """Firecracker microVM sandbox with resource isolation and snapshotting."""
 
     def __init__(
-        self, config: SandboxConfig | None = None, vm_dir: str = "/tmp/alcyoneus-vm"  # noqa: S108
+        self,
+        config: SandboxConfig | None = None,
+        vm_dir: str = "/tmp/alcyoneus-vm",  # noqa: S108
     ) -> None:
         super().__init__(config)
         self.vm_dir = Path(vm_dir)

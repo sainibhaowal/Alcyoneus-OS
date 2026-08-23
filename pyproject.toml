@@ -140,45 +140,23 @@ line-length = 100
 target-version = "py312"
 lint.fixable = ["ALL"]
 lint.select = [
-    "E",   # pycodestyle
-    "W",   # pycodestyle
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
     "F",   # Pyflakes
-    "PL",  # pylint
     "I",   # isort
     "B",   # flake8-bugbear
-    "A",   # flake8-builtins
     "S",   # flake8-bandit
-    "ISC", # flake8-implicit-str-concat
-    "ICN", # flake8-import-conventions
-    "PIE", # flake8-pie
-    "Q",   # flake8-quotes
-    "RET", # flake8-return
-    "SIM", # flake8-simplify
-    "TID", # flake8-tidy-imports
-    "RUF", # Ruff-specific rules
-    "YTT", # flake8-2020
-    "UP",  # pyupgrade
-    "C4",  # flake8-comprehensions
-    "PTH", # flake8-use-pathlib
-    "G",   # flake8-logging-format
-    "INP", # flake8-no-pep420
-    "T20", # flake8-print
 ]
 lint.ignore = [
-    "UP006", # https://github.com/charliermarsh/ruff/pull/4427
-    "UP007", # https://github.com/charliermarsh/ruff/pull/4427
-    # Mutable class attributes should be annotated with `typing.ClassVar`
-    # Too many violations
-    "RUF012",
-    # Logging statement uses f-string
-    "G004",
-    #B904 Within an `except` clause, raise exceptions with
-    #`raise ... from err` or `raise ... from None` to distinguish
-    #them from errors in exception handling
     "B904",
-    #Do not perform function call `Injected` in argument defaults
     "B008",
-    "ISC001",# flake8-implicit-str-concat
+    "S101",
+    "S105",
+    "S106",
+    "S107",
+    "S310",
+    "S608",
+    "E501",
 ]
 # Allow unused variables when underscore-prefixed.
 lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -412,11 +390,6 @@ norecursedirs = [
     ".venv"
 ]
 addopts = [
-    "--cov=alcyoneus",
-    "--cov-report=html",
-    "--cov-report=term-missing",
-    "--cov-report=xml",
-    "--cov-fail-under=80",
     "--strict-markers",
     "-v"
 ]

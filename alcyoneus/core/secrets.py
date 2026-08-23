@@ -564,7 +564,9 @@ class CompositeSecretManager(SecretManager):
             try:
                 return await backend.set_secret(key, value, metadata)
             except Exception as e:
-                logger.debug("Backend %s failed to set secret %s: %s", type(backend).__name__, key, e)  # noqa: E501
+                logger.debug(
+                    "Backend %s failed to set secret %s: %s", type(backend).__name__, key, e
+                )  # noqa: E501
                 continue
         raise SecretBackendError("No backend available for writing")
 
@@ -574,7 +576,9 @@ class CompositeSecretManager(SecretManager):
                 if await backend.delete_secret(key):
                     return True
             except Exception as e:
-                logger.debug("Backend %s failed to delete secret %s: %s", type(backend).__name__, key, e)  # noqa: E501
+                logger.debug(
+                    "Backend %s failed to delete secret %s: %s", type(backend).__name__, key, e
+                )  # noqa: E501
                 continue
         return False
 

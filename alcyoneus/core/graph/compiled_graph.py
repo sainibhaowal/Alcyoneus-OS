@@ -875,29 +875,29 @@ class CompiledGraph[StateT: AgentState]:
     ) -> AsyncIterator[dict[str, Any]]:
         """Stream graph execution as structured events (GraphRunStream v3).
 
-        This method yields structured event dictionaries compatible with
-        GraphRunStream v3 specification, including:
-        - Tool calls and approvals
-        - Handoff events
-        - Item streaming (messages, tool outputs, state updates)
-        - Node execution lifecycle
-        - Graph start/end events
+                This method yields structured event dictionaries compatible with
+                GraphRunStream v3 specification, including:
+                - Tool calls and approvals
+                - Handoff events
+                - Item streaming (messages, tool outputs, state updates)
+                - Node execution lifecycle
+                - Graph start/end events
 
-        Args:
-            input_data: Input dictionary for graph execution.
-            config: Optional configuration dictionary.
-            response_granularity: Level of detail in response.
-            stream_mode: Filter events by mode ("messages", "updates", "values",
-"events", "custom").
-            heartbeat_interval: Optional heartbeat interval in seconds.
-            debug: Override compile-time debug flag.
+                Args:
+                    input_data: Input dictionary for graph execution.
+                    config: Optional configuration dictionary.
+                    response_granularity: Level of detail in response.
+                    stream_mode: Filter events by mode ("messages", "updates", "values",
+        "events", "custom").
+                    heartbeat_interval: Optional heartbeat interval in seconds.
+                    debug: Override compile-time debug flag.
 
-        Yields:
-            Structured event dictionaries with type, timestamp, and payload.
+                Yields:
+                    Structured event dictionaries with type, timestamp, and payload.
 
-        Example:
-            async for event in graph.astream_events({"messages": [...]}):
-                print(event["type"], event["payload"])
+                Example:
+                    async for event in graph.astream_events({"messages": [...]}):
+                        print(event["type"], event["payload"])
         """
 
         self._guard_not_realtime()
@@ -1491,7 +1491,9 @@ class CompiledGraph[StateT: AgentState]:
         png_file = mmd_file.replace(".mmd", ".png")
         try:
             subprocess.run(  # noqa: S603
-                ["mmdc", "-i", mmd_file, "-o", png_file], check=True, capture_output=True  # noqa: S607
+                ["mmdc", "-i", mmd_file, "-o", png_file],
+                check=True,
+                capture_output=True,  # noqa: S607
             )
             with open(png_file, "rb") as f:
                 png_data = f.read()

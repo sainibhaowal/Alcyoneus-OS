@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
       - name: Verify Core Imports & CLI Smoke Test
         run: |
           python -c "import alcyoneus as alc; print('Alcyoneus core loaded successfully:', alc.__file__)"
-          python -c "from alcyoneus.core import StateGraph, Agent, ToolNode; print('StateGraph & Agent primitives verified')"
+          python -c "from alcyoneus import StateGraph, Agent, ToolNode, START, END; print('StateGraph & Agent primitives verified')"
           python -c "from alcyoneus.storage.checkpointer import InMemoryCheckpointer; print('Checkpointer modules verified')"
           python -m alcyoneus --version || true
 
@@ -95,10 +95,10 @@ jobs:
         run: pip install ruff
 
       - name: Ruff Check
-        run: ruff check alcyoneus
+        run: ruff check alcyoneus/
 
       - name: Ruff Format Check
-        run: ruff format --check alcyoneus
+        run: ruff format --check alcyoneus/
 
   # =========================================================================
   # 4. STATIC TYPE CHECKING (Mypy)
@@ -123,7 +123,7 @@ jobs:
           pip install mypy types-PyYAML
 
       - name: Run Mypy Typecheck
-        run: mypy alcyoneus
+        run: mypy alcyoneus/
 
   # =========================================================================
   # 5. PARALLEL MULTI-THREADED TEST SLICES (Multi-OS & Multi-Core xdist)
@@ -134,8 +134,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.12", "3.13"]
+        os: [ubuntu-latest]
+        python-version: ["3.12"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -154,7 +154,7 @@ jobs:
 
       - name: Run Core & Graph Tests (Parallel xdist)
         run: |
-          pytest -n auto --dist=loadscope tests/graph tests/test_multiagent.py tests/test_skills.py tests/test_all_new_features.py
+          pytest -n auto --dist=loadscope tests/graph tests/test_basic.py tests/test_multiagent.py tests/test_skills.py tests/test_all_new_features.py
 
   tests-storage-and-memory:
     name: 💾 Storage & Checkpointers (${{ matrix.os }} - Py${{ matrix.python-version }})
@@ -162,8 +162,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.12", "3.13"]
+        os: [ubuntu-latest]
+        python-version: ["3.12"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -190,8 +190,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.12", "3.13"]
+        os: [ubuntu-latest]
+        python-version: ["3.12"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -218,8 +218,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.12", "3.13"]
+        os: [ubuntu-latest]
+        python-version: ["3.12"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

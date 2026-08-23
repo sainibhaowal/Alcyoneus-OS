@@ -44,19 +44,22 @@ async def _openai_dalle(request: dict[str, Any]) -> list[dict]:
     count = min(request.get("count", 1), 10)
     quality = request.get("quality", "standard")
     style = request.get("style", "vivid")
-    async with aiohttp.ClientSession() as sess, sess.post(
-        "https://api.openai.com/v1/images/generations",
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json={
-            "model": model,
-            "prompt": request["prompt"],
-            "n": count,
-            "size": size,
-            "quality": quality,
-            "style": style,
-        },
-        timeout=aiohttp.ClientTimeout(total=120),
-    ) as resp:
+    async with (
+        aiohttp.ClientSession() as sess,
+        sess.post(
+            "https://api.openai.com/v1/images/generations",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": model,
+                "prompt": request["prompt"],
+                "n": count,
+                "size": size,
+                "quality": quality,
+                "style": style,
+            },
+            timeout=aiohttp.ClientTimeout(total=120),
+        ) as resp,
+    ):
         data = await resp.json()
     outputs = []
     for item in data.get("data", []):

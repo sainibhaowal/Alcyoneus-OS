@@ -135,16 +135,16 @@ def computer_use(
 ) -> dict[str, Any]:
     """Executes OS computer GUI interaction.
 
-    Args:
-        action: The GUI action to perform (screenshot, mouse_move,
-left_click, type, key_press, etc.).
-        coordinate: Optional (x, y) pixel coordinate tuple.
-        text: Optional text string for typing action.
-        key: Optional key name for key press action (e.g. 'Return', 'BackSpace', 'Tab').
-        scroll_amount: Optional integer scroll amount (positive for up, negative for down).
+        Args:
+            action: The GUI action to perform (screenshot, mouse_move,
+    left_click, type, key_press, etc.).
+            coordinate: Optional (x, y) pixel coordinate tuple.
+            text: Optional text string for typing action.
+            key: Optional key name for key press action (e.g. 'Return', 'BackSpace', 'Tab').
+            scroll_amount: Optional integer scroll amount (positive for up, negative for down).
 
-    Returns:
-        Dict containing action result status and optional screenshot base64.
+        Returns:
+            Dict containing action result status and optional screenshot base64.
     """
     try:
         pa = _load_pyautogui()

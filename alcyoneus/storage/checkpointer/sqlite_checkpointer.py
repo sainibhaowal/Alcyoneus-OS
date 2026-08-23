@@ -409,10 +409,7 @@ checkpoint_metadata, created_at, run_id)
                 ")"
             )
             conn.execute(query, (config.get("thread_id", ""), *run_ids))
-            query = (
-                "DELETE FROM checkpoints "
-                f"WHERE thread_id = ? AND run_id IN ({placeholders})"
-            )
+            query = f"DELETE FROM checkpoints WHERE thread_id = ? AND run_id IN ({placeholders})"
             conn.execute(query, (config.get("thread_id", ""), *run_ids))
             conn.commit()
         return len(run_ids)
