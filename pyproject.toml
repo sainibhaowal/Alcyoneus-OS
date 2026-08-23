@@ -1,6 +1,6 @@
 [project]
 name = "alcyoneus"
-version = "1.0.0"
+version = "0.0.1"
 description = "Alcyoneus OS: Production-grade Python operating system & framework for building, orchestrating, and deploying multi-agent LLM systems."
 readme = "README.md"
 keywords = [
@@ -469,5 +469,51 @@ dev = [
     "mem0ai>=0.1.117",
     "google-genai>=1.56.0",
     "a2a_sdk",
-    "aiohttp"
+    "aiohttp",
+    "python-semantic-release>=9.8.0"
 ]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+tag_format = "v{version}"
+commit_parser = "conventional"
+build_command = "pip install build && python -m build"
+
+[tool.semantic_release.changelog]
+template_dir = "templates"
+changelog_file = "CHANGELOG.md"
+exclude_commit_patterns = []
+
+[tool.semantic_release.changelog.environment]
+block_start_string = "{%"
+block_end_string = "%}"
+variable_start_string = "{{"
+variable_end_string = "}}"
+comment_start_string = "{#"
+comment_end_string = "#}"
+trim_blocks = false
+lstrip_blocks = false
+newline_sequence = "\n"
+keep_trailing_newline = false
+
+[tool.semantic_release.branches.main]
+match = "(main|master)"
+prerelease_token = "rc"
+prerelease = false
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "style",
+    "refactor",
+    "test"
+]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf", "refactor"]
+

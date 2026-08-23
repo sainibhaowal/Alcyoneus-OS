@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------
+  # Parallel Job 1: Secret scanning
+  # -------------------------------------------------------------
+  secrets-scan:
+    name: 🛡️ Secret Scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # -------------------------------------------------------------
+  # Parallel Job 2: Ruff Linting & Formatting Check
+  # -------------------------------------------------------------
+  lint-and-format:
+    name: ⚡ Lint & Code Style (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Ruff Check
+        run: ruff check .
+
+      - name: Ruff Format Check
+        run: ruff format --check .
+
+  # -------------------------------------------------------------
+  # Parallel Job 3: Static Type Checking
+  # -------------------------------------------------------------
+  type-check:
+    name: 🔬 Type Check (Mypy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Dependencies & Mypy
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install mypy types-PyYAML
+
+      - name: Run Mypy
+        run: mypy alcyoneus
+
+  # -------------------------------------------------------------
+  # Parallel Job 4: Fast Matrix Unit & Integration Tests
+  # -------------------------------------------------------------
+  tests:
+    name: 🧪 Test Suite (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Package & Test Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist hypothesis
+
+      - name: Run Parallel Tests (pytest-xdist)
+        run: |
+          pytest -n auto --cov=alcyoneus --cov-report=xml tests/
+
+      - name: Upload Coverage Report
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml

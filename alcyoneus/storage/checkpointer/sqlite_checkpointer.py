@@ -401,18 +401,18 @@ checkpoint_metadata, created_at, run_id)
             await self._ensure_setup()
             conn = await self._get_conn()
             placeholders = ",".join("?" for _ in run_ids)
-            query = (  # noqa: S608
+            query = (
                 "DELETE FROM checkpoint_writes "
                 "WHERE checkpoint_id IN ("
                 "    SELECT checkpoint_id FROM checkpoints "
-                "    WHERE thread_id = ? AND run_id IN ({placeholders})"
+                f"    WHERE thread_id = ? AND run_id IN ({placeholders})"
                 ")"
-            ).format(placeholders=placeholders)
+            )
             conn.execute(query, (config.get("thread_id", ""), *run_ids))
-            query = (  # noqa: S608
+            query = (
                 "DELETE FROM checkpoints "
-                "WHERE thread_id = ? AND run_id IN ({placeholders})"
-            ).format(placeholders=placeholders)
+                f"WHERE thread_id = ? AND run_id IN ({placeholders})"
+            )
             conn.execute(query, (config.get("thread_id", ""), *run_ids))
             conn.commit()
         return len(run_ids)
