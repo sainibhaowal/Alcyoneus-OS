@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#0d1127"/>
+      <stop offset="45%" stop-color="#060913"/>
+      <stop offset="100%" stop-color="#020307"/>
+    </radialGradient>
+
+    <!-- Core Energy Gradients -->
+    <linearGradient id="cyanPlasma" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f6ff"/>
+      <stop offset="50%" stop-color="#00a3ff"/>
+      <stop offset="100%" stop-color="#7000ff"/>
+    </linearGradient>
+
+    <linearGradient id="neonViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d946ef"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+
+    <linearGradient id="goldTitan" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+
+    <!-- Neon Glow Filters -->
+    <filter id="superGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur1"/>
+      <feGaussianBlur stdDeviation="24" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="coreGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="35" result="coreBlur"/>
+      <feMerge>
+        <feMergeNode in="coreBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="800" rx="160" fill="url(#bgGlow)"/>
+
+  <!-- Cybernetic Grid Backdrop -->
+  <g stroke="rgba(0, 246, 255, 0.05)" stroke-width="1.5">
+    <circle cx="400" cy="400" r="340" fill="none" stroke-dasharray="4 8"/>
+    <circle cx="400" cy="400" r="280" fill="none"/>
+    <circle cx="400" cy="400" r="220" fill="none" stroke-dasharray="2 6"/>
+    <line x1="400" y1="60" x2="400" y2="740"/>
+    <line x1="60" y1="400" x2="740" y2="400"/>
+    <line x1="160" y1="160" x2="640" y2="640" stroke-dasharray="3 7"/>
+    <line x1="640" y1="160" x2="160" y2="640" stroke-dasharray="3 7"/>
+  </g>
+
+  <!-- Orbital Cyber Rings -->
+  <g transform="rotate(45 400 400)" filter="url(#superGlow)">
+    <ellipse cx="400" cy="400" rx="310" ry="110" fill="none" stroke="url(#cyanPlasma)" stroke-width="3" opacity="0.6"/>
+    <ellipse cx="400" cy="400" rx="310" ry="110" fill="none" stroke="#00f6ff" stroke-width="4" stroke-dasharray="40 180" stroke-linecap="round"/>
+  </g>
+
+  <g transform="rotate(-45 400 400)" filter="url(#superGlow)">
+    <ellipse cx="400" cy="400" rx="310" ry="110" fill="none" stroke="url(#neonViolet)" stroke-width="3" opacity="0.6"/>
+    <ellipse cx="400" cy="400" rx="310" ry="110" fill="none" stroke="#d946ef" stroke-width="4" stroke-dasharray="50 160" stroke-linecap="round"/>
+  </g>
+
+  <!-- Outer Hexagonal Quantum Armor -->
+  <polygon points="400,120 642,260 642,540 400,680 158,540 158,260"
+           fill="none"
+           stroke="url(#cyanPlasma)"
+           stroke-width="4"
+           stroke-linejoin="round"
+           filter="url(#superGlow)"
+           opacity="0.9"/>
+
+  <!-- Inner Concentric Hexagon Shield -->
+  <polygon points="400,170 599,285 599,515 400,630 201,515 201,285"
+           fill="rgba(6, 11, 28, 0.6)"
+           stroke="url(#neonViolet)"
+           stroke-width="2.5"
+           stroke-linejoin="round"/>
+
+  <!-- Alcyoneus 'A' Futuristic Monogram Prism Core -->
+  <g filter="url(#coreGlow)">
+    <!-- Central Ethereal Core Glow -->
+    <circle cx="400" cy="400" r="100" fill="url(#cyanPlasma)" opacity="0.25"/>
+
+    <!-- Left Titan Blade -->
+    <path d="M 400,200 L 250,560 L 315,560 L 365,435 L 400,435 Z"
+          fill="url(#cyanPlasma)"
+          stroke="#00f6ff"
+          stroke-width="1.5"/>
+
+    <!-- Right Titan Blade -->
+    <path d="M 400,200 L 550,560 L 485,560 L 435,435 L 400,435 Z"
+          fill="url(#neonViolet)"
+          stroke="#d946ef"
+          stroke-width="1.5"/>
+
+    <!-- Quantum Core Diamond Prism -->
+    <polygon points="400,260 450,370 400,480 350,370"
+             fill="url(#goldTitan)"
+             stroke="#ffffff"
+             stroke-width="2"
+             filter="url(#superGlow)"/>
+
+    <!-- Neural Apex Crystal -->
+    <polygon points="400,220 425,275 400,310 375,275"
+             fill="#ffffff"
+             opacity="0.95"/>
+  </g>
+
+  <!-- High-Tech Node Data Vertices -->
+  <g fill="#00f6ff" filter="url(#superGlow)">
+    <circle cx="400" cy="120" r="7" fill="#ffffff" stroke="#00f6ff" stroke-width="3"/>
+    <circle cx="642" cy="260" r="6" fill="#00f6ff"/>
+    <circle cx="642" cy="540" r="6" fill="#8b5cf6"/>
+    <circle cx="400" cy="680" r="7" fill="#ffffff" stroke="#d946ef" stroke-width="3"/>
+    <circle cx="158" cy="540" r="6" fill="#8b5cf6"/>
+    <circle cx="158" cy="260" r="6" fill="#00f6ff"/>
+  </g>
+
+  <!-- Ambient Micro Light Highlights -->
+  <circle cx="400" cy="370" r="16" fill="#ffffff" filter="url(#superGlow)"/>
+  <circle cx="400" cy="370" r="6" fill="#00f6ff"/>
+</svg>
