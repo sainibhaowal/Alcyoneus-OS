@@ -321,10 +321,10 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Links
 
-- **Documentation**: https://alcyoneus-os.github.io/alcyoneus/
-- **GitHub**: https://github.com/alcyoneus-os/alcyoneus
-- **PyPI**: https://pypi.org/project/alcyoneus
-- **Examples**: https://github.com/alcyoneus-os/alcyoneus/tree/main/examples
+- **GitHub Repository**: https://github.com/sainibhaowal/Alcyoneus-OS
+- **Documentation**: [docs/QUICKSTART.md](docs/QUICKSTART.md)
+- **Examples**: [examples/](examples/)
+- **License**: [LICENSE](LICENSE)
 
 ---
 
