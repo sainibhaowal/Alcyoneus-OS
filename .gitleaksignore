@@ -4,11 +4,14 @@
 #
 # NOTE: only add entries after confirming the finding is a false positive.
 
-# False positive: generic-api-key trips on "expiration=123" kwarg in test (no secret present)
+# False positive: generic-api-key trips on dummy media hash in test (no secret present)
 753149ff0ed4972a190710088eeb45e545f3a385:tests/test_cloud_media_store.py:generic-api-key:233
+a84bb5c8c46d2a5ad9e07ae8145f14aa4b92d125:tests/test_cloud_media_store.py:generic-api-key:233
 
 # False positive: same pattern
 753149ff0ed4972a190710088eeb45e545f3a385:tests/test_cloud_media_store.py:generic-api-key:239
+a84bb5c8c46d2a5ad9e07ae8145f14aa4b92d125:tests/test_cloud_media_store.py:generic-api-key:239
 
 # False positive: docs example - SecretId is an AWS secret NAME ("alcyoneus/prod"), not a value
 753149ff0ed4972a190710088eeb45e545f3a385:docs/DEPLOYMENT.md:generic-api-key:326
+a84bb5c8c46d2a5ad9e07ae8145f14aa4b92d125:docs/DEPLOYMENT.md:generic-api-key:326

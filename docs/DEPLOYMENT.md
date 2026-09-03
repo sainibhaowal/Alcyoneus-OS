@@ -323,7 +323,7 @@ OPENAI_API_KEY = secret["data"]["data"]["OPENAI_API_KEY"]
 import boto3
 
 client = boto3.client("secretsmanager", region_name="us-east-1")
-secret = client.get_secret_value(SecretId="alcyoneus/prod")
+secret = client.get_secret_value(SecretId="alcyoneus/prod")  # gitleaks:allow
 config = json.loads(secret["SecretString"])
 ```
 

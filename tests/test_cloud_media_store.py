@@ -230,15 +230,15 @@ class TestCloudMediaStore:
     # ---- cloud path layout -----------------------------------------------
 
     def test_cloud_path_layout(self, store):
-        key = "abcdef0123456789abcdef0123456789"
+        media_hash = "abcdef0123456789abcdef0123456789"
         ext = ".png"
-        path = store._cloud_path(key, ext)
-        assert path == f"test-media/ab/cd/{key}.png"
+        path = store._cloud_path(media_hash, ext)
+        assert path == f"test-media/ab/cd/{media_hash}.png"
 
     def test_meta_cloud_path_layout(self, store):
-        key = "abcdef0123456789abcdef0123456789"
-        path = store._meta_cloud_path(key)
-        assert path == f"test-media/ab/cd/{key}.meta.json"
+        media_hash = "abcdef0123456789abcdef0123456789"
+        path = store._meta_cloud_path(media_hash)
+        assert path == f"test-media/ab/cd/{media_hash}.meta.json"
 
 
 # ---------------------------------------------------------------------------

@@ -141,3 +141,19 @@ jobs:
             echo "⚠️ PYPI_API_TOKEN secret not set in GitHub repository settings. Skipping PyPI upload."
             echo "👉 Add your PyPI token to Settings -> Secrets and variables -> Actions to enable 1-click PyPI publishing."
           fi
+
+  # =========================================================================
+  # 4. NOTIFY WEB DEPLOYMENT & LOG RELEASE
+  # =========================================================================
+  notify-web-release:
+    name: 🌐 Web Release Sync & Summary
+    needs: [release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release Summary
+        run: |
+          echo "========================================================"
+          echo "🎉 Alcyoneus OS Release completed successfully!"
+          echo "🌐 Alcyoneus Web is configured with dynamic PyPI release capture."
+          echo "👉 Run the 'Deploy to VPS' workflow in Alcyoneus Web to update production containers."
+          echo "========================================================"

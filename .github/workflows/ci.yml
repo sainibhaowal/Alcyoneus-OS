@@ -145,8 +145,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist hypothesis
+          pip install -e ".[testing]"
 
       - name: Run Core & Graph Tests (Parallel xdist)
         run: |
@@ -172,8 +171,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
+          pip install -e ".[testing]"
 
       - name: Run Storage & Checkpointer Tests (Parallel xdist)
         run: |
@@ -199,8 +197,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
+          pip install -e ".[testing]"
 
       - name: Run Multimodal Tests (Parallel xdist)
         run: |
@@ -226,8 +223,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest pytest-asyncio pytest-cov pytest-env pytest-xdist
+          pip install -e ".[testing]"
 
       - name: Run Integration & Chaos Tests (Parallel xdist)
         run: |

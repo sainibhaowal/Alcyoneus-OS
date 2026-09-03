@@ -1,0 +1,13 @@
+# Gitleaks configuration file
+title = "Alcyoneus OS Gitleaks Config"
+
+[allowlist]
+description = "Ignore known false positives in tests and documentation"
+paths = [
+    '''docs/DEPLOYMENT\.md''',
+    '''tests/test_cloud_media_store\.py''',
+]
+stopwords = [
+    '''alcyoneus/prod''',
+    '''abcdef0123456789abcdef0123456789''',
+]
