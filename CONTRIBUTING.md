@@ -109,4 +109,4 @@ dependency. See `alcyoneus/core/llm/client_factory.py` for the pattern.
 ## License
 
 By contributing, you agree that your contributions are licensed under the
-project's [MIT License](LICENSE).
+project's [Apache 2.0 License](LICENSE).

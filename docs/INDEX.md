@@ -54,4 +54,4 @@ StateGraph → add_node() → add_edge() → compile() → invoke()
 
 ## Version
 
-**Alcyoneus OS v1.0.1** — Package: `pip install alcyoneus`
+**Alcyoneus OS v1.1.0** — Apache 2.0 Licensed — Package: `pip install alcyoneus`

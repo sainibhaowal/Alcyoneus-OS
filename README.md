@@ -1,10 +1,10 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/sainibhaowal/Alcyoneus-OS/main/assets/png/alcyoneus_banner_1200x320.png" alt="Alcyoneus OS Banner" width="100%" />
   <p>
-    <a href="https://pypi.org/project/alcyoneus/"><img src="https://img.shields.io/badge/PyPI-v1.0.0-00F0FF?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>&nbsp;
-    <a href="https://github.com/sainibhaowal/Alcyoneus-OS/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/Release-v1.0.0-38BDF8?style=flat-square&logo=github" alt="Release" /></a>&nbsp;
+    <a href="https://pypi.org/project/alcyoneus/"><img src="https://img.shields.io/badge/PyPI-v1.1.0-00F0FF?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>&nbsp;
+    <a href="https://github.com/sainibhaowal/Alcyoneus-OS/releases/tag/v1.1.0"><img src="https://img.shields.io/badge/Release-v1.1.0-38BDF8?style=flat-square&logo=github" alt="Release" /></a>&nbsp;
     <a href="https://github.com/sainibhaowal/Alcyoneus-OS"><img src="https://img.shields.io/badge/Python-3.12%20|%203.13-3B82F6?style=flat-square&logo=python" alt="Python Versions" /></a>&nbsp;
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-6366F1?style=flat-square" alt="License: MIT" /></a>&nbsp;
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-6366F1?style=flat-square" alt="License: Apache 2.0" /></a>&nbsp;
     <a href="https://github.com/sainibhaowal/Alcyoneus-OS/actions"><img src="https://img.shields.io/badge/CI-Passing-10B981?style=flat-square&logo=github-actions" alt="CI Status" /></a>&nbsp;
     <a href="https://github.com/sainibhaowal/Alcyoneus-OS"><img src="https://img.shields.io/badge/Coverage-80%25-10B981?style=flat-square" alt="Coverage" /></a>
   </p>
@@ -316,7 +316,7 @@ mypy alcyoneus/
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+Apache License 2.0 - see [LICENSE](LICENSE) for details.
 
 ---
 
