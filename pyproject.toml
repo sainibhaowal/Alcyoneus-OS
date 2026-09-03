@@ -1,6 +1,6 @@
 [project]
 name = "alcyoneus"
-version = "1.1.0"
+version = "1.1.1"
 description = "Alcyoneus OS: Production-grade Python operating system & framework for building, orchestrating, and deploying multi-agent LLM systems."
 readme = "README.md"
 keywords = [
