@@ -100,7 +100,8 @@ class MockAsyncMem0:
 @pytest.fixture()
 def store():
     mock_instance = MockAsyncMem0()
-    with patch("alcyoneus.storage.store.mem0_store.AsyncMemory") as mock_class:
+    with patch("alcyoneus.storage.store.mem0_store.HAS_MEM0", True), \
+         patch("alcyoneus.storage.store.mem0_store.AsyncMemory") as mock_class:
         # Mock the from_config class method to return our mock instance
         async def mock_from_config(config):
             return mock_instance
