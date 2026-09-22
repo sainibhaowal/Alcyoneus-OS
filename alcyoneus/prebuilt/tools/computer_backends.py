@@ -74,7 +74,7 @@ class X11Backend(ComputerBackend):
     """X11 backend using pyautogui."""
 
     def __init__(self) -> None:
-        self._pa = None
+        self._pa: Any = None
 
     async def initialize(self) -> None:
         import pyautogui
@@ -246,7 +246,7 @@ class VNCBackend(ComputerBackend):
         self.host = host
         self.port = port
         self.password = password
-        self._client = None
+        self._client: Any = None
 
     async def initialize(self) -> None:
         try:

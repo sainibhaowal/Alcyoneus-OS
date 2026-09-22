@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from alcyoneus.core.graph.tool_node import ToolNode
 
@@ -18,6 +18,7 @@ logger = logging.getLogger("alcyoneus.agent")
 class AgentMemoryMixin:
     """Memory registration helpers for Agent."""
 
+    system_prompt: list[Any]
     _memory_config: MemoryConfig | None
     _memory_integration: Any | None
     _memory_prompt: dict[str, Any] | None
@@ -119,7 +120,7 @@ class AgentMemoryMixin:
             return []
 
         sections: list[str] = []
-        scopes = [
+        scopes: list[tuple[str, Literal["user", "agent"], Any]] = [
             ("User memory", "user", memory.user_memory),
             ("Agent memory", "agent", memory.agent_memory),
         ]

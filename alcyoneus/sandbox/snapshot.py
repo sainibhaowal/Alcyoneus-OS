@@ -114,7 +114,7 @@ class SnapshotManager:
             description=spec.description,
             created_at=created_at,
             path=f".snapshots/{snapshot_id}.json",
-            metadata=snapshot_data["metadata"],
+            metadata=spec.metadata,
         )
 
     async def restore(self, spec: SnapshotSpec | str) -> bool:

@@ -6,17 +6,17 @@ from typing import Any, TypeVar
 from collections.abc import Callable
 
 try:
-    from injectq import inject, Inject
+    from injectq import Inject, inject
 except ImportError:
 
-    def inject(fn=None):
+    def inject(fn: Any = None) -> Any:  # type: ignore[no-redef]
         return fn if fn else lambda f: f
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: Any = _DummyInject()  # type: ignore[misc,assignment,no-redef]
 
 
 from alcyoneus.core.exceptions import GraphRecursionError
@@ -68,7 +68,7 @@ class InvokeHandler[StateT: AgentState](
         interrupt_before: list[str] | None = None,
         interrupt_after: list[str] | None = None,
         get_node_factory: Callable[[str], Node] | None = None,
-        callback_mgr: CallbackManager = Inject[CallbackManager],
+        callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
     ):
         self.nodes: dict[str, Node] = nodes
         self.edges: list[Edge] = edges

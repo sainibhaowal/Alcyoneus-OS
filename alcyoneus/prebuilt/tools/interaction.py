@@ -96,12 +96,14 @@ async def ask_question(
         "allow_freeform": allow_freeform,
         "run_id": (config or {}).get("run_id") or (config or {}).get("thread_id"),
     }
+    answer: Any
     if isinstance(broker, HumanQuestionBroker):
         answer = broker.ask(request)
     else:
         answer = broker(request)
     if inspect.isawaitable(answer):
         answer = await answer
+    payload: dict[str, Any]
     if isinstance(answer, dict):
         payload = answer
     else:

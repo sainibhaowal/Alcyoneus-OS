@@ -64,17 +64,17 @@ class CodexAgent:
 
         self.history.append({"role": "user", "content": instruction})
 
-        prompt_messages = [
-            {
-                "role": "system",
-                "content": f"You are Codex, an expert autonomous coding agent working in directory {opt.workdir}.",  # noqa: E501
-            },
-            *self.history,
-        ]
+        system_prompt = (
+            f"You are Codex, an expert autonomous coding agent working in directory {opt.workdir}."
+        )
 
         try:
-            llm_res = await call_llm(prompt_messages, model=self.options.model)
-            reply = llm_res.get("content", str(llm_res))
+            res_tuple = await call_llm(
+                self.options.model,
+                instruction,
+                system_prompt=system_prompt,
+            )
+            reply = res_tuple[0]
         except Exception as err:
             logger.debug("Codex LLM call offline fallback (%s)", err)
             reply = f"Codex processed task: '{instruction}' using workspace {opt.workdir}"

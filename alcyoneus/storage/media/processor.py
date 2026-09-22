@@ -175,6 +175,8 @@ class MediaProcessor:
         except ImportError:
             return None
 
+        if not block.media.data_base64:
+            return None
         raw = base64.b64decode(block.media.data_base64)
         try:
             return Image.open(io.BytesIO(raw))
@@ -211,8 +213,10 @@ class MediaProcessor:
         except ImportError:
             return block
 
+        if not block.media.data_base64:
+            return block
         raw = base64.b64decode(block.media.data_base64)
-        img = Image.open(io.BytesIO(raw))
+        img: Any = Image.open(io.BytesIO(raw))
 
         if img.width <= max_dim and img.height <= max_dim:
             return block
@@ -263,8 +267,10 @@ class MediaProcessor:
         except ImportError:
             return block
 
+        if not block.media.data_base64:
+            return block
         raw = base64.b64decode(block.media.data_base64)
-        img = Image.open(io.BytesIO(raw))
+        img: Any = Image.open(io.BytesIO(raw))
 
         if target_format.upper() == "JPEG" and img.mode in ("RGBA", "P", "LA"):
             img = img.convert("RGB")

@@ -5,6 +5,8 @@ for all agents - both production and test agents. This allows swapping between
 Agent and TestAgent seamlessly for testability.
 """
 
+from __future__ import annotations
+
 import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -46,12 +48,15 @@ class BaseAgent(ABC):
         ```
     """
 
+    tool_node_name: str | None = None
+    _tool_node: ToolNode | None = None
+
     def __init__(
         self,
         model: str,
         provider: str | None = None,
         system_prompt: list[dict[str, Any]] | None = None,
-        tool_node: "str | ToolNode | None" = None,
+        tool_node: str | ToolNode | None = None,
         extra_messages: list[Message] | None = None,
         client: Any = None,  # Escape hatch: allow custom client
         base_url: str | None = None,  # For OpenAI-compatible APIs (ollama, vllm, etc.)
@@ -113,7 +118,7 @@ class BaseAgent(ABC):
             LLM response (format depends on implementation)
         """
 
-    def get_tool_node(self) -> "ToolNode | None":
+    def get_tool_node(self) -> ToolNode | None:
         """Return the agent's internal ToolNode, or None if not configured.
 
         Use this instead of accessing ``agent._tool_node`` directly when you

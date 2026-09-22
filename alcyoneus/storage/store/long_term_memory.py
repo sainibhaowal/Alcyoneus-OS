@@ -65,7 +65,7 @@ from typing import TYPE_CHECKING, Any, Literal
 try:
     from injectq import InjectQ
 except ImportError:
-    InjectQ = Any
+    InjectQ = Any  # type: ignore[misc,assignment]
 
 
 from alcyoneus.core.state import AgentState, Message
@@ -439,9 +439,9 @@ def create_memory_preload_node(
             return []
 
         lines = []
-        for r in results:
-            score_str = f" (relevance: {r.score:.2f})" if r.score else ""
-            lines.append(f"- {r.content}{score_str}")
+        for mem in results:
+            score_str = f" (relevance: {mem.score:.2f})" if mem.score else ""
+            lines.append(f"- {mem.content}{score_str}")
         memory_text = system_prompt_template.format(memories="\n".join(lines))
 
         return [Message.text_message(memory_text, role="system")]

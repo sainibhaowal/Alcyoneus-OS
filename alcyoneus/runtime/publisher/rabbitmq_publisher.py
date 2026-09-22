@@ -96,7 +96,9 @@ class RabbitMQPublisher(BasePublisher):
                 timeout=self.connection_timeout,
                 heartbeat=self.heartbeat,
             )
+            assert self._conn is not None
             self._channel = await self._conn.channel()
+            assert self._channel is not None
 
             if self.declare:
                 ex_type = getattr(

@@ -1,12 +1,12 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/sainibhaowal/Alcyoneus-OS/main/assets/png/alcyoneus_banner_1200x320.png" alt="Alcyoneus OS Banner" width="100%" />
   <p>
-    <a href="https://pypi.org/project/alcyoneus/"><img src="https://img.shields.io/badge/PyPI-v1.1.0-00F0FF?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>&nbsp;
-    <a href="https://github.com/sainibhaowal/Alcyoneus-OS/releases/tag/v1.1.0"><img src="https://img.shields.io/badge/Release-v1.1.0-38BDF8?style=flat-square&logo=github" alt="Release" /></a>&nbsp;
+    <a href="https://pypi.org/project/alcyoneus/"><img src="https://img.shields.io/badge/PyPI-v1.2.0-00F0FF?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>&nbsp;
+    <a href="https://github.com/sainibhaowal/Alcyoneus-OS/releases/tag/v1.2.0"><img src="https://img.shields.io/badge/Release-v1.2.0-38BDF8?style=flat-square&logo=github" alt="Release" /></a>&nbsp;
     <a href="https://github.com/sainibhaowal/Alcyoneus-OS"><img src="https://img.shields.io/badge/Python-3.12%20|%203.13-3B82F6?style=flat-square&logo=python" alt="Python Versions" /></a>&nbsp;
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-6366F1?style=flat-square" alt="License: Apache 2.0" /></a>&nbsp;
     <a href="https://github.com/sainibhaowal/Alcyoneus-OS/actions"><img src="https://img.shields.io/badge/CI-Passing-10B981?style=flat-square&logo=github-actions" alt="CI Status" /></a>&nbsp;
-    <a href="https://github.com/sainibhaowal/Alcyoneus-OS"><img src="https://img.shields.io/badge/Coverage-80%25-10B981?style=flat-square" alt="Coverage" /></a>
+    <a href="https://github.com/sainibhaowal/Alcyoneus-OS"><img src="https://img.shields.io/badge/Coverage-90%25+-10B981?style=flat-square" alt="Coverage" /></a>
   </p>
 </div>
 
@@ -126,17 +126,19 @@ result = compiled.invoke(
 | **GraphRunStream v3** | SSE streaming, heartbeat keep-alive, sync wrapper |
 | **Granularity** | `LOW`/`PARTIAL`/`FULL` response granularity |
 | **Realtime Audio** | `AudioAgent` (Gemini Live, OpenAI Realtime, Azure, Local Whisper+TTS) |
+| **SIP Telephony** | Native VoIP phone call management (`SIPTelephony`, `SIPCallConfig`), Twilio gateway, mock CI mode |
 | **Barge-in** | Audio interruption with transcript persistence |
 | **WebRTC Streaming** | `RemoteDesktopStreamer` for VNC/WebRTC frame broadcast |
 
 ### 🛡️ Security & Guardrails
 | Feature | Description |
 |---------|-------------|
+| **Policy Engine** | Enterprise 9-tier priority tool authorization (Specific/Prefix/Global), HITL approval, fail-closed defaults |
+| **Path Sandboxing** | `workspace_only()` directory confinement preventing path traversal attacks |
 | **Input Guardrails** | PII detection, prompt injection prevention, length limits |
 | **Output Guardrails** | JSON schema enforcement, blocked words, length limits |
 | **Tool Guardrails** | `ToolInputGuardrail`/`ToolOutputGuardrail` with allow/deny/rate limits |
-| **Policy Engine** | 9-priority RBAC (allow/deny/ask_user), predicates, tenant scoping |
-| **RBAC** | 9 permissions (Viewer/Dev/Admin/Owner), tenant scoping |
+| **RBAC & Multi-tenant** | 9 permissions (Viewer/Dev/Admin/Owner), tenant isolation and quota enforcement |
 | **Auth** | JWT (JWKS), mTLS, Token Introspection (RFC 7662), API Key Manager |
 | **Secrets** | Vault, AWS/GCP/Azure Key Vault, Composite fallback chain |
 
@@ -152,18 +154,24 @@ result = compiled.invoke(
 ### 🛠️ Developer Experience & CLI
 | Tool | Purpose |
 |------|---------|
-| **`alc` CLI** | `alc graph create/run/visualize/validate`, `alc agent create`, `alc tool list/test`, `alc config`, `alc deploy docker/helm/k8s` |
-| **Graph Visualizer** | `compiled.generate_graph("mermaid" \| "graphviz" \| "html")` - renders in GitHub, Notion, browser |
-| **Graph Visualizer** | Interactive HTML with browser preview |
+| **`alcyoneus init`** | Interactive project scaffolding wizard — 5 architectures × 4 storage backends × 4 LLM providers |
+| **`alcyoneus doctor`** | System health diagnostics — Python, Docker, dependencies, API credentials |
+| **`alcyoneus completion`** | Shell tab auto-completion for bash, zsh, and fish |
+| **`--json` / `--yaml`** | Machine-readable output on `version`, `doctor`, `agent list`, `tool list`, `graph inspect` |
+| **`alcyoneus graph`** | `create/run/visualize/validate/inspect` — graph management |
+| **`alcyoneus agent`** | `create/list` — agent scaffolding |
+| **`alcyoneus tool`** | `list/test` — tool discovery and testing |
+| **Graph Visualizer** | `compiled.generate_graph("mermaid" \| "graphviz" \| "html")` — renders in GitHub, Notion, browser |
 | **Graph Debug** | `alc debug state/replay/trace` for debugging checkpoints and traces |
 
 ### 🖥️ Sandboxing & Isolation
 | Backend | Capabilities |
 |---------|-------------|
-| **DockerSandbox** | GPU passthrough, resource limits, volume mounts, PTY |
-| **K8sSandbox** | Pod lifecycle, exec, resource quotas, GPU |
-| **FirecrackerSandbox** | Micro-VM, resource isolation |
-| **LocalSandbox** | Unix PTY, subprocess |
+| **UnixPTYSandbox** | Local Unix pseudo-terminal (PTY) emulation, interactive CLI execution, non-blocking I/O, timeouts |
+| **DockerSandbox** | Containerized execution, GPU passthrough, resource limits, volume mounts |
+| **K8sSandbox** | Ephemeral Kubernetes pod runner lifecycle, exec, resource quotas |
+| **FirecrackerSandbox** | Micro-VM hardware virtualization and resource isolation |
+| **RemoteFileSync** | Bidirectional host-to-sandbox filesystem synchronization |
 | **Computer Use** | X11/Wayland/Headless/VNC/Remote Desktop, Accessibility Bridge, Action Verifier |
 | **ShellTool** | Docker/Local environments, policy-guarded, workspace scoping |
 
@@ -229,6 +237,14 @@ pip install "alcyoneus[cli]"           # CLI tools
 export OPENAI_API_KEY=sk-...    # or GEMINI_API_KEY, ANTHROPIC_API_KEY
 ```
 
+```bash
+# Diagnose environment & backends
+alcyoneus doctor
+
+# Scaffold a production agent project
+alcyoneus init my_agent --template standard
+```
+
 ---
 
 ## 30-Second Example
@@ -258,17 +274,21 @@ result = compiled.invoke(
 
 | Topic | Link |
 |-------|------|
+| **Full Index** | [docs/INDEX.md](docs/INDEX.md) |
 | **Quickstart** | [docs/QUICKSTART.md](docs/QUICKSTART.md) |
+| **CLI Reference** | [docs/CLI.md](docs/CLI.md) |
 | **All Imports** | [docs/IMPORTS.md](docs/IMPORTS.md) |
 | **Core Patterns** | [docs/CORE_PATTERNS.md](docs/CORE_PATTERNS.md) |
 | **Prebuilt Agents** | [docs/PREBUILT_AGENTS.md](docs/PREBUILT_AGENTS.md) |
+| **Voice & Telephony** | [docs/VOICE.md](docs/VOICE.md) |
+| **Sandboxes & Isolation** | [docs/SANDBOX.md](docs/SANDBOX.md) |
 | **Tools** | [docs/TOOLS.md](docs/TOOLS.md) |
 | **Persistence** | [docs/PERSISTENCE.md](docs/PERSISTENCE.md) |
 | **Streaming** | [docs/STREAMING.md](docs/STREAMING.md) |
 | **Testing** | [docs/TESTING.md](docs/TESTING.md) |
 | **Evaluation** | [docs/EVALUATION.md](docs/EVALUATION.md) |
 | **Skills** | [docs/SKILLS.md](docs/SKILLS.md) |
-| **Security** | [docs/SECURITY.md](docs/SECURITY.md) |
+| **Security & Policy** | [docs/SECURITY.md](docs/SECURITY.md) |
 | **Protocols** | [docs/PROTOCOLS.md](docs/PROTOCOLS.md) |
 | **Configuration** | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) |
 | **Deployment** | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
@@ -302,7 +322,7 @@ python examples/realtime/audio_agent_file.py
 ## Testing & Quality
 
 ```bash
-# Run all tests (3159 passing)
+# Run all tests (3,273+ passing, 0 skipped)
 pytest tests/ -q
 
 # Lint

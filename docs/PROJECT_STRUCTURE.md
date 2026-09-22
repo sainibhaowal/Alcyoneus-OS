@@ -2,6 +2,13 @@
 
 > **Organize your Alcyoneus project for maintainability and scale.**
 
+> [!TIP]
+> You can automatically generate this structure using the CLI:
+> ```bash
+> alcyoneus init my_project --template standard
+> ```
+> See [CLI.md](CLI.md) for all available templates (`standard`, `voice`, `researcher`, `minimal`).
+
 ---
 
 ## Recommended Layout

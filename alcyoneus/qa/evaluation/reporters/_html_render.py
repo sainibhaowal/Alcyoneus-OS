@@ -457,7 +457,7 @@ def _render_trajectory_steps(trajectory: list[Any]) -> list[str]:
 
     for step in trajectory:
         if isinstance(step, dict):
-            stype = step.get("step_type", step.get("type", "node")).lower()
+            stype = step.get("step_type", step.get("type", "node")).lower()  # type: ignore[union-attr]
             sname = _html.escape(str(step.get("name", step.get("node", step.get("tool", "")))))
             sargs = step.get("args", {})
             smeta = step.get("metadata", {})

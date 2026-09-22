@@ -267,7 +267,7 @@ try:
     from a2a.server.tasks.task_updater import TaskUpdater
 
     try:
-        from a2a.types import Task, TaskState, TextPart
+        from a2a.types import Task, TaskState, TextPart  # type: ignore[attr-defined]
     except ImportError:
         from a2a.server.tasks.task_updater import TaskState
         from a2a.types import Part as TextPart
@@ -279,7 +279,7 @@ try:
 except Exception as exc:
     _A2A_IMPORT_ERROR: BaseException | None = exc
 
-    class _AgentExecutor:
+    class _AgentExecutor:  # type: ignore[no-redef]
         """Fallback base class used when a2a-sdk is not installed."""
 
 else:

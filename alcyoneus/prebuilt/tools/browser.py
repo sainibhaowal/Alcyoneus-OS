@@ -65,7 +65,7 @@ class BrowserController:
     def __init__(self, *, policy: BrowserPolicy | None = None, browser: Any = None) -> None:
         self.policy = policy or BrowserPolicy()
         self._browser = browser
-        self._playwright = None
+        self._playwright: Any = None
         self._contexts: dict[str, Any] = {}
         self._pages: dict[str, Any] = {}
 

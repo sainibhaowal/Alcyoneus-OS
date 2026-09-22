@@ -51,7 +51,7 @@ from alcyoneus.utils.constants import ResponseGranularity
 class RemoteGraphConfig:
     """Configuration for RemoteGraph client."""
 
-    url: str
+    url: str = ""
     api_key: str | None = None
     timeout: float = 60.0
     connect_timeout: float = 10.0
@@ -144,6 +144,8 @@ class RemoteGraph:
         config: RemoteGraphConfig with URL, auth, timeouts, retries, etc.
     """
 
+    _config: RemoteGraphConfig | None = None
+
     def __init__(
         self,
         graph: Any | None = None,
@@ -206,6 +208,8 @@ class RemoteGraph:
             for sess in self._sessions:
                 if not sess.closed and getattr(sess, "_loop", None) is running:
                     return sess
+        if self._config is None:
+            self._config = RemoteGraphConfig()
         timeout = ClientTimeout(
             total=self._config.timeout,
             connect=self._config.connect_timeout,
@@ -218,7 +222,7 @@ class RemoteGraph:
             ttl_dns_cache=300,
             enable_cleanup_closed=True,
             keepalive_timeout=30,
-            ssl=ssl_context,
+            ssl=ssl_context if ssl_context is not None else False,
         )
         session = aiohttp.ClientSession(
             connector=connector,
@@ -270,7 +274,7 @@ class RemoteGraph:
         self,
         input_data: dict[str, Any],
         config: dict[str, Any] | None = None,
-        response_granularity: ResponseGranularity = "low",
+        response_granularity: ResponseGranularity | str = "low",
         debug: bool | None = None,
     ) -> dict[str, Any]:
         """Execute the graph synchronously."""
@@ -280,12 +284,12 @@ class RemoteGraph:
         self,
         input_data: dict[str, Any],
         config: dict[str, Any] | None = None,
-        response_granularity: ResponseGranularity = "low",
+        response_granularity: ResponseGranularity | str = "low",
         debug: bool | None = None,
     ) -> dict[str, Any]:
         """Execute the graph asynchronously."""
         if self._config and self._config.url:
-            return await self._http_invoke(input_data, config, response_granularity)
+            return await self._http_invoke(input_data, config, _normalize_granularity(response_granularity))
         if self.graph is None:
             raise ValueError("RemoteGraph requires either a graph or a URL config")
         return await self.graph.ainvoke(
@@ -299,7 +303,7 @@ class RemoteGraph:
         self,
         input_data: dict[str, Any],
         config: dict[str, Any] | None = None,
-        response_granularity: ResponseGranularity = "low",
+        response_granularity: ResponseGranularity | str = "low",
         stream_mode: str | list[str] | None = None,
         debug: bool | None = None,
     ) -> Generator[Any]:
@@ -339,13 +343,13 @@ class RemoteGraph:
         self,
         input_data: dict[str, Any],
         config: dict[str, Any] | None = None,
-        response_granularity: ResponseGranularity = "low",
+        response_granularity: ResponseGranularity | str = "low",
         stream_mode: str | list[str] | None = None,
         debug: bool | None = None,
     ) -> AsyncIterator[Any]:
         """Stream graph execution asynchronously."""
         if self._config and self._config.url:
-            result = await self._http_invoke(input_data, config, response_granularity)
+            result = await self._http_invoke(input_data, config, _normalize_granularity(response_granularity))
             yield {"event": "values", "data": result}
             return
         if self.graph is None:
@@ -363,13 +367,13 @@ class RemoteGraph:
         self,
         input_data: dict[str, Any],
         config: dict[str, Any] | None = None,
-        response_granularity: ResponseGranularity = "low",
+        response_granularity: ResponseGranularity | str = "low",
         stream_mode: str | list[str] | None = None,
         debug: bool | None = None,
     ) -> AsyncIterator[dict[str, Any]]:
         """Stream graph execution as structured events (GraphRunStream v3)."""
         if self._config and self._config.url:
-            async for event in self._http_stream_events(input_data, config, response_granularity):
+            async for event in self._http_stream_events(input_data, config, _normalize_granularity(response_granularity)):
                 yield event
             return
         if self.graph is None:
@@ -394,7 +398,7 @@ class RemoteGraph:
         self,
         input_data: dict[str, Any],
         config: dict[str, Any] | None = None,
-        response_granularity: ResponseGranularity = "low",
+        response_granularity: ResponseGranularity | str = "low",
         stream_mode: str | list[str] | None = None,
         debug: bool | None = None,
     ) -> Generator[dict[str, Any]]:
@@ -506,8 +510,8 @@ class RemoteGraph:
         session = self._ensure_session()
         async with session.post(url, json=payload, headers=headers) as resp:
             resp.raise_for_status()
-            async for line in resp.content:
-                line = line.decode("utf-8").strip()
+            async for raw_line in resp.content:
+                line = raw_line.decode("utf-8").strip()
                 if line.startswith("data: "):
                     try:
                         yield json.loads(line[6:])
@@ -700,7 +704,7 @@ class GraphServer:
         except Exception as exc:
             return web.json_response({"error": str(exc)}, status=500)
 
-    async def _handle_stream_events(self, request: web.Request) -> web.Response:
+    async def _handle_stream_events(self, request: web.Request) -> web.StreamResponse:
         """Handle /stream-events endpoint with SSE."""
         graph = request.app["graph"]
         try:

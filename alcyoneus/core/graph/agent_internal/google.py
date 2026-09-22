@@ -16,6 +16,15 @@ logger = logging.getLogger("alcyoneus.agent")
 class AgentGoogleMixin:
     """Google GenAI message conversion and request helpers."""
 
+    model: str
+    client: Any
+    llm_kwargs: dict[str, Any]
+    output_type: str | None
+    reasoning_config: dict[str, Any] | None
+
+    def _extract_prompt(self, messages: list[dict[str, Any]]) -> str:
+        raise NotImplementedError
+
     def _convert_to_google_format(
         self,
         messages: list[dict[str, Any]],

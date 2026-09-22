@@ -183,7 +183,7 @@ class QuickEval:
         eval_set = EvalSetBuilder.quick(*test_pairs)
 
         config = EvalPresets.quick_check()
-        config.criteria.rouge_match.threshold = threshold
+        config.criteria.rouge_match.threshold = threshold  # type: ignore[union-attr]
 
         evaluator = AgentEvaluator(graph, collector, config=config)
         report = await evaluator.evaluate(eval_set, verbose=verbose)
@@ -221,7 +221,7 @@ class QuickEval:
             builder.add_case(
                 query=query,
                 expected=expected,
-                expected_tools=tools,
+                expected_tools=tools,  # type: ignore[arg-type]
                 case_id=f"tool_test_{i + 1}",
             )
 

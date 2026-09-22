@@ -257,8 +257,8 @@ class ToolInputGuardrail(Generic[TContext_co]):
 
     def get_name(self) -> str:
         """Return the guardrail name."""
-        return self.name or getattr(
-            self.guardrail_function, "__name__", "unnamed_tool_input_guardrail"
+        return self.name or str(
+            getattr(self.guardrail_function, "__name__", "unnamed_tool_input_guardrail")
         )
 
     async def run(self, data: ToolInputGuardrailData) -> ToolInputGuardrailResult:
@@ -302,8 +302,8 @@ class ToolOutputGuardrail(Generic[TContext_co]):
 
     def get_name(self) -> str:
         """Return the guardrail name."""
-        return self.name or getattr(
-            self.guardrail_function, "__name__", "unnamed_tool_output_guardrail"
+        return self.name or str(
+            getattr(self.guardrail_function, "__name__", "unnamed_tool_output_guardrail")
         )
 
     async def run(self, data: ToolOutputGuardrailData) -> ToolOutputGuardrailResult:

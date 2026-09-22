@@ -114,6 +114,37 @@ from alcyoneus.qa.testing import (
 )
 ```
 
+## Security & Policy — Guardrails & Policy Engine
+
+```python
+from alcyoneus.core.policy import (
+    PolicyEngine, Policy, Decision, PolicyAction,
+    allow, deny, ask_user, safe_defaults, workspace_only,
+    confirm_run_command, default_ask_user_handler,
+)
+from alcyoneus.core.guardrails import (
+    InputGuardrail, OutputGuardrail, ToolInputGuardrail, ToolOutputGuardrail,
+)
+```
+
+## Voice & Telephony — SIP Protocol & Audio
+
+```python
+from alcyoneus.core.voice.sip import (
+    SIPTelephony, SIPCallConfig,
+    SIPTelephonyError, SIPConfigurationError, SIPCallFailedError,
+)
+```
+
+## Sandboxes & Isolation — Execution Environments
+
+```python
+from alcyoneus.sandbox import (
+    UnixPTYSandbox, DockerSandbox, K8sSandbox, FirecrackerSandbox,
+    SandboxConfig, ExecResult, RemoteFileSync,
+)
+```
+
 ## Utils — Helpers
 
 ```python

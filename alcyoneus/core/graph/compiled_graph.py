@@ -44,7 +44,7 @@ except ImportError:
         def try_get(self, *a, **kw):
             return kw.get("default") if len(a) < 2 else a[1]
 
-    InjectQ = DummyContainer
+    InjectQ: Any = DummyContainer  # type: ignore[misc,assignment,no-redef]
 
 
 from alcyoneus.core.exceptions.graph_error import GraphError
@@ -52,7 +52,7 @@ from alcyoneus.core.graph.base_agent import BaseAgent
 from alcyoneus.core.graph.tool_node.base import ToolNode
 from alcyoneus.core.state import AgentState
 from alcyoneus.core.state.execution_state import StopRequestStatus
-from alcyoneus.core.state.stream_chunks import StreamChunk
+from alcyoneus.core.state.stream_chunks import StreamChunk, StreamEvent
 from alcyoneus.runtime.publisher.base_publisher import BasePublisher
 from alcyoneus.storage.checkpointer.base_checkpointer import BaseCheckpointer
 from alcyoneus.storage.store.base_store import BaseStore
@@ -492,6 +492,7 @@ class CompiledGraph[StateT: AgentState]:
             current = self._state
 
         # Merge updates
+        updated: Any
         if hasattr(current, "model_copy"):
             updated = current.model_copy(update=values)
         else:
@@ -501,6 +502,7 @@ class CompiledGraph[StateT: AgentState]:
         checkpoint_id = str(uuid4())
 
         await self._checkpointer.aput_state(cfg, updated)
+        await self._checkpointer.aput_state_cache(cfg, updated)
         return {"configurable": {"thread_id": cfg["thread_id"], "checkpoint_id": checkpoint_id}}
 
     def bulk_update_state(
@@ -563,12 +565,15 @@ class CompiledGraph[StateT: AgentState]:
         cfg["checkpoint_id"] = checkpoint_id
 
         # Get state at checkpoint
+        if not self._checkpointer:
+            raise ValueError(f"Checkpointer required to resume from checkpoint {checkpoint_id}")
         state = await self._checkpointer.aget_state(cfg)
         if state is None:
             raise ValueError(f"Checkpoint {checkpoint_id} not found")
 
         # Resume from that state
-        return await self.ainvoke({"messages": state.get("messages", [])}, cfg)
+        messages = state.get("messages", []) if isinstance(state, dict) else getattr(state, "messages", [])
+        return await self.ainvoke({"messages": messages}, cfg)
 
     def fork(
         self, config: dict[str, Any] | str, checkpoint_id: str, new_thread_id: str | None = None
@@ -606,6 +611,8 @@ class CompiledGraph[StateT: AgentState]:
         cfg["checkpoint_id"] = checkpoint_id
 
         # Get state at checkpoint
+        if not self._checkpointer:
+            raise ValueError(f"Checkpointer required to fork from checkpoint {checkpoint_id}")
         state = await self._checkpointer.aget_state(cfg)
         if state is None:
             raise ValueError(f"Checkpoint {checkpoint_id} not found")
@@ -810,8 +817,8 @@ class CompiledGraph[StateT: AgentState]:
                     if not stop_heartbeat.is_set():
                         chunk = StreamChunk(
                             content="",
-                            chunk_id=str(uuid4()),
-                            event="heartbeat",
+                            id=str(uuid4()),
+                            event=StreamEvent.CUSTOM,
                             data={"timestamp": time.time(), "type": "heartbeat"},
                         )
                         await heartbeat_queue.put(chunk)
@@ -1199,7 +1206,7 @@ class CompiledGraph[StateT: AgentState]:
             )
 
         name, node = live[0]
-        agent = node.func
+        agent: Any = node.func
         agent._node_name = name
         cfg = self._prepare_config(config, is_stream=True)
         callback_manager = InjectQ.get_instance().try_get(CallbackManager)
@@ -1247,7 +1254,9 @@ class CompiledGraph[StateT: AgentState]:
                     break
         finally:
             with contextlib.suppress(Exception):
-                loop.run_until_complete(agen.aclose())
+                aclose_fn = getattr(agen, "aclose", None)
+                if callable(aclose_fn):
+                    loop.run_until_complete(aclose_fn())
             loop.close()
 
     async def aclose(self) -> dict[str, Any]:  # noqa: PLR0915
@@ -1373,14 +1382,16 @@ class CompiledGraph[StateT: AgentState]:
             Graph structure as dict, mermaid diagram string, ASCII art, or PNG bytes.
         """
         # Build internal representation
-        graph = {
+        graph_nodes: list[dict[str, Any]] = []
+        graph_edges: list[dict[str, Any]] = []
+        graph: dict[str, Any] = {
             "info": {},
-            "nodes": [],
-            "edges": [],
+            "nodes": graph_nodes,
+            "edges": graph_edges,
         }
         # Populate the graph with nodes and edges
         for node_name in self._state_graph.nodes:
-            graph["nodes"].append(
+            graph_nodes.append(
                 {
                     "id": str(uuid4()),
                     "name": node_name,
@@ -1397,7 +1408,7 @@ class CompiledGraph[StateT: AgentState]:
                 edge_dict["condition"] = "conditional"
             if edge.condition_result:
                 edge_dict["condition_result"] = str(edge.condition_result)
-            graph["edges"].append(edge_dict)
+            graph_edges.append(edge_dict)
 
         # Add info
         graph["info"] = {

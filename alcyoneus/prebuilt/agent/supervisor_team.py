@@ -63,7 +63,7 @@ from typing import Any, TypeVar
 try:
     from injectq import InjectQ
 except ImportError:
-    InjectQ = Any
+    InjectQ = Any  # type: ignore[misc,assignment]
 
 
 from alcyoneus.core.graph.agent import Agent

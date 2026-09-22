@@ -73,13 +73,13 @@ class MultiProvider(BaseConverter):
         self, messages: list[Any], model: str | None = None, **kwargs: Any
     ) -> dict[str, Any]:
         converter, clean_model = self.resolve_converter(model)
-        return converter.convert_request(messages=messages, model=clean_model, **kwargs)
+        return converter.convert_request(messages=messages, model=clean_model, **kwargs)  # type: ignore[attr-defined]
 
-    def convert_response(self, raw_response: Any) -> dict[str, Any]:
-        return self.default_provider.convert_response(raw_response)
+    def convert_response(self, raw_response: Any) -> dict[str, Any]:  # type: ignore[override]
+        return self.default_provider.convert_response(raw_response)  # type: ignore[return-value]
 
-    def convert_streaming_response(self, raw_chunk: Any) -> dict[str, Any] | None:
-        return self.default_provider.convert_streaming_response(raw_chunk)
+    def convert_streaming_response(self, raw_chunk: Any) -> dict[str, Any] | None:  # type: ignore[override]
+        return self.default_provider.convert_streaming_response(raw_chunk)  # type: ignore[call-arg, return-value]
 
 
 __all__ = ["MultiProvider"]

@@ -45,11 +45,10 @@ class SQLAlchemySession(SessionABC):
         if self._session_factory is not None:
             return self._session_factory()
         try:
-            from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-            from sqlalchemy.orm import sessionmaker
+            from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
             engine = create_async_engine(self.engine_url)
-            factory = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+            factory = async_sessionmaker(engine, expire_on_commit=False)
             self._session_factory = factory
             return factory()
         except ImportError:

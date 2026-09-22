@@ -81,6 +81,15 @@ def _to_responses_content(content: Any) -> Any:
 class AgentOpenAIMixin:
     """OpenAI and OpenAI-compatible API request helpers."""
 
+    model: str
+    client: Any
+    llm_kwargs: dict[str, Any]
+    output_type: str | None
+    reasoning_config: dict[str, Any] | None
+
+    def _extract_prompt(self, messages: list[dict[str, Any]]) -> str:
+        raise NotImplementedError
+
     async def _call_openai(
         self,
         messages: list[dict[str, Any]],

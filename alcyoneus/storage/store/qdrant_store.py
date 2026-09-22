@@ -107,6 +107,7 @@ class QdrantStore(BaseStore):
         # Initialize async client
         from qdrant_client import AsyncQdrantClient
 
+        self.client: Any
         if path:
             self.client = AsyncQdrantClient(path=path, **kwargs)
         elif url:
@@ -117,7 +118,7 @@ class QdrantStore(BaseStore):
             self.client = AsyncQdrantClient(host=host, port=port, api_key=api_key, **kwargs)
 
         # Cache for collection existence checks
-        self._collection_cache = set()
+        self._collection_cache: set[str] = set()
         self._setup_lock = asyncio.Lock()
 
         self.collection = collection or DEFAULT_COLLECTION
@@ -195,7 +196,7 @@ class QdrantStore(BaseStore):
         filters: dict[str, Any] | None = None,
     ) -> Any | None:
         """Build Qdrant filter from parameters."""
-        conditions = []
+        conditions: list[Any] = []
 
         from qdrant_client.http.models import (
             FieldCondition,

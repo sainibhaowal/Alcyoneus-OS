@@ -245,7 +245,7 @@ class UserSimulator:
 
                 # Build full conversation history for the graph (not just current message)
                 all_messages = [
-                    Message.text_message(msg["content"], role=msg["role"]) for msg in conversation
+                    Message.text_message(msg["content"], role=msg["role"]) for msg in conversation  # type: ignore[arg-type]
                 ]
                 input_data = {"messages": all_messages}
 
@@ -333,9 +333,9 @@ class UserSimulator:
         except Exception as e:
             logger.error("Simulation failed: %s", e)
             # Attempt criterion evaluation even on failure
-            criterion_scores: dict[str, float] = {}
-            criterion_details: dict[str, Any] = {}
-            criterion_results: list[Any] = []
+            criterion_scores: dict[str, float] = {}  # type: ignore[no-redef]
+            criterion_details: dict[str, Any] = {}  # type: ignore[no-redef]
+            criterion_results: list[Any] = []  # type: ignore[no-redef]
             try:
                 (
                     criterion_scores,

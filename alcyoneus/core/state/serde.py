@@ -46,7 +46,7 @@ class JsonSerde(SerializerProtocol):
             return obj.model_dump()
         if hasattr(obj, "dict"):
             return obj.dict()
-        if is_dataclass(obj):
+        if is_dataclass(obj) and not isinstance(obj, type):
             import dataclasses
 
             return dataclasses.asdict(obj)

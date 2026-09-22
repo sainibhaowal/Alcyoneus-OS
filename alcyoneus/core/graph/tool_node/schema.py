@@ -229,16 +229,17 @@ class SchemaMixin:
             if tags and fun_tags and tags.isdisjoint(fun_tags):
                 continue
 
-            entry = {
-                "type": "function",
-                "function": {
-                    "name": tool_name,
-                    "description": description,
-                    "parameters": params_schema,
-                },
+            func_dict: dict[str, t.Any] = {
+                "name": tool_name,
+                "description": description,
+                "parameters": params_schema,
             }
             if capabilities is not None:
-                entry["function"]["x-function-capabilities"] = capabilities
+                func_dict["x-function-capabilities"] = capabilities
+            entry: dict[str, t.Any] = {
+                "type": "function",
+                "function": func_dict,
+            }
             # meta: dict[str, t.Any] = {}
             # if provider:
             #     meta["provider"] = provider

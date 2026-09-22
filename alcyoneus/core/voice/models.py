@@ -57,7 +57,7 @@ class TTSModel(abc.ABC):
         """Synthesize text string into audio bytes."""
 
     @abc.abstractmethod
-    async def synthesize_stream(
+    def synthesize_stream(
         self, text: str, settings: TTSModelSettings | None = None
     ) -> AsyncIterator[bytes]:
         """Stream synthesized audio chunks for text."""

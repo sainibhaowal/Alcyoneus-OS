@@ -93,9 +93,9 @@ class VaultSecretManager(SecretManager):
 
     async def _get_session(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
-            headers = {"X-Vault-Token": self.token}
+            headers: dict[str, str] = {"X-Vault-Token": str(self.token or "")}
             if self.namespace:
-                headers["X-Vault-Namespace"] = self.namespace
+                headers["X-Vault-Namespace"] = str(self.namespace)
             self._session = aiohttp.ClientSession(
                 headers=headers,
                 timeout=aiohttp.ClientTimeout(total=self.timeout),
@@ -129,6 +129,7 @@ class VaultSecretManager(SecretManager):
         session = await self._get_session()
         path = self._secret_path(key)
 
+        payload: dict[str, Any]
         if self.kv_version == 1:
             payload = {"value": value}
             if metadata:
@@ -617,7 +618,7 @@ def get_secret_manager() -> SecretManager:
     if _secret_manager is not None:
         return _secret_manager
 
-    backends = []
+    backends: list[SecretManager] = []
 
     # Try Vault
     if os.getenv("VAULT_ADDR") and os.getenv("VAULT_TOKEN"):

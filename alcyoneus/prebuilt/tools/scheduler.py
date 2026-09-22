@@ -52,14 +52,14 @@ def _next_cron(expression: str, after: datetime, zone: ZoneInfo) -> datetime:
         allowed.append(values)
     candidate = after.astimezone(zone).replace(second=0, microsecond=0) + timedelta(minutes=1)
     for _ in range(60 * 24 * 366):
-        values = [
+        candidate_fields = [
             candidate.minute,
             candidate.hour,
             candidate.day,
             candidate.month,
             (candidate.weekday() + 1) % 7,
         ]
-        if all(-1 in allowed[i] or values[i] in allowed[i] for i in range(5)):
+        if all(-1 in allowed[i] or candidate_fields[i] in allowed[i] for i in range(5)):
             return candidate.astimezone(UTC)
         candidate += timedelta(minutes=1)
     raise ValueError("cron expression did not produce a time within one year")

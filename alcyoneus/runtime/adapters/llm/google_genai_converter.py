@@ -42,7 +42,7 @@ try:
     HAS_GOOGLE_GENAI = True
 except ImportError:
     HAS_GOOGLE_GENAI = False
-    GenerateContentResponse = None
+    GenerateContentResponse = None  # type: ignore[assignment, misc]
 
 
 class GoogleGenAIConverter(BaseConverter):
@@ -141,8 +141,8 @@ class GoogleGenAIConverter(BaseConverter):
 
     def _process_parts(self, parts: list) -> tuple[list, list, str]:
         """Process content parts and extract blocks, tool calls, and reasoning."""
-        blocks = []
-        tools_calls = []
+        blocks = []  # type: ignore[var-annotated]
+        tools_calls = []  # type: ignore[var-annotated]
         reasoning_content = ""
 
         for part in parts:
@@ -186,7 +186,7 @@ class GoogleGenAIConverter(BaseConverter):
                 ToolCallBlock(
                     name=func_call.name,
                     args=args,
-                    id=tool_call_id,
+                    id=tool_call_id,  # type: ignore[arg-type]
                 )
             )
 
@@ -225,7 +225,7 @@ class GoogleGenAIConverter(BaseConverter):
     ) -> None:
         """Add appropriate media block based on MIME type."""
         media = MediaRef(
-            kind=kind,
+            kind=kind,  # type: ignore[arg-type]
             data_base64=data if kind == "data" else None,
             url=data if kind == "url" else None,
             mime_type=mime_type,
@@ -252,8 +252,8 @@ class GoogleGenAIConverter(BaseConverter):
         """
         text_part = ""
         reasoning_part = ""
-        content_blocks = []
-        tools_calls = []
+        content_blocks = []  # type: ignore[var-annotated]
+        tools_calls = []  # type: ignore[var-annotated]
 
         if not candidate or not candidate.content:
             return text_part, reasoning_part, content_blocks, tools_calls
@@ -274,7 +274,7 @@ class GoogleGenAIConverter(BaseConverter):
             # Handle text parts
             if hasattr(part, "text") and part.text:
                 text_part += part.text
-                content_blocks.append(TextBlock(text=part.text))
+                content_blocks.append(TextBlock(text=part.text))  # type: ignore[arg-type]
 
             # Handle function calls
             if hasattr(part, "function_call") and part.function_call:
@@ -285,10 +285,10 @@ class GoogleGenAIConverter(BaseConverter):
                 args = dict(func_call.args) if func_call.args else {}
 
                 content_blocks.append(
-                    ToolCallBlock(
+                    ToolCallBlock(  # type: ignore[arg-type]
                         name=func_call.name,
                         args=args,
-                        id=tool_call_id,
+                        id=tool_call_id,  # type: ignore[arg-type]
                     )
                 )
 
@@ -399,8 +399,8 @@ class GoogleGenAIConverter(BaseConverter):
             Message: Converted message chunk from the stream.
         """
         accumulated_content = ""
-        tool_calls = []
-        tool_ids = set()
+        tool_calls = []  # type: ignore[var-annotated]
+        tool_ids = set()  # type: ignore[var-annotated]
         accumulated_reasoning_content = ""
         seq = 0
 
@@ -441,7 +441,7 @@ class GoogleGenAIConverter(BaseConverter):
         if accumulated_content:
             blocks.append(TextBlock(text=accumulated_content))
         if accumulated_reasoning_content:
-            blocks.append(ReasoningBlock(summary=accumulated_reasoning_content))
+            blocks.append(ReasoningBlock(summary=accumulated_reasoning_content))  # type: ignore[arg-type]
         if tool_calls:
             for tc in tool_calls:
                 func_data = tc.get("function", {})
@@ -451,7 +451,7 @@ class GoogleGenAIConverter(BaseConverter):
                 except Exception:
                     args = {}
                 blocks.append(
-                    ToolCallBlock(
+                    ToolCallBlock(  # type: ignore[arg-type]
                         name=func_data.get("name", ""),
                         args=args,
                         id=tc.get("id", ""),

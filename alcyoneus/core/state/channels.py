@@ -551,7 +551,7 @@ class CRDTChannelSync(ChannelSync):
 
     async def _get_crdt_changes(self, channel_name: str, from_version: int) -> list[ChannelEvent]:
         """Get changes from CRDT document."""
-        events = []
+        events: list[ChannelEvent] = []
         if self.crdt_type == "yjs" and self._yjs_doc:
             ymap = self._yjs_doc.get_map(channel_name)
             for k, v in ymap.items():
@@ -589,7 +589,7 @@ class CRDTChannelSync(ChannelSync):
         local_events = await self._get_crdt_changes(channel_name, from_version)
 
         # Then pull from peers via network adapter
-        remote_events = []
+        remote_events: list[ChannelEvent] = []
         if self.network_adapter:
             for peer in self.peers:
                 try:
@@ -605,11 +605,11 @@ class CRDTChannelSync(ChannelSync):
         all_events = local_events + remote_events
         seen_versions = set()
         deduped = []
-        for e in all_events:
-            key = (e.channel_name, e.version)
+        for ev in all_events:
+            key = (ev.channel_name, ev.version)
             if key not in seen_versions:
                 seen_versions.add(key)
-                deduped.append(e)
+                deduped.append(ev)
 
         return sorted(deduped, key=lambda e: e.version)
 
@@ -671,7 +671,7 @@ class CRDTChannelSync(ChannelSync):
 
         # Fallback: timestamp-based last-writer-wins
         all_events = local_events + remote_events
-        by_version = {}
+        by_version: dict[int, ChannelEvent] = {}
         for e in all_events:
             if e.version not in by_version or e.timestamp > by_version[e.version].timestamp:
                 by_version[e.version] = e

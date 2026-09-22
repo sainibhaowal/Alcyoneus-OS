@@ -67,7 +67,7 @@ def trigger(
     if len(params) != 1:
         raise ValueError("Trigger function must accept exactly one parameter (TriggerContext).")
 
-    func.__is_trigger__ = True
+    setattr(func, "__is_trigger__", True)  # noqa: B010
     return func
 
 

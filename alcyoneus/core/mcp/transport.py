@@ -155,8 +155,8 @@ class SSETransport(MCPTransport):
         if not self._sse_response:
             return
         async for line in self._sse_response.content:
-            line = line.decode().strip()
-            if line.startswith("data: "):
+            line = line.decode().strip()  # type: ignore[assignment]
+            if line.startswith("data: "):  # type: ignore[arg-type]
                 data = line[6:]
                 if data:
                     try:
@@ -186,7 +186,7 @@ class SSETransport(MCPTransport):
             if resp.status != 200:
                 raise RuntimeError(f"SSE send failed: {resp.status}")
 
-    async def receive(self) -> AsyncIterator[dict[str, Any]]:
+    async def receive(self) -> AsyncIterator[dict[str, Any]]:  # type: ignore[misc, override]
         while True:
             msg = await self._notification_queue.get()
             yield msg
@@ -246,7 +246,7 @@ class WebSocketTransport(MCPTransport):
             raise RuntimeError("Not connected")
         await self._ws.send_json(message)
 
-    async def receive(self) -> AsyncIterator[dict[str, Any]]:
+    async def receive(self) -> AsyncIterator[dict[str, Any]]:  # type: ignore[misc, override]
         while True:
             msg = await self._notification_queue.get()
             yield msg
@@ -274,7 +274,7 @@ class MCPClient:
     async def connect(self) -> MCPServerInfo:
         await self.transport.connect()
         await self._negotiate_capabilities()
-        return self._server_info
+        return self._server_info  # type: ignore[return-value]
 
     async def _negotiate_capabilities(self) -> None:
         """Perform MCP initialization handshake."""
@@ -310,7 +310,7 @@ class MCPClient:
         result = await self.transport.request("tools/list")
         if result and "tools" in result:
             self._tools_cache = result["tools"]
-            self._cache_time = time.time()
+            self._cache_time = time.time()  # type: ignore[assignment]
             return self._tools_cache
         return []
 

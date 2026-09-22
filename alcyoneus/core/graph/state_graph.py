@@ -37,7 +37,7 @@ except ImportError:
         def try_get(self, *a, **kw):
             return None
 
-    InjectQ = DummyContainer
+    InjectQ: Any = DummyContainer  # type: ignore[misc,assignment,no-redef]
 
 
 from alcyoneus.core.exceptions import GraphError
@@ -143,13 +143,14 @@ class StateGraph[StateT: AgentState]:
         )
 
         # State handling - accept both a class (e.g. AgentState) and an instance
+        self._state: StateT
         if state is not None:
             if isinstance(state, type) and issubclass(state, AgentState):
-                self._state: StateT = state()  # type: ignore[assignment]
+                self._state = state()  # type: ignore[assignment]
             else:
-                self._state: StateT = state  # type: ignore[assignment]
+                self._state = state  # type: ignore[assignment]
         else:
-            self._state: StateT = AgentState()  # type: ignore[assignment]
+            self._state = AgentState()  # type: ignore[assignment]
 
         # Graph structure
         self.nodes: dict[str, Node] = {}
@@ -669,7 +670,36 @@ class StateGraph[StateT: AgentState]:
         # Import the CompiledGraph class
         from .compiled_graph import CompiledGraph
 
-        # Setup dependencies
+        # Setup dependencies - clear cached singletons so new bindings take immediate effect
+        try:
+            singleton_scope = self._container._scope_manager.get_scope("singleton")
+            instances = getattr(singleton_scope, "_instances", None)
+            if isinstance(instances, dict):
+                instances.pop(BaseCheckpointer, None)
+                instances.pop(BaseStore, None)
+        except Exception as e:
+            logger.debug("Could not evict singleton instances: %s", e)
+
+        # Reset any cached _injected_value on function default Inject proxies
+        from alcyoneus.core.graph.utils.utils import (
+            call_realtime_sync,
+            load_or_create_state,
+            reload_state,
+            sync_data,
+        )
+
+        for fn in (sync_data, reload_state, load_or_create_state, call_realtime_sync):
+            if fn.__defaults__:
+                for d in fn.__defaults__:
+                    if (
+                        hasattr(d, "_injected_value")
+                        and getattr(d, "service_type", None) in (BaseCheckpointer, BaseStore)
+                    ):
+                        try:
+                            object.__setattr__(d, "_injected_value", None)
+                        except Exception as e:
+                            logger.debug("Could not reset proxy _injected_value: %s", e)
+
         self._container.bind_instance(
             BaseCheckpointer,
             checkpointer,
@@ -777,7 +807,7 @@ class StateGraph[StateT: AgentState]:
         from alcyoneus.core.graph.tool_node import ToolNode
 
         for node in self.nodes.values():
-            agent = node.func
+            agent: Any = node.func
             tool_node_name = getattr(agent, "tool_node_name", None)
             if not tool_node_name:
                 continue

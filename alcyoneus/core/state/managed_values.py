@@ -128,9 +128,10 @@ class WritableManagedValue(ManagedValue[T]):
         Returns:
             The stored value or default.
         """
-        if not hasattr(execution_state, "_managed_values"):
+        mv = getattr(execution_state, "_managed_values", None)
+        if mv is None:
             return self._default
-        return getattr(execution_state._managed_values, self._key, self._default)
+        return getattr(mv, self._key, self._default)
 
     def set_value(self, execution_state: ExecutionState, value: T) -> None:
         """Set the value in execution state.
@@ -139,11 +140,13 @@ class WritableManagedValue(ManagedValue[T]):
             execution_state: The current execution state.
             value: The value to store.
         """
-        if not hasattr(execution_state, "_managed_values"):
+        mv = getattr(execution_state, "_managed_values", None)
+        if mv is None:
             from types import SimpleNamespace
 
-            execution_state._managed_values = SimpleNamespace()
-        setattr(execution_state._managed_values, self._key, value)
+            mv = SimpleNamespace()
+            setattr(execution_state, "_managed_values", mv)  # noqa: B010
+        setattr(mv, self._key, value)
 
 
 # Predefined managed value instances

@@ -14,6 +14,23 @@ pip install "alcyoneus[google-genai,openai,mcp,pg_checkpoint]"
 
 ---
 
+## Fast Track — `alcyoneus init`
+
+The fastest way to start a new project:
+
+```bash
+# Interactive wizard
+alcyoneus init
+
+# Or non-interactive (for CI/CD)
+alcyoneus init my-agent --agent-type react --storage sqlite --llm-provider gemini
+cd my-agent && pip install -e . && python agent.py
+```
+
+This generates a fully wired project with `agent.py`, `pyproject.toml`, `.env.example`, tests, and a README. See [CLI.md](CLI.md) for full details.
+
+---
+
 ## Minimal Working Example
 
 ```python

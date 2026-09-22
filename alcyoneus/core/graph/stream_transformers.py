@@ -94,7 +94,7 @@ class ToolCallTransformer(StreamTransformer):
     streaming of tool execution progress.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._tool_calls: dict[str, dict[str, Any]] = {}
         self._pending_results: dict[str, list[Any]] = {}
@@ -108,19 +108,19 @@ class ToolCallTransformer(StreamTransformer):
         """Process a stream chunk and emit tool call/result events."""
         output = []
 
-        if chunk.event == StreamEvent.TOOL_EXECUTION:
+        if chunk.event == StreamEvent.TOOL_EXECUTION and chunk.data:
             # Parse tool execution data
             data = chunk.data
-            tool_name = data.get("tool_name")
-            tool_call_id = data.get("tool_call_id")
+            tool_name = str(data.get("tool_name") or "unknown_tool")
+            tool_call_id = str(data.get("tool_call_id") or id(data))
             status = data.get("status")  # "start", "progress", "complete", "error"
 
             if status == "start":
                 # Emit tool call start
                 tool_call = ToolCallBlock(
-                    tool_name=tool_name,
-                    arguments=data.get("arguments", {}),
-                    tool_call_id=tool_call_id or str(id(data)),
+                    name=tool_name,
+                    args=data.get("arguments", {}),
+                    id=tool_call_id,
                 )
                 output_chunk = StreamChunk(
                     event=StreamEvent.TOOL_CALL,
@@ -141,10 +141,10 @@ class ToolCallTransformer(StreamTransformer):
             elif status in ("complete", "error"):
                 # Emit tool result
                 tool_result = ToolResultBlock(
-                    tool_name=tool_name,
-                    tool_call_id=tool_call_id or str(id(data)),
-                    result=data.get("result") if status == "complete" else None,
-                    error=data.get("error") if status == "error" else None,
+                    call_id=tool_call_id,
+                    output=data.get("result") if status == "complete" else data.get("error"),
+                    is_error=(status == "error"),
+                    status="completed" if status == "complete" else "failed",
                 )
                 result_chunk = StreamChunk(
                     event=StreamEvent.TOOL_RESULT,
@@ -183,9 +183,9 @@ class MessagesTransformer(StreamTransformer):
 class ValuesTransformer(StreamTransformer):
     """Emits full state values at each step."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self._latest_state = None
+        self._latest_state: dict[str, Any] | None = None
 
     async def init(self, config: dict[str, Any]) -> None:
         self._latest_state = None

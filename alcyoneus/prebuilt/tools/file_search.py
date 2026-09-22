@@ -438,7 +438,7 @@ class FileSearchTool:
     def __init__(self, search_path: str = ".") -> None:
         self.search_path = search_path
 
-    def __call__(self, query: str, top_k: int = 5) -> dict[str, Any]:
+    def __call__(self, query: str, top_k: int = 5) -> str:
         return file_search(query=query, search_path=self.search_path, top_k=top_k)
 
 

@@ -46,7 +46,8 @@ class RemoteFileSync:
 
     async def sync(self, local_path: str, options: SyncOptions | None = None) -> dict[str, Any]:
         opts = options or SyncOptions()
-        results = {"files_synced": 0, "bytes": 0, "errors": []}
+        errors_list: list[dict[str, str]] = []
+        results: dict[str, Any] = {"files_synced": 0, "bytes": 0, "errors": errors_list}
         local = Path(local_path)
         if not local.exists():
             raise FileNotFoundError(local_path)
@@ -54,7 +55,7 @@ class RemoteFileSync:
             try:
                 await self._sync_mount(mount, local, opts, results)
             except Exception as exc:
-                results["errors"].append({"mount": mount.container_path, "error": str(exc)})
+                errors_list.append({"mount": mount.container_path, "error": str(exc)})
         return results
 
     async def _sync_mount(

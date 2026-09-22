@@ -1,15 +1,16 @@
 import logging
+from typing import Any
 
 
 try:
-    from injectq import Inject
+    from injectq import Inject  # type: ignore[assignment]
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: Any = _DummyInject()  # type: ignore[no-redef]
 
 
 from alcyoneus.runtime.publisher.base_publisher import BasePublisher
@@ -40,10 +41,8 @@ async def _publish_event_task(
 
 def publish_event(
     event: EventModel,
-    publisher: BasePublisher | None = Inject[BasePublisher] if Inject is not None else None,
-    task_manager: BackgroundTaskManager | None = Inject[BackgroundTaskManager]
-    if Inject is not None
-    else None,
+    publisher: BasePublisher | None = Inject[BasePublisher],  # type: ignore[assignment]
+    task_manager: BackgroundTaskManager | None = Inject[BackgroundTaskManager],  # type: ignore[assignment]
 ) -> None:
     """Publish an event asynchronously using the background task manager.
 

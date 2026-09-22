@@ -1,6 +1,7 @@
 """Google embedding service for vector stores."""
 
 import os
+from typing import Any, cast
 
 from .base_embedding import BaseEmbedding
 
@@ -24,15 +25,17 @@ class GoogleEmbedding(BaseEmbedding):
         model: str = "gemini-embedding-001",
         api_key: str | None = None,
         output_dimensionality: int | None = None,
-    ) -> None:
-        if not HAS_GOOGLE:
-            raise ImportError(
-                "The 'google-genai' package is required for GoogleEmbedding. "
-                "Please install it via 'pip install google-genai'."
-            )
+    ):
         self.model = model
         self._output_dimensionality = output_dimensionality
 
+        if not HAS_GOOGLE:
+            raise ImportError(
+                "google-genai package is required for GoogleEmbedding. "
+                "Install with `pip install 'alcyoneus[google]'`."
+            )
+
+        # Get API key from parameter or environment
         if api_key:
             self.api_key = api_key
         elif "GOOGLE_API_KEY" in os.environ:
@@ -58,7 +61,7 @@ class GoogleEmbedding(BaseEmbedding):
 
             result = await self.client.aio.models.embed_content(
                 model=self.model,
-                contents=texts,
+                contents=cast(Any, texts),
                 config=config,
             )
 
@@ -80,14 +83,14 @@ class GoogleEmbedding(BaseEmbedding):
 
             result = await self.client.aio.models.embed_content(
                 model=self.model,
-                contents=[text],
+                contents=cast(Any, [text]),
                 config=config,
             )
 
             if not result.embeddings or len(result.embeddings) == 0:
                 raise ValueError("No embeddings returned from Google API")
 
-            return result.embeddings[0].values
+            return result.embeddings[0].values or []
         except Exception as e:
             raise RuntimeError(f"Google API error: {e}") from e
 

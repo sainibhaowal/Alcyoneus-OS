@@ -117,6 +117,7 @@ class RedisPublisher(BasePublisher):
                 self._redis = redis_asyncio.Redis(connection_pool=pool)
 
                 # Test connection
+                assert self._redis is not None
                 await self._redis.ping()
                 logger.info(
                     "RedisPublisher connected successfully (max_connections=%d)",

@@ -397,66 +397,85 @@ class TestPgCheckpointerIntegration2:
 
 
 @pytest.mark.integration
-@pytest.mark.skipif(
-    True,  # Skip integration tests by default unless --integration flag is used
-    reason="Integration tests require real PostgreSQL and Redis connections",
-)
 class TestPgCheckpointerIntegration:
-    """Integration tests requiring real PostgreSQL and Redis connections."""
+    """Integration workflow tests for PgCheckpointer."""
 
     @pytest.fixture
-    async def real_checkpointer(self):
-        """Create a PgCheckpointer with real database connections."""
-        checkpointer = PgCheckpointer(
-            database_url="postgresql://postgres:password@localhost:5432/test_db",
-            redis_url="redis://localhost:6379/1",  # Use different DB for testing
-        )
-        await checkpointer.asetup()
-        try:
-            yield checkpointer
-        finally:
-            await checkpointer.arelease()
+    def integration_checkpointer(self):
+        """Create a PgCheckpointer with mocked database and Redis connections."""
+        mock_pg_pool = MagicMock()
+        connection = AsyncMock()
+        mock_pg_pool.is_closing.return_value = False
+
+        async_cm = AsyncMock()
+        async_cm.__aenter__ = AsyncMock(return_value=connection)
+        async_cm.__aexit__ = AsyncMock(return_value=None)
+        mock_pg_pool.acquire.return_value = async_cm
+        mock_pg_pool.close = AsyncMock()
+
+        mock_redis = AsyncMock()
+
+        with patch("asyncpg.create_pool", return_value=mock_pg_pool), \
+             patch("redis.asyncio.from_url", return_value=mock_redis):
+            checkpointer = PgCheckpointer(
+                postgres_dsn="postgresql://postgres:password@localhost:5432/test_db",
+                redis_url="redis://localhost:6379/1",
+            )
+            checkpointer._pg_pool = mock_pg_pool
+            checkpointer.redis = mock_redis
+
+            connection.execute = AsyncMock()
+            connection.fetchval = AsyncMock(return_value=None)
+
+            return checkpointer, connection, mock_redis
 
     @pytest.mark.asyncio
-    async def test_full_workflow(self, real_checkpointer):
-        """Test complete workflow with real database."""
+    async def test_full_workflow(self, integration_checkpointer):
+        """Test complete workflow with database and cache operations."""
+        checkpointer, connection, mock_redis = integration_checkpointer
+
         config = {
             "thread_id": "integration_test_123",
             "user_id": "test_user_456",
             "thread_name": "Integration Test Thread",
         }
 
-        try:
-            # Setup schema
-            await real_checkpointer.asetup()
+        # 1. Setup schema
+        await checkpointer.asetup()
+        assert checkpointer._schema_initialized
 
-            # Create state and store it
-            state = AgentState()
-            state.context = [
-                Message.text_message("Integration test", role="user", message_id="int_msg1")
-            ]
+        # 2. Create state and store it
+        state = AgentState()
+        state.context = [
+            Message.text_message("Integration test", role="user", message_id="int_msg1")
+        ]
 
-            stored_state = await real_checkpointer.aput_state(config, state)
-            assert stored_state == state
+        stored_state = await checkpointer.aput_state(config, state)
+        assert stored_state == state
 
-            # Retrieve state
-            retrieved_state = await real_checkpointer.aget_state(
-                {**config, "state_class": AgentState}
-            )
-            assert retrieved_state is not None
-            assert len(retrieved_state.context) == 1
+        # 3. Retrieve state
+        data = state.model_dump()
+        data["__class_path__"] = checkpointer._get_full_class_path(state)
+        state_json = json.dumps(data)
+        connection.fetchrow = AsyncMock(return_value={"state_data": state_json})
 
-            # Test caching
-            cached_state = await real_checkpointer.aget_state_cache(
-                {**config, "state_class": AgentState}
-            )
-            assert cached_state is not None
+        retrieved_state = await checkpointer.aget_state(
+            {**config, "state_class": AgentState}
+        )
+        assert retrieved_state is not None
+        assert len(retrieved_state.context) == 1
 
-            # Clean up
-            await real_checkpointer.aclean_thread(config)
+        # 4. Test caching
+        mock_redis.get.return_value = state_json.encode()
+        cached_state = await checkpointer.aget_state_cache(
+            {**config, "state_class": AgentState}
+        )
+        assert cached_state is not None
+        assert len(cached_state.context) == 1
 
-        finally:
-            await real_checkpointer.arelease()
+        # 5. Clean up thread
+        await checkpointer.aclean_thread(config)
+        mock_redis.delete.assert_called()
 
 
 if __name__ == "__main__":

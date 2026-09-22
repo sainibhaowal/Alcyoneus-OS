@@ -12,13 +12,34 @@ provide additional metadata for function calling APIs and agent execution.
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import Any, TypeVar, overload
 
 
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def tool[F: Callable[..., Any]](
+@overload
+def tool(
+    _func: F,
+    /,
+) -> F: ...
+
+
+@overload
+def tool(
+    _func: None = None,
+    /,
+    *,
+    name: str | None = None,
+    description: str | None = None,
+    tags: list[str] | set[str] | None = None,
+    provider: str | None = None,
+    capabilities: list[str] | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> Callable[[F], F]: ...
+
+
+def tool(
     _func: F | None = None,
     /,
     *,

@@ -21,10 +21,10 @@ try:
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: Any = _DummyInject()  # type: ignore[misc,assignment,no-redef]
 
 
 from alcyoneus.core.graph.utils.invoke_node_handler import InvokeNodeHandler
@@ -131,7 +131,7 @@ class Node:
         self,
         config: dict[str, Any],
         state: AgentState,
-        callback_mgr: CallbackManager = Inject[CallbackManager],
+        callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
     ) -> dict[str, Any] | list[Message] | Command:
         """Execute the node function with comprehensive context and callback support.
 
@@ -185,7 +185,7 @@ class Node:
         self,
         config: dict[str, Any],
         state: AgentState,
-        callback_mgr: CallbackManager = Inject[CallbackManager],
+        callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
     ) -> AsyncIterable[dict[str, Any] | Message | StreamChunk]:
         """Execute the node function with streaming output support.
 

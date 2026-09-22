@@ -234,7 +234,7 @@ class DockerSandbox(BaseSandbox):
             exec_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
         try:
-            stdout, stderr = await asyncio.wait_for(
+            out_bytes, err_bytes = await asyncio.wait_for(
                 proc.communicate(), timeout=timeout or self.config.timeout_seconds
             )
         except TimeoutError:
@@ -243,8 +243,8 @@ class DockerSandbox(BaseSandbox):
             raise ExecTimeoutError(f"Command timed out after {timeout}s")
         return ExecResult(
             exit_code=proc.returncode or 0,
-            stdout=stdout.decode(errors="replace"),
-            stderr=stderr.decode(errors="replace"),
+            stdout=out_bytes.decode(errors="replace") if out_bytes else "",
+            stderr=err_bytes.decode(errors="replace") if err_bytes else "",
             duration_seconds=time.monotonic() - start_t,
         )
 
@@ -327,8 +327,8 @@ class DockerSandbox(BaseSandbox):
         proc = await asyncio.create_subprocess_shell(cmd, stdin=asyncio.subprocess.PIPE)
         await proc.communicate(input=text.encode())
 
-    async def exec_interactive(self, command: str) -> asyncio.subprocess.Popen:
-        """PTY interactive execution. Returns a Popen for streaming I/O."""
+    async def exec_interactive(self, command: str) -> asyncio.subprocess.Process:
+        """PTY interactive execution. Returns a Process for streaming I/O."""
         if not self.container_id:
             raise SandboxError("Container not running")
         # Use docker exec -i -t

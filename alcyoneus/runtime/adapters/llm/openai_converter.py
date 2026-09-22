@@ -178,13 +178,13 @@ class OpenAIConverter(BaseConverter):
         if reasoning_content:
             blocks.append(ReasoningBlock(summary=reasoning_content))
         if content:
-            blocks.append(TextBlock(text=content))
+            blocks.append(TextBlock(text=content))  # type: ignore[arg-type]
 
         audio_block = self._extract_audio_block(getattr(message, "audio", None))
         if audio_block:
-            blocks.append(audio_block)
+            blocks.append(audio_block)  # type: ignore[arg-type]
 
-        blocks.extend(self._extract_image_blocks(getattr(message, "images", None)))
+        blocks.extend(self._extract_image_blocks(getattr(message, "images", None)))  # type: ignore[arg-type]
         return blocks
 
     def _append_tool_call_blocks(self, message: Any, blocks: list) -> list[dict]:
@@ -265,7 +265,7 @@ class OpenAIConverter(BaseConverter):
         Returns:
             list[ImageBlock]: List of image blocks.
         """
-        blocks = []
+        blocks = []  # type: ignore[var-annotated]
         try:
             if not images_data:
                 return blocks
@@ -320,20 +320,20 @@ class OpenAIConverter(BaseConverter):
         if not reasoning_part:
             reasoning_part = getattr(delta, "reasoning", "") or ""
         if reasoning_part:
-            content_blocks.append(ReasoningBlock(summary=reasoning_part))
+            content_blocks.append(ReasoningBlock(summary=reasoning_part))  # type: ignore[arg-type]
 
         # Extract audio if present in delta
         audio_data = getattr(delta, "audio", None) if hasattr(delta, "audio") else None
         if audio_data:
             audio_block = self._extract_audio_block(audio_data)
             if audio_block:
-                content_blocks.append(audio_block)
+                content_blocks.append(audio_block)  # type: ignore[arg-type]
 
         # Extract images if present in delta
         images_data = getattr(delta, "images", None) if hasattr(delta, "images") else None
         if images_data:
             image_blocks = self._extract_image_blocks(images_data)
-            content_blocks.extend(image_blocks)
+            content_blocks.extend(image_blocks)  # type: ignore[arg-type]
 
         return text_part, reasoning_part, content_blocks
 
@@ -489,11 +489,11 @@ class OpenAIConverter(BaseConverter):
         if accumulated_content:
             blocks.append(TextBlock(text=accumulated_content))
         if accumulated_reasoning_content:
-            blocks.append(ReasoningBlock(summary=accumulated_reasoning_content))
+            blocks.append(ReasoningBlock(summary=accumulated_reasoning_content))  # type: ignore[arg-type]
         for tc in tool_calls:
             func_data = tc.get("function", {})
             blocks.append(
-                ToolCallBlock(
+                ToolCallBlock(  # type: ignore[arg-type]
                     name=func_data.get("name", ""),
                     args=json.loads(func_data.get("arguments", "{}")),
                     id=tc.get("id", ""),
@@ -521,8 +521,8 @@ class OpenAIConverter(BaseConverter):
             Message: Converted message chunk from the stream.
         """
         accumulated_content = ""
-        tool_calls = []
-        tool_ids = set()
+        tool_calls = []  # type: ignore[var-annotated]
+        tool_ids = set()  # type: ignore[var-annotated]
         accumulated_reasoning_content = ""
 
         is_awaitable = inspect.isawaitable(stream)
@@ -576,7 +576,7 @@ class OpenAIConverter(BaseConverter):
         )
         yield message
 
-    async def convert_streaming_response(
+    async def convert_streaming_response(  # type: ignore[override]
         self,
         config: dict,
         node_name: str,

@@ -23,14 +23,14 @@ from typing import Any, TypeVar
 
 
 try:
-    from injectq import Inject
+    from injectq import Inject  # type: ignore[assignment]
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: Any = _DummyInject()  # type: ignore[no-redef]
 
 
 from alcyoneus.core.state import AgentState, ExecutionStatus
@@ -54,7 +54,7 @@ async def check_interrupted[StateT: AgentState](
     state: StateT,
     input_data: dict[str, Any],
     config: dict[str, Any],
-    callback_mgr: CallbackManager = Inject[CallbackManager],
+    callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
 ) -> tuple[StateT, dict[str, Any]]:
     if state.is_interrupted():
         logger.info(
@@ -119,7 +119,7 @@ async def check_and_handle_interrupt[StateT: AgentState](
     config: dict[str, Any],
     interrupt_before: list[str] | None = None,
     interrupt_after: list[str] | None = None,
-    callback_mgr: CallbackManager = Inject[CallbackManager],
+    callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
 ) -> bool:
     """Check for interrupts and save state if needed. Returns True if interrupted."""
     interrupt_nodes: list[str] = (
@@ -187,7 +187,7 @@ async def interrupt_graph[StateT: AgentState](
     current_node: str,
     state: StateT,
     config: dict[str, Any],
-    callback_mgr: CallbackManager = Inject[CallbackManager],
+    callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
 ) -> bool:
     """Check for interrupts and save state if needed. Returns True if interrupted."""
     status = ExecutionStatus.INTERRUPTED_AFTER
@@ -224,7 +224,7 @@ async def check_stop_requested[StateT: AgentState](
     event: EventModel,
     messages: list[Message],
     config: dict[str, Any],
-    callback_mgr: CallbackManager = Inject[CallbackManager],
+    callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
 ) -> bool:
     """Check if a stop has been requested externally."""
     state = await reload_state(config, state)  # type: ignore

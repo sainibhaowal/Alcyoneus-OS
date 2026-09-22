@@ -57,7 +57,7 @@ class _TestAgentConverter(BaseConverter):
                         args = json.loads(args)
                     except json.JSONDecodeError:
                         args = {}
-                msg.content.append(
+                msg.content.append(  # type: ignore[attr-defined]
                     ToolCallBlock(
                         id=tc.get("id", str(uuid.uuid4())),
                         name=func_info.get("name", ""),
@@ -316,7 +316,7 @@ class TestAgent(BaseAgent):
         }
         config.update(kwargs)
 
-        return TestAgent(**config)
+        return TestAgent(**config)  # type: ignore[arg-type]
 
     def __repr__(self) -> str:
         return f"TestAgent(model={self.model!r}, responses={len(self.responses)}, calls={self.call_count})"  # noqa: E501

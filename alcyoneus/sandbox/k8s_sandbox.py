@@ -66,22 +66,24 @@ class K8sSandbox(BaseSandbox):
 
     def _build_pod_manifest(self) -> dict[str, Any]:
         cfg = self.config
-        container = {
+        resources: dict[str, Any] = {
+            "requests": {"cpu": str(cfg.cpu_limit), "memory": cfg.memory_limit},
+            "limits": {"cpu": str(cfg.cpu_limit), "memory": cfg.memory_limit},
+        }
+
+        # GPU
+        if cfg.gpu_config != GPUConfig.NONE and cfg.gpu_devices:
+            resources["limits"]["nvidia.com/gpu"] = str(len(cfg.gpu_devices))
+            resources["requests"]["nvidia.com/gpu"] = str(len(cfg.gpu_devices))
+
+        container: dict[str, Any] = {
             "name": "sandbox",
             "image": cfg.image,
             "workingDir": cfg.workdir,
             "env": [{"name": k, "value": v} for k, v in cfg.env.items()],
             "command": ["sh", "-c", "sleep infinity"],
-            "resources": {
-                "requests": {"cpu": str(cfg.cpu_limit), "memory": cfg.memory_limit},
-                "limits": {"cpu": str(cfg.cpu_limit), "memory": cfg.memory_limit},
-            },
+            "resources": resources,
         }
-
-        # GPU
-        if cfg.gpu_config != GPUConfig.NONE and cfg.gpu_devices:
-            container["resources"]["limits"]["nvidia.com/gpu"] = str(len(cfg.gpu_devices))
-            container["resources"]["requests"]["nvidia.com/gpu"] = str(len(cfg.gpu_devices))
 
         # Volume mounts
         volumes = []

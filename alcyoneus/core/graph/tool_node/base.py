@@ -29,14 +29,14 @@ import typing as t
 
 
 try:
-    from injectq import Inject
+    from injectq import Inject  # type: ignore[assignment]
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: t.Any) -> t.Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: t.Any = _DummyInject()  # type: ignore[no-redef]
 
 
 from alcyoneus.core.state import AgentState, ErrorBlock, Message, ToolCallBlock, ToolResultBlock
@@ -48,7 +48,14 @@ from alcyoneus.utils import CallbackManager
 
 from . import deps
 from .executors import KwargsResolverMixin, LocalExecMixin, MCPMixin
-from .policy import PolicyConfig
+from .policy import (
+    Decision,
+    Policy,
+    PolicyAction,
+    PolicyConfig,
+    PolicyEngine,
+    ToolExecutionPolicy,
+)
 from .registry import ToolRegistry
 from .schema import SchemaMixin
 
@@ -109,8 +116,13 @@ class ToolNode(
         pass_user_info_to_mcp: bool = False,
         enabled_tools: list[str] | None = None,
         disabled_tools: list[str] | None = None,
-        policy_config: PolicyConfig | None = None,
+        policy_config: PolicyConfig | PolicyEngine | t.Sequence[Policy] | None = None,
         registry: ToolRegistry | None = None,
+        policy: PolicyEngine
+        | PolicyConfig
+        | t.Sequence[Policy]
+        | ToolExecutionPolicy
+        | None = None,
     ) -> None:
         """Initialize ToolNode with functions and optional MCP client.
 
@@ -181,7 +193,18 @@ class ToolNode(
         self._pass_user_info_to_mcp: bool = pass_user_info_to_mcp
         self._enabled_tools: set[str] | None = set(enabled_tools) if enabled_tools else None
         self._disabled_tools: set[str] | None = set(disabled_tools) if disabled_tools else None
-        self._policy_config: PolicyConfig | None = policy_config
+        # Support both policy and policy_config
+        effective_policy = policy if policy is not None else policy_config
+        self._execution_policy: ToolExecutionPolicy | None = None
+        if isinstance(effective_policy, ToolExecutionPolicy):
+            self._execution_policy = effective_policy
+            self._policy_config: PolicyEngine | None = None
+        elif isinstance(effective_policy, (list, tuple)):
+            self._policy_config = PolicyEngine(effective_policy)
+        elif isinstance(effective_policy, PolicyEngine):
+            self._policy_config = effective_policy
+        else:
+            self._policy_config = None
         self.registry = registry or ToolRegistry()
 
         for tool in tools:
@@ -345,10 +368,12 @@ class ToolNode(
         name: str,
         args: dict,
         tool_call_id: str,
-        config: dict[str, t.Any],
-        state: AgentState,
-        callback_manager: CallbackManager = Inject[CallbackManager],
+        config: dict[str, t.Any] | None = None,
+        state: AgentState | None = None,
+        callback_manager: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
     ) -> dict[str, t.Any] | Message:
+        config = config or {}
+        state = state or AgentState()
         """Execute a specific tool by name with the provided arguments.
 
         This method handles tool execution across all configured providers (local,
@@ -398,26 +423,35 @@ class ToolNode(
 
         # Check policy enforcement if configured
         if self._policy_config is not None:
-            from .policy import PolicyAction
-
             # Determine if this is an MCP tool
             mcp_server_name = None
             if name in self.mcp_tools:
                 mcp_server_name = "mcp"
 
-            action, policy = self._policy_config.evaluate(
+            eval_res = self._policy_config.evaluate(
                 name,
-                mcp_server_name,
                 args=args,
+                mcp_server_name=mcp_server_name,
                 context=config,
             )
+            if inspect.isawaitable(eval_res):
+                action, policy = await eval_res
+            else:
+                action, policy = eval_res
+
             audit = config.get("audit_tool_call") if isinstance(config, dict) else None
             if audit is not None:
+                action_val = getattr(action, "value", str(action))
+                pol_name = (
+                    (getattr(policy, "description", None) or getattr(policy, "name", None))
+                    if policy
+                    else None
+                )
                 audit_record = {
                     "tool": name,
                     "args": args,
-                    "action": action.value,
-                    "policy": policy.description if policy else None,
+                    "action": action_val,
+                    "policy": pol_name,
                     "user_id": config.get("user_id"),
                     "tenant_id": config.get("tenant_id"),
                 }
@@ -425,10 +459,13 @@ class ToolNode(
                 if inspect.isawaitable(audit_result):
                     await audit_result
 
-            if action == PolicyAction.DENY:
-                logger.warning(
-                    f"Tool '{name}' denied by policy: {policy.description if policy else 'No matching policy'}"  # noqa: E501
+            if action in (PolicyAction.DENY, Decision.DENY):
+                pol_desc = (
+                    getattr(policy, "description", None)
+                    or getattr(policy, "name", None)
+                    or "No matching policy"
                 )
+                logger.warning(f"Tool '{name}' denied by policy: {pol_desc}")
                 return Message.tool_message(
                     content=[
                         ErrorBlock(message=f"Tool '{name}' is denied by safety policy"),
@@ -446,14 +483,19 @@ class ToolNode(
                     },
                 )
 
-            if action == PolicyAction.ASK_USER:
-                handler = policy.handler if policy else None
+            if action in (PolicyAction.ASK_USER, Decision.ASK_USER):
+                handler = getattr(policy, "handler", None) or getattr(policy, "ask_user", None)
                 if handler is None:
                     from .policy import default_ask_user_handler
 
                     handler = default_ask_user_handler
 
-                allowed = await handler(name, args)
+                handler_res = handler(name, args)
+                if inspect.isawaitable(handler_res):
+                    allowed = await handler_res
+                else:
+                    allowed = bool(handler_res)
+
                 if not allowed:
                     logger.warning(f"Tool '{name}' denied by user confirmation")
                     return Message.tool_message(
@@ -498,6 +540,7 @@ class ToolNode(
                 },
             )
 
+        res: dict[str, t.Any] | Message
         if name in self.mcp_tools:
             event.metadata["is_mcp"] = True
             publish_event(event)
@@ -581,7 +624,7 @@ class ToolNode(
         config: dict[str, t.Any],
         state: AgentState,
         emit: StreamEmitter | None = None,
-        callback_manager: CallbackManager = Inject[CallbackManager],
+        callback_manager: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
     ) -> t.AsyncIterator[Message | dict[str, t.Any]]:
         """Execute a tool with streaming support, yielding incremental results.
 

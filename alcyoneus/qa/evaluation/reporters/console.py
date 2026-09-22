@@ -182,10 +182,10 @@ class ConsoleReporter(BaseReporter):
         c = self._c
         title = report.eval_set_name or report.eval_set_id
         self._print()
-        self._print(f"{c.BOLD}{c.CYAN}╔{'═' * 60}╗{c.RESET}")
-        title_str = f"{c.BOLD}Evaluation Report: {title}{c.RESET}"
-        self._print(f"{c.BOLD}{c.CYAN}║{c.RESET} {title_str}")
-        self._print(f"{c.BOLD}{c.CYAN}╚{'═' * 60}╝{c.RESET}")
+        self._print(f"{c.BOLD}{c.CYAN}╔{'═' * 60}╗{c.RESET}")  # type: ignore[attr-defined]
+        title_str = f"{c.BOLD}Evaluation Report: {title}{c.RESET}"  # type: ignore[attr-defined]
+        self._print(f"{c.BOLD}{c.CYAN}║{c.RESET} {title_str}")  # type: ignore[attr-defined]
+        self._print(f"{c.BOLD}{c.CYAN}╚{'═' * 60}╝{c.RESET}")  # type: ignore[attr-defined]
         self._print()
 
     def _print_summary(self, report: EvalReport) -> None:
@@ -193,38 +193,38 @@ class ConsoleReporter(BaseReporter):
         summary = report.summary
 
         if summary.pass_rate == 1.0:
-            status = f"{c.BG_GREEN}{c.WHITE}{c.BOLD} ALL PASSED {c.RESET}"
+            status = f"{c.BG_GREEN}{c.WHITE}{c.BOLD} ALL PASSED {c.RESET}"  # type: ignore[attr-defined]
         elif summary.pass_rate == 0.0:
-            status = f"{c.BG_RED}{c.WHITE}{c.BOLD} ALL FAILED {c.RESET}"
+            status = f"{c.BG_RED}{c.WHITE}{c.BOLD} ALL FAILED {c.RESET}"  # type: ignore[attr-defined]
         else:
-            status = f"{c.YELLOW}{c.BOLD}PARTIAL{c.RESET}"
+            status = f"{c.YELLOW}{c.BOLD}PARTIAL{c.RESET}"  # type: ignore[attr-defined]
 
-        self._print(f"{c.BOLD}Summary:{c.RESET} {status}")
+        self._print(f"{c.BOLD}Summary:{c.RESET} {status}")  # type: ignore[attr-defined]
         self._print()
 
-        total_str = f"Total Cases:  {c.BOLD}{summary.total_cases}{c.RESET}"
-        self._print(f"  {c.DIM}├─{c.RESET} {total_str}")
+        total_str = f"Total Cases:  {c.BOLD}{summary.total_cases}{c.RESET}"  # type: ignore[attr-defined]
+        self._print(f"  {c.DIM}├─{c.RESET} {total_str}")  # type: ignore[attr-defined]
 
-        pass_color = c.GREEN if summary.passed_cases > 0 else c.DIM
+        pass_color = c.GREEN if summary.passed_cases > 0 else c.DIM  # type: ignore[attr-defined]
         self._print(
-            f"  {c.DIM}├─{c.RESET} Passed:       "
-            f"{pass_color}{summary.passed_cases} ({summary.pass_rate:.1%}){c.RESET}"
+            f"  {c.DIM}├─{c.RESET} Passed:       "  # type: ignore[attr-defined]
+            f"{pass_color}{summary.passed_cases} ({summary.pass_rate:.1%}){c.RESET}"  # type: ignore[attr-defined]
         )
 
-        fail_color = c.RED if summary.failed_cases > 0 else c.DIM
+        fail_color = c.RED if summary.failed_cases > 0 else c.DIM  # type: ignore[attr-defined]
         self._print(
-            f"  {c.DIM}├─{c.RESET} Failed:       {fail_color}{summary.failed_cases}{c.RESET}"
+            f"  {c.DIM}├─{c.RESET} Failed:       {fail_color}{summary.failed_cases}{c.RESET}"  # type: ignore[attr-defined]
         )
 
-        error_color = c.YELLOW if summary.error_cases > 0 else c.DIM
+        error_color = c.YELLOW if summary.error_cases > 0 else c.DIM  # type: ignore[attr-defined]
         self._print(
-            f"  {c.DIM}├─{c.RESET} Errors:       {error_color}{summary.error_cases}{c.RESET}"
+            f"  {c.DIM}├─{c.RESET} Errors:       {error_color}{summary.error_cases}{c.RESET}"  # type: ignore[attr-defined]
         )
 
         duration_str = (
             f"{summary.total_duration_seconds:.2f}s (avg: {summary.avg_duration_seconds:.2f}s)"
         )
-        self._print(f"  {c.DIM}└─{c.RESET} Duration:     {duration_str}")
+        self._print(f"  {c.DIM}└─{c.RESET} Duration:     {duration_str}")  # type: ignore[attr-defined]
         self._print()
 
     def _print_criterion_stats(self, report: EvalReport) -> None:
@@ -232,7 +232,7 @@ class ConsoleReporter(BaseReporter):
         if not report.summary.criterion_stats:
             return
 
-        self._print(f"{c.BOLD}Criteria Results:{c.RESET}")
+        self._print(f"{c.BOLD}Criteria Results:{c.RESET}")  # type: ignore[attr-defined]
         self._print()
 
         HIGH_PASS_RATE = 0.9
@@ -245,14 +245,14 @@ class ConsoleReporter(BaseReporter):
             total = stats.get("total", 0)
 
             if pass_rate >= HIGH_PASS_RATE:
-                color, icon = c.GREEN, "✓"
+                color, icon = c.GREEN, "✓"  # type: ignore[attr-defined]
             elif pass_rate >= MED_PASS_RATE:
-                color, icon = c.YELLOW, "○"
+                color, icon = c.YELLOW, "○"  # type: ignore[attr-defined]
             else:
-                color, icon = c.RED, "✗"
+                color, icon = c.RED, "✗"  # type: ignore[attr-defined]
 
             self._print(
-                f"  {color}{icon}{c.RESET} {criterion}: "
+                f"  {color}{icon}{c.RESET} {criterion}: "  # type: ignore[attr-defined]
                 f"{passed}/{total} passed, avg score: {avg_score:.2f}"
             )
 
@@ -260,7 +260,7 @@ class ConsoleReporter(BaseReporter):
 
     def _print_case_details(self, report: EvalReport) -> None:
         c = self._c
-        self._print(f"{c.BOLD}Case Details:{c.RESET}")
+        self._print(f"{c.BOLD}Case Details:{c.RESET}")  # type: ignore[attr-defined]
         self._print()
         for result in report.results:
             self._print_case(result)
@@ -268,46 +268,46 @@ class ConsoleReporter(BaseReporter):
     def _print_case(self, result: EvalCaseResult) -> None:  # noqa: PLR0912, PLR0915
         c = self._c
         if result.is_error:
-            icon, color, status = "⚠", c.YELLOW, "ERROR"
+            icon, color, status = "⚠", c.YELLOW, "ERROR"  # type: ignore[attr-defined]
         elif result.passed:
-            icon, color, status = "✓", c.GREEN, "PASS"
+            icon, color, status = "✓", c.GREEN, "PASS"  # type: ignore[attr-defined]
         else:
-            icon, color, status = "✗", c.RED, "FAIL"
+            icon, color, status = "✗", c.RED, "FAIL"  # type: ignore[attr-defined]
 
         name = case_display_name(result)
-        self._print(f"  {color}{icon} {status}{c.RESET} {name} ({result.duration_seconds:.2f}s)")
+        self._print(f"  {color}{icon} {status}{c.RESET} {name} ({result.duration_seconds:.2f}s)")  # type: ignore[attr-defined]
 
         if result.error:
-            self._print(f"      {c.YELLOW}Error: {result.error}{c.RESET}")
+            self._print(f"      {c.YELLOW}Error: {result.error}{c.RESET}")  # type: ignore[attr-defined]
 
         # --- Metadata (always shown when non-empty) ---
         if getattr(result, "metadata", None):
-            self._print(f"      {c.BOLD}Metadata:{c.RESET}")
+            self._print(f"      {c.BOLD}Metadata:{c.RESET}")  # type: ignore[attr-defined]
             for mk, mv in result.metadata.items():
-                self._print(f"        {c.DIM}{mk}: {mv}{c.RESET}")
+                self._print(f"        {c.DIM}{mk}: {mv}{c.RESET}")  # type: ignore[attr-defined]
 
         # --- Agent response (shown when flag is set) ---
         if self.include_actual_response and result.actual_response:
             self._print(
-                f"      {c.BOLD}Response:{c.RESET} {c.DIM}{result.actual_response}{c.RESET}"
+                f"      {c.BOLD}Response:{c.RESET} {c.DIM}{result.actual_response}{c.RESET}"  # type: ignore[attr-defined]
             )
 
         # --- Tool calls (always shown) ---
         if result.actual_tool_calls:
-            self._print(f"      {c.BOLD}Tool Calls ({len(result.actual_tool_calls)}):{c.RESET}")
+            self._print(f"      {c.BOLD}Tool Calls ({len(result.actual_tool_calls)}):{c.RESET}")  # type: ignore[attr-defined]
             for tc_info in format_tool_calls(result.actual_tool_calls):
-                self._print(f"        {c.CYAN}→{c.RESET} {tc_info['name']}")
+                self._print(f"        {c.CYAN}→{c.RESET} {tc_info['name']}")  # type: ignore[attr-defined]
                 if tc_info.get("call_id"):
-                    self._print(f"          {c.DIM}call_id: {tc_info['call_id']}{c.RESET}")
+                    self._print(f"          {c.DIM}call_id: {tc_info['call_id']}{c.RESET}")  # type: ignore[attr-defined]
                 if tc_info["args"] and tc_info["args"] != "{}":
-                    self._print(f"          {c.DIM}args: {tc_info['args']}{c.RESET}")
+                    self._print(f"          {c.DIM}args: {tc_info['args']}{c.RESET}")  # type: ignore[attr-defined]
                 if tc_info["result"]:
-                    self._print(f"          {c.DIM}result: {tc_info['result']}{c.RESET}")
+                    self._print(f"          {c.DIM}result: {tc_info['result']}{c.RESET}")  # type: ignore[attr-defined]
 
         # --- Trajectory (shown when flag is set) ---
         if self.include_trajectory and result.actual_trajectory:
             self._print(
-                f"      {c.BOLD}Trajectory ({len(result.actual_trajectory)} steps):{c.RESET}"
+                f"      {c.BOLD}Trajectory ({len(result.actual_trajectory)} steps):{c.RESET}"  # type: ignore[attr-defined]
             )
             for step in result.actual_trajectory:
                 if hasattr(step, "step_type"):
@@ -317,7 +317,7 @@ class ConsoleReporter(BaseReporter):
                         else str(step.step_type)
                     )
                     sname = step.name if hasattr(step, "name") else str(step)
-                    self._print(f"        {c.CYAN}→{c.RESET} [{stype.upper()}] {sname}")
+                    self._print(f"        {c.CYAN}→{c.RESET} [{stype.upper()}] {sname}")  # type: ignore[attr-defined]
                     if hasattr(step, "args") and step.args:
                         import json as _json
 
@@ -325,24 +325,24 @@ class ConsoleReporter(BaseReporter):
                             args_str = _json.dumps(step.args, default=str, ensure_ascii=False)
                         except (TypeError, ValueError):
                             args_str = str(step.args)
-                        self._print(f"          {c.DIM}args: {args_str}{c.RESET}")
+                        self._print(f"          {c.DIM}args: {args_str}{c.RESET}")  # type: ignore[attr-defined]
                     if hasattr(step, "metadata") and step.metadata:
-                        self._print(f"          {c.DIM}metadata: {step.metadata}{c.RESET}")
+                        self._print(f"          {c.DIM}metadata: {step.metadata}{c.RESET}")  # type: ignore[attr-defined]
                     if hasattr(step, "timestamp") and step.timestamp:
-                        self._print(f"          {c.DIM}timestamp: {step.timestamp}{c.RESET}")
+                        self._print(f"          {c.DIM}timestamp: {step.timestamp}{c.RESET}")  # type: ignore[attr-defined]
                 else:
-                    self._print(f"        {c.CYAN}→{c.RESET} {step}")
+                    self._print(f"        {c.CYAN}→{c.RESET} {step}")  # type: ignore[attr-defined]
 
         # --- Node visits (always shown) ---
         if getattr(result, "node_visits", None):
             self._print(
-                f"      {c.BOLD}Node Visits:{c.RESET} "
-                f"{c.DIM}{' → '.join(result.node_visits)}{c.RESET}"
+                f"      {c.BOLD}Node Visits:{c.RESET} "  # type: ignore[attr-defined]
+                f"{c.DIM}{' → '.join(result.node_visits)}{c.RESET}"  # type: ignore[attr-defined]
             )
 
         # --- Node responses (always shown with full fields) ---
         if getattr(result, "node_responses", None):
-            self._print(f"      {c.BOLD}Node Responses ({len(result.node_responses)}):{c.RESET}")
+            self._print(f"      {c.BOLD}Node Responses ({len(result.node_responses)}):{c.RESET}")  # type: ignore[attr-defined]
             for nr in result.node_responses:
                 nr_name = (
                     nr.get("node_name", "?")
@@ -378,72 +378,72 @@ class ConsoleReporter(BaseReporter):
                     else getattr(nr, "input_messages", [])
                 )
                 marker = " [FINAL]" if nr_final else ""
-                self._print(f"        {c.MAGENTA}⊙{c.RESET} {nr_name}{marker}")
+                self._print(f"        {c.MAGENTA}⊙{c.RESET} {nr_name}{marker}")  # type: ignore[attr-defined]
                 if nr_text:
-                    self._print(f"          {c.DIM}output: {nr_text}{c.RESET}")
+                    self._print(f"          {c.DIM}output: {nr_text}{c.RESET}")  # type: ignore[attr-defined]
                 if nr_tools:
-                    self._print(f"          {c.DIM}tools: {', '.join(nr_tools)}{c.RESET}")
+                    self._print(f"          {c.DIM}tools: {', '.join(nr_tools)}{c.RESET}")  # type: ignore[attr-defined]
                 if nr_has_tools:
-                    self._print(f"          {c.DIM}has_tool_calls: True{c.RESET}")
+                    self._print(f"          {c.DIM}has_tool_calls: True{c.RESET}")  # type: ignore[attr-defined]
                 if nr_timestamp:
-                    self._print(f"          {c.DIM}timestamp: {nr_timestamp}{c.RESET}")
+                    self._print(f"          {c.DIM}timestamp: {nr_timestamp}{c.RESET}")  # type: ignore[attr-defined]
                 if nr_input_msgs and self.verbose:
-                    self._print(f"          {c.DIM}input_messages ({len(nr_input_msgs)}):{c.RESET}")
+                    self._print(f"          {c.DIM}input_messages ({len(nr_input_msgs)}):{c.RESET}")  # type: ignore[attr-defined]
                     for msg in nr_input_msgs:
                         role = msg.get("role", "?") if isinstance(msg, dict) else "?"
                         content = msg.get("content", "") if isinstance(msg, dict) else str(msg)
-                        self._print(f"            {c.DIM}[{role}] {content}{c.RESET}")
+                        self._print(f"            {c.DIM}[{role}] {content}{c.RESET}")  # type: ignore[attr-defined]
 
         # --- Messages (always shown) ---
         if getattr(result, "messages", None):
-            self._print(f"      {c.BOLD}Messages ({len(result.messages)}):{c.RESET}")
+            self._print(f"      {c.BOLD}Messages ({len(result.messages)}):{c.RESET}")  # type: ignore[attr-defined]
             for msg in result.messages:
                 role = msg.get("role", "?") if isinstance(msg, dict) else "?"
                 content = msg.get("content", "") if isinstance(msg, dict) else str(msg)
-                self._print(f"        {c.DIM}[{role}] {content}{c.RESET}")
+                self._print(f"        {c.DIM}[{role}] {content}{c.RESET}")  # type: ignore[attr-defined]
 
         # --- Turn results (multi-turn per-turn data) ---
         if getattr(result, "turn_results", None):
             self._print(
-                f"      {c.BOLD}Turn-by-Turn Results ({len(result.turn_results)}):{c.RESET}"
+                f"      {c.BOLD}Turn-by-Turn Results ({len(result.turn_results)}):{c.RESET}"  # type: ignore[attr-defined]
             )
             for tr in result.turn_results:
                 tidx = tr.get("turn_index", "?")
-                self._print(f"        {c.CYAN}Turn {tidx}:{c.RESET}")
-                self._print(f"          {c.DIM}user: {tr.get('user_input', '')}{c.RESET}")
-                self._print(f"          {c.DIM}agent: {tr.get('agent_response', '')}{c.RESET}")
+                self._print(f"        {c.CYAN}Turn {tidx}:{c.RESET}")  # type: ignore[attr-defined]
+                self._print(f"          {c.DIM}user: {tr.get('user_input', '')}{c.RESET}")  # type: ignore[attr-defined]
+                self._print(f"          {c.DIM}agent: {tr.get('agent_response', '')}{c.RESET}")  # type: ignore[attr-defined]
                 turn_tcs = tr.get("tool_calls", [])
                 if turn_tcs:
-                    self._print(f"          {c.DIM}tool_calls: {len(turn_tcs)}{c.RESET}")
+                    self._print(f"          {c.DIM}tool_calls: {len(turn_tcs)}{c.RESET}")  # type: ignore[attr-defined]
                 turn_nv = tr.get("node_visits", [])
                 if turn_nv:
-                    self._print(f"          {c.DIM}nodes: {' → '.join(turn_nv)}{c.RESET}")
+                    self._print(f"          {c.DIM}nodes: {' → '.join(turn_nv)}{c.RESET}")  # type: ignore[attr-defined]
 
         # --- Criteria results (always shown for ALL criteria with full details) ---
         for cr in result.criterion_results:
             cr_icon = "✓" if cr.passed else "✗"
-            cr_color = c.GREEN if cr.passed else c.RED
+            cr_color = c.GREEN if cr.passed else c.RED  # type: ignore[attr-defined]
             self._print(
-                f"      {cr_color}{cr_icon}{c.RESET} {cr.criterion}: "
+                f"      {cr_color}{cr_icon}{c.RESET} {cr.criterion}: "  # type: ignore[attr-defined]
                 f"{cr.score:.2f} (threshold: {cr.threshold})"
             )
             if cr.error:
-                self._print(f"        {c.YELLOW}Error: {cr.error}{c.RESET}")
+                self._print(f"        {c.YELLOW}Error: {cr.error}{c.RESET}")  # type: ignore[attr-defined]
             if cr.reason:
-                self._print(f"        {c.DIM}Reason: {cr.reason}{c.RESET}")
+                self._print(f"        {c.DIM}Reason: {cr.reason}{c.RESET}")  # type: ignore[attr-defined]
             # Print ALL details from the criterion (not just reason)
             if cr.details:
                 for dk, dv in cr.details.items():
                     if dk == "reason":
                         continue  # Already printed above
-                    self._print(f"        {c.DIM}{dk}: {dv}{c.RESET}")
+                    self._print(f"        {c.DIM}{dk}: {dv}{c.RESET}")  # type: ignore[attr-defined]
 
         self._print()
 
     def _print_footer(self, report: EvalReport) -> None:
         c = self._c
         timestamp = format_timestamp(report.timestamp)
-        self._print(f"{c.DIM}Report generated: {timestamp}{c.RESET}")
+        self._print(f"{c.DIM}Report generated: {timestamp}{c.RESET}")  # type: ignore[attr-defined]
         self._print()
 
 
