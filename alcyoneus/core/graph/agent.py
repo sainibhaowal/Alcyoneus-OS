@@ -453,10 +453,14 @@ class Agent(
         Returns:
             Execution result dict containing messages and state updates.
         """
-        from alcyoneus.core.graph.state_graph import StateGraph
+        import importlib
+
         from alcyoneus.utils import END, START
 
-        graph: StateGraph = StateGraph()
+        state_graph_module = importlib.import_module("alcyoneus.core.graph.state_graph")
+        StateGraphClass = state_graph_module.StateGraph
+
+        graph = StateGraphClass()
         graph.add_node("agent", self)
         graph.add_edge(START, "agent")
         graph.add_edge("agent", END)

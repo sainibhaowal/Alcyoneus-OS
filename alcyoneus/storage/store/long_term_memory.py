@@ -59,7 +59,7 @@ import asyncio
 import logging
 from collections.abc import Callable
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any, Literal
+from typing import Any, Literal
 
 
 try:
@@ -73,9 +73,6 @@ from alcyoneus.storage.store.base_store import BaseStore
 from alcyoneus.storage.store.store_schema import MemorySearchResult, MemoryType
 from alcyoneus.utils.background_task_manager import BackgroundTaskManager
 
-
-if TYPE_CHECKING:
-    from alcyoneus.core.graph.state_graph import StateGraph
 
 logger = logging.getLogger("alcyoneus.store.long_term_memory")
 
@@ -654,7 +651,7 @@ class MemoryIntegration:
 
     def wire(
         self,
-        graph: StateGraph,
+        graph: Any,
         entry_to: str,
         preload_node_name: str = "memory_preload",
     ) -> None:

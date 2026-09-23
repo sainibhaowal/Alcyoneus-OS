@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import logging
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar
 
 
 try:
@@ -59,7 +61,6 @@ from .tool_node import ToolNode
 if TYPE_CHECKING:
     from alcyoneus.storage.media.storage.base import BaseMediaStore
 
-    from .agent import Agent
     from .compiled_graph import CompiledGraph
 
 
@@ -236,12 +237,12 @@ class StateGraph[StateT: AgentState]:
     def add_node(
         self,
         name_or_func: str | Callable,
-        func: Union[Callable, "ToolNode", "Agent", None] = None,
+        func: Callable | ToolNode | BaseAgent | None = None,
         retry_policy: Any | None = None,
         cache_policy: Any | None = None,
         error_handler: Any | None = None,
         timeout: float | None = None,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Add a node to the graph.
 
         This method supports multiple calling patterns:
@@ -325,7 +326,7 @@ class StateGraph[StateT: AgentState]:
         self,
         from_node: str,
         to_node: str,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Add a static edge between two nodes.
 
         Creates a direct connection from one node to another. If the source
@@ -356,7 +357,7 @@ class StateGraph[StateT: AgentState]:
         from_node: str,
         condition: Callable,
         path_map: dict[str, str] | None = None,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Add conditional routing between nodes based on runtime evaluation.
 
         Creates dynamic routing logic where the next node is determined by evaluating
@@ -427,7 +428,7 @@ class StateGraph[StateT: AgentState]:
             self.edges.append(Edge(from_node, "", condition))
         return self
 
-    def set_entry_point(self, node_name: str) -> "StateGraph":
+    def set_entry_point(self, node_name: str) -> StateGraph:
         """Set the entry point for the graph."""
         self.entry_point = node_name
         self.add_edge(START, node_name)
@@ -438,7 +439,7 @@ class StateGraph[StateT: AgentState]:
         self,
         sequence: list[str],
         conditional_edges: list[tuple[Callable, dict[str, str]]] | None = None,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Set a linear sequence of nodes as the graph's execution flow.
 
         Creates a straight-line chain: ``START -> seq[0] -> seq[1] -> ... -> END``.
@@ -494,7 +495,7 @@ class StateGraph[StateT: AgentState]:
         self,
         condition: Callable,
         path_map: dict[str, str] | None = None,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Set a conditional entry point: the first node is chosen at runtime.
 
         Args:
@@ -516,7 +517,7 @@ class StateGraph[StateT: AgentState]:
         logger.info("Set conditional entry point")
         return self
 
-    def set_finish_point(self, node_name: str) -> "StateGraph":
+    def set_finish_point(self, node_name: str) -> StateGraph:
         """Set the finish point for the graph (edge from node to END).
 
         Args:
@@ -540,8 +541,8 @@ class StateGraph[StateT: AgentState]:
     def override_node(
         self,
         name: str,
-        func: Union[Callable, "ToolNode", "Agent"],
-    ) -> "StateGraph":
+        func: Callable | ToolNode | BaseAgent,
+    ) -> StateGraph:
         """Override an existing node with a different function.
 
         Use this in tests to swap production nodes with test doubles.
@@ -579,14 +580,14 @@ class StateGraph[StateT: AgentState]:
         self,
         checkpointer: BaseCheckpointer[StateT] | None = None,
         store: BaseStore | None = None,
-        media_store: "BaseMediaStore | None" = None,
+        media_store: BaseMediaStore | None = None,
         interrupt_before: list[str] | None = None,
         interrupt_after: list[str] | None = None,
         callback_manager: CallbackManager = CallbackManager(),
         shutdown_timeout: float = 30.0,
         debug: bool = False,
         durability: str | None = None,
-    ) -> "CompiledGraph[StateT]":
+    ) -> CompiledGraph[StateT]:
         """Compile the graph for execution.
 
         Args:
