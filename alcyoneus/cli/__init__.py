@@ -289,7 +289,9 @@ def graph_inspect(graph_file: str, as_json: bool, as_yaml: bool) -> None:
     is_compiled = isinstance(graph_obj, CompiledGraph)
     state_graph = graph_obj._state_graph if is_compiled else graph_obj  # type: ignore[attr-defined]
 
-    node_names: list[str] = [str(k) for k in state_graph.nodes.keys()] if hasattr(state_graph, "nodes") else []
+    node_names: list[str] = (
+        [str(k) for k in state_graph.nodes.keys()] if hasattr(state_graph, "nodes") else []
+    )
     edges_list: list[dict[str, str]] = [
         {"source": str(getattr(e, "source", "")), "target": str(getattr(e, "target", ""))}
         for e in getattr(state_graph, "edges", [])
@@ -353,7 +355,10 @@ def agent_list(as_json: bool, as_yaml: bool):
     """List available agent types."""
     agents = [
         {"type": "react", "description": "Reasoning + Acting agent with tool use"},
-        {"type": "plan-act-reflect", "description": "Autonomous planning, execution, reflection agent"},
+        {
+            "type": "plan-act-reflect",
+            "description": "Autonomous planning, execution, reflection agent",
+        },
         {"type": "rag", "description": "Retrieval-Augmented Generation agent"},
         {"type": "swarm", "description": "Multi-agent swarm coordination"},
         {"type": "supervisor", "description": "Supervisor team orchestration"},
@@ -720,7 +725,6 @@ agent = SwarmAgent(
     return templates.get(agent_type, templates["react"])
 
 
-
 # -----------------------------------------------------------------------------
 # Version & Inspection with Machine-Readable (--json / --yaml) Outputs
 # -----------------------------------------------------------------------------
@@ -842,7 +846,9 @@ def cli_init(
         llm_provider=llm_provider,
     )
 
-    console.print(f"\n[bold green]✨ Project '{project_name}' successfully created in {target_dir}![/bold green]\n")
+    console.print(
+        f"\n[bold green]✨ Project '{project_name}' successfully created in {target_dir}![/bold green]\n"
+    )
     console.print("[bold]Scaffolded Files:[/bold]")
     for p in created:
         console.print(f"  • [cyan]{p.relative_to(target_dir)}[/cyan]")
@@ -906,13 +912,17 @@ def cli_completion(shell: str, install: bool) -> None:
         target_path.parent.mkdir(parents=True, exist_ok=True)
         existing_content = target_path.read_text() if target_path.exists() else ""
         if script_snippet in existing_content:
-            console.print(f"[yellow]Auto-completion snippet is already installed in {target_path}[/yellow]")
+            console.print(
+                f"[yellow]Auto-completion snippet is already installed in {target_path}[/yellow]"
+            )
             return
 
         with open(target_path, "a") as f:
             f.write(f"\n# Alcyoneus OS shell completion\n{script_snippet}\n")
 
-        console.print(f"[bold green]Installed {shell} auto-completion to {target_path}![/bold green]")
+        console.print(
+            f"[bold green]Installed {shell} auto-completion to {target_path}![/bold green]"
+        )
         console.print(f"To activate immediately, run: [cyan]source {target_path}[/cyan]")
     except Exception as exc:
         console.print(f"[red]Failed to install completion script: {exc}[/red]")
@@ -922,4 +932,3 @@ def cli_completion(shell: str, install: bool) -> None:
 
 if __name__ == "__main__":
     cli()
-

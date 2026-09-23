@@ -572,7 +572,9 @@ class CompiledGraph[StateT: AgentState]:
             raise ValueError(f"Checkpoint {checkpoint_id} not found")
 
         # Resume from that state
-        messages = state.get("messages", []) if isinstance(state, dict) else getattr(state, "messages", [])
+        messages = (
+            state.get("messages", []) if isinstance(state, dict) else getattr(state, "messages", [])
+        )
         return await self.ainvoke({"messages": messages}, cfg)
 
     def fork(

@@ -48,88 +48,102 @@ def generate_agent_code(
 
     # Imports based on agent type
     if agent_type == "react":
-        lines.extend([
-            "from alcyoneus.prebuilt.agent import ReactAgent",
-            "from alcyoneus.prebuilt.tools import safe_calculator, fetch_url, web_search",
-            "",
-            "def create_agent():",
-            "    tools = [safe_calculator, fetch_url, web_search]",
-            "    agent = ReactAgent(",
-            f'        model="{model_name}",',
-            '        system_prompt="You are a helpful, rigorous enterprise assistant with access to tools.",',
-            "        tools=tools,",
-            "    )",
-            "    return agent",
-        ])
+        lines.extend(
+            [
+                "from alcyoneus.prebuilt.agent import ReactAgent",
+                "from alcyoneus.prebuilt.tools import safe_calculator, fetch_url, web_search",
+                "",
+                "def create_agent():",
+                "    tools = [safe_calculator, fetch_url, web_search]",
+                "    agent = ReactAgent(",
+                f'        model="{model_name}",',
+                '        system_prompt="You are a helpful, rigorous enterprise assistant with access to tools.",',
+                "        tools=tools,",
+                "    )",
+                "    return agent",
+            ]
+        )
     elif agent_type == "plan-act-reflect":
-        lines.extend([
-            "from alcyoneus.prebuilt.agent.plan_act_reflect import PlanActReflectAgent",
-            "from alcyoneus.prebuilt.tools import safe_calculator, fetch_url",
-            "",
-            "def create_agent():",
-            "    tools = [safe_calculator, fetch_url]",
-            "    agent = PlanActReflectAgent(",
-            f'        model="{model_name}",',
-            "        tools=tools,",
-            "    )",
-            "    return agent",
-        ])
+        lines.extend(
+            [
+                "from alcyoneus.prebuilt.agent.plan_act_reflect import PlanActReflectAgent",
+                "from alcyoneus.prebuilt.tools import safe_calculator, fetch_url",
+                "",
+                "def create_agent():",
+                "    tools = [safe_calculator, fetch_url]",
+                "    agent = PlanActReflectAgent(",
+                f'        model="{model_name}",',
+                "        tools=tools,",
+                "    )",
+                "    return agent",
+            ]
+        )
     elif agent_type == "rag":
-        lines.extend([
-            "from alcyoneus.prebuilt.agent import RAGAgent",
-            "from alcyoneus.storage.store import InMemoryStore",
-            "",
-            "def create_agent():",
-            "    store = InMemoryStore()",
-            "    agent = RAGAgent(",
-            f'        model="{model_name}",',
-            '        system_prompt="You are a domain-expert answering questions using retrieved context.",',
-            "        store=store,",
-            "    )",
-            "    return agent",
-        ])
+        lines.extend(
+            [
+                "from alcyoneus.prebuilt.agent import RAGAgent",
+                "from alcyoneus.storage.store import InMemoryStore",
+                "",
+                "def create_agent():",
+                "    store = InMemoryStore()",
+                "    agent = RAGAgent(",
+                f'        model="{model_name}",',
+                '        system_prompt="You are a domain-expert answering questions using retrieved context.",',
+                "        store=store,",
+                "    )",
+                "    return agent",
+            ]
+        )
     elif agent_type == "swarm":
-        lines.extend([
-            "from alcyoneus.prebuilt.agent import SwarmAgent",
-            "",
-            "def create_agent():",
-            "    agent = SwarmAgent(",
-            f'        model="{model_name}",',
-            '        system_prompt="You are a swarm coordinator routing tasks across specialized agents.",',
-            "    )",
-            "    return agent",
-        ])
+        lines.extend(
+            [
+                "from alcyoneus.prebuilt.agent import SwarmAgent",
+                "",
+                "def create_agent():",
+                "    agent = SwarmAgent(",
+                f'        model="{model_name}",',
+                '        system_prompt="You are a swarm coordinator routing tasks across specialized agents.",',
+                "    )",
+                "    return agent",
+            ]
+        )
     elif agent_type == "supervisor":
-        lines.extend([
-            "from alcyoneus.prebuilt.agent import SupervisorTeamAgent",
-            "",
-            "def create_agent():",
-            "    agent = SupervisorTeamAgent(",
-            '        name="supervisor",',
-            f'        model="{model_name}",',
-            '        system_prompt="You coordinate a specialist team to deliver complete solutions.",',
-            "        team_members={",
-            f'            "researcher": {{"model": "{model_name}", "prompt": "Research specialist"}},',
-            f'            "analyst": {{"model": "{model_name}", "prompt": "Data analysis specialist"}},',
-            "        },",
-            "    )",
-            "    return agent",
-        ])
+        lines.extend(
+            [
+                "from alcyoneus.prebuilt.agent import SupervisorTeamAgent",
+                "",
+                "def create_agent():",
+                "    agent = SupervisorTeamAgent(",
+                '        name="supervisor",',
+                f'        model="{model_name}",',
+                '        system_prompt="You coordinate a specialist team to deliver complete solutions.",',
+                "        team_members={",
+                f'            "researcher": {{"model": "{model_name}", "prompt": "Research specialist"}},',
+                f'            "analyst": {{"model": "{model_name}", "prompt": "Data analysis specialist"}},',
+                "        },",
+                "    )",
+                "    return agent",
+            ]
+        )
     else:  # fallback
-        lines.extend([
-            "from alcyoneus.prebuilt.agent import ReactAgent",
-            "from alcyoneus.prebuilt.tools import safe_calculator",
-            "",
-            "def create_agent():",
-            f'    return ReactAgent(model="{model_name}", tools=[safe_calculator])',
-        ])
+        lines.extend(
+            [
+                "from alcyoneus.prebuilt.agent import ReactAgent",
+                "from alcyoneus.prebuilt.tools import safe_calculator",
+                "",
+                "def create_agent():",
+                f'    return ReactAgent(model="{model_name}", tools=[safe_calculator])',
+            ]
+        )
 
-    lines.extend([
-        "",
-        'if __name__ == "__main__":',
-        "    agent = create_agent()",
-        '    print(f"Agent initialized: {agent}")',
-    ])
+    lines.extend(
+        [
+            "",
+            'if __name__ == "__main__":',
+            "    agent = create_agent()",
+            '    print(f"Agent initialized: {agent}")',
+        ]
+    )
     return "\n".join(lines) + "\n"
 
 
@@ -181,15 +195,19 @@ def generate_env_example(storage: str, llm_provider: str) -> str:
         lines.append("OLLAMA_BASE_URL=http://localhost:11434")
 
     if storage == "postgres":
-        lines.extend([
-            "POSTGRES_URL=postgresql://user:password@localhost:5432/alcyoneus_db",
-            "REDIS_URL=redis://localhost:6379/0",
-        ])
+        lines.extend(
+            [
+                "POSTGRES_URL=postgresql://user:password@localhost:5432/alcyoneus_db",
+                "REDIS_URL=redis://localhost:6379/0",
+            ]
+        )
     elif storage == "qdrant":
-        lines.extend([
-            "QDRANT_URL=http://localhost:6333",
-            "# QDRANT_API_KEY=your-qdrant-cloud-key",
-        ])
+        lines.extend(
+            [
+                "QDRANT_URL=http://localhost:6333",
+                "# QDRANT_API_KEY=your-qdrant-cloud-key",
+            ]
+        )
     return "\n".join(lines) + "\n"
 
 

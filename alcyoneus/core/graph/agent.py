@@ -484,7 +484,10 @@ class Agent(
                 [
                     m.model_dump()
                     if hasattr(m, "model_dump")
-                    else {"role": getattr(m, "role", "user"), "content": getattr(m, "content", str(m))}
+                    else {
+                        "role": getattr(m, "role", "user"),
+                        "content": getattr(m, "content", str(m)),
+                    }
                     for m in self.extra_messages
                 ]
             )

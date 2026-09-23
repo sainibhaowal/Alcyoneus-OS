@@ -691,9 +691,9 @@ class StateGraph[StateT: AgentState]:
         for fn in (sync_data, reload_state, load_or_create_state, call_realtime_sync):
             if fn.__defaults__:
                 for d in fn.__defaults__:
-                    if (
-                        hasattr(d, "_injected_value")
-                        and getattr(d, "service_type", None) in (BaseCheckpointer, BaseStore)
+                    if hasattr(d, "_injected_value") and getattr(d, "service_type", None) in (
+                        BaseCheckpointer,
+                        BaseStore,
                     ):
                         try:
                             object.__setattr__(d, "_injected_value", None)

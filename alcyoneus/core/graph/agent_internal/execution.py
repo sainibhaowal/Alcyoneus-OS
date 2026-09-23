@@ -191,7 +191,6 @@ class AgentExecutionMixin:
     api_style: str
     reasoning_config: dict[str, Any] | None
 
-
     def _setup_tools(self) -> ToolNode | None:
         """Normalize the tool_node input and wire internal state.
 

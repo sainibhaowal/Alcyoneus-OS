@@ -362,8 +362,12 @@ class ItemStreamEnd(RealtimeEvent):
         }
 
     @classmethod
-    def create(
-        cls, session_id: str, stream_name: str, total_items: int, duration_ms: float = 0.0  # type: ignore[override]
+    def create(  # type: ignore[override]
+        cls,
+        session_id: str,
+        stream_name: str,
+        total_items: int,
+        duration_ms: float = 0.0,
     ) -> ItemStreamEnd:
         return cls(
             session_id=session_id,

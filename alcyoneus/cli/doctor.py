@@ -55,19 +55,23 @@ def check_dependencies() -> list[dict[str, Any]]:
         try:
             mod = importlib.import_module(import_module)
             ver = getattr(mod, "__version__", "installed")
-            results.append({
-                "package": pkg_name,
-                "status": "INSTALLED",
-                "version": str(ver),
-                "description": description,
-            })
+            results.append(
+                {
+                    "package": pkg_name,
+                    "status": "INSTALLED",
+                    "version": str(ver),
+                    "description": description,
+                }
+            )
         except ImportError:
-            results.append({
-                "package": pkg_name,
-                "status": "MISSING",
-                "version": None,
-                "description": description,
-            })
+            results.append(
+                {
+                    "package": pkg_name,
+                    "status": "MISSING",
+                    "version": None,
+                    "description": description,
+                }
+            )
     return results
 
 
@@ -78,19 +82,23 @@ def check_api_credentials() -> list[dict[str, Any]]:
         val = os.getenv(env_var)
         if val and not val.startswith("dummy-"):
             masked = f"{val[:4]}...{val[-4:]}" if len(val) >= 8 else "configured"
-            results.append({
-                "variable": env_var,
-                "service": service,
-                "status": "CONFIGURED",
-                "detail": masked,
-            })
+            results.append(
+                {
+                    "variable": env_var,
+                    "service": service,
+                    "status": "CONFIGURED",
+                    "detail": masked,
+                }
+            )
         else:
-            results.append({
-                "variable": env_var,
-                "service": service,
-                "status": "NOT SET",
-                "detail": "Optional: needed for live model/service calls",
-            })
+            results.append(
+                {
+                    "variable": env_var,
+                    "service": service,
+                    "status": "NOT SET",
+                    "detail": "Optional: needed for live model/service calls",
+                }
+            )
     return results
 
 
@@ -106,6 +114,7 @@ def check_docker_daemon() -> dict[str, Any]:
         }
 
     import subprocess  # nosec: B404
+
     try:
         res = subprocess.run(  # noqa: S603
             [docker_bin, "info"],
@@ -188,7 +197,11 @@ def render_diagnostics_table(data: dict[str, Any], console: Console) -> None:
     env_table.add_row(py["name"], py_style, py["detail"], py["recommended"])
 
     pty_info = data["pty"]
-    pty_style = "[green]AVAILABLE[/green]" if pty_info["status"] == "AVAILABLE" else "[yellow]UNAVAILABLE[/yellow]"
+    pty_style = (
+        "[green]AVAILABLE[/green]"
+        if pty_info["status"] == "AVAILABLE"
+        else "[yellow]UNAVAILABLE[/yellow]"
+    )
     env_table.add_row(pty_info["name"], pty_style, pty_info["detail"], pty_info["recommended"])
 
     doc = data["docker"]
@@ -211,7 +224,9 @@ def render_diagnostics_table(data: dict[str, Any], console: Console) -> None:
     dep_table.add_column("Feature Description", style="dim")
 
     for dep in data["dependencies"]:
-        status_str = "[green]INSTALLED[/green]" if dep["status"] == "INSTALLED" else "[dim]MISSING[/dim]"
+        status_str = (
+            "[green]INSTALLED[/green]" if dep["status"] == "INSTALLED" else "[dim]MISSING[/dim]"
+        )
         ver_str = dep["version"] or "-"
         dep_table.add_row(dep["package"], status_str, ver_str, dep["description"])
 
@@ -226,7 +241,9 @@ def render_diagnostics_table(data: dict[str, Any], console: Console) -> None:
     cred_table.add_column("Detail", style="dim")
 
     for cred in data["credentials"]:
-        status_str = "[green]CONFIGURED[/green]" if cred["status"] == "CONFIGURED" else "[dim]NOT SET[/dim]"
+        status_str = (
+            "[green]CONFIGURED[/green]" if cred["status"] == "CONFIGURED" else "[dim]NOT SET[/dim]"
+        )
         cred_table.add_row(cred["variable"], cred["service"], status_str, cred["detail"])
 
     console.print(cred_table)

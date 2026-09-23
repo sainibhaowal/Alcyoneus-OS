@@ -289,7 +289,9 @@ class RemoteGraph:
     ) -> dict[str, Any]:
         """Execute the graph asynchronously."""
         if self._config and self._config.url:
-            return await self._http_invoke(input_data, config, _normalize_granularity(response_granularity))
+            return await self._http_invoke(
+                input_data, config, _normalize_granularity(response_granularity)
+            )
         if self.graph is None:
             raise ValueError("RemoteGraph requires either a graph or a URL config")
         return await self.graph.ainvoke(
@@ -349,7 +351,9 @@ class RemoteGraph:
     ) -> AsyncIterator[Any]:
         """Stream graph execution asynchronously."""
         if self._config and self._config.url:
-            result = await self._http_invoke(input_data, config, _normalize_granularity(response_granularity))
+            result = await self._http_invoke(
+                input_data, config, _normalize_granularity(response_granularity)
+            )
             yield {"event": "values", "data": result}
             return
         if self.graph is None:
@@ -373,7 +377,9 @@ class RemoteGraph:
     ) -> AsyncIterator[dict[str, Any]]:
         """Stream graph execution as structured events (GraphRunStream v3)."""
         if self._config and self._config.url:
-            async for event in self._http_stream_events(input_data, config, _normalize_granularity(response_granularity)):
+            async for event in self._http_stream_events(
+                input_data, config, _normalize_granularity(response_granularity)
+            ):
                 yield event
             return
         if self.graph is None:

@@ -391,6 +391,10 @@ class TestMemoryLeakDetection:
             await asyncio.sleep(0.002)
 
         await manager.wait_for_all()
+        for _ in range(10):
+            if len(manager._tasks) == initial_task_count:
+                break
+            await asyncio.sleep(0.01)
         gc.collect()
 
         # Should return to initial state

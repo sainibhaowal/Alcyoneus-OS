@@ -245,7 +245,8 @@ class UserSimulator:
 
                 # Build full conversation history for the graph (not just current message)
                 all_messages = [
-                    Message.text_message(msg["content"], role=msg["role"]) for msg in conversation  # type: ignore[arg-type]
+                    Message.text_message(msg["content"], role=msg["role"])  # type: ignore[arg-type]
+                    for msg in conversation
                 ]
                 input_data = {"messages": all_messages}
 

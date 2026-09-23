@@ -196,15 +196,18 @@ class BackgroundTaskManager:
         try:
             if timeout:
                 await asyncio.wait_for(
-                    asyncio.gather(*self._tasks, return_exceptions=return_exceptions),
+                    asyncio.gather(*list(self._tasks), return_exceptions=return_exceptions),
                     timeout=timeout,
                 )
             else:
-                await asyncio.gather(*self._tasks, return_exceptions=return_exceptions)
+                await asyncio.gather(*list(self._tasks), return_exceptions=return_exceptions)
             logger.info("All background tasks finished.")
         except TimeoutError:
             logger.warning("Timeout waiting for background tasks, some may still be running")
             metrics.counter("background_task_manager.wait_timeout").inc()
+        finally:
+            # Yield so registered task completion callbacks process
+            await asyncio.sleep(0)
 
     def get_task_count(self) -> int:
         """Get the number of active background tasks."""
