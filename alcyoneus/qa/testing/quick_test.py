@@ -74,7 +74,7 @@ class QuickTest:
         agent = TestAgent(model=model, responses=[agent_response])
 
         # Build simple graph
-        graph = StateGraph()
+        graph = StateGraph()  # type: ignore[var-annotated]
         graph.add_node("MAIN", agent)
         graph.set_entry_point("MAIN")
         graph.add_edge("MAIN", END)
@@ -120,7 +120,7 @@ class QuickTest:
         agent = TestAgent(model=model, responses=responses)
 
         # Build graph without checkpointer - we'll manage state manually
-        graph = StateGraph()
+        graph = StateGraph()  # type: ignore[var-annotated]
         graph.add_node("MAIN", agent)
         graph.set_entry_point("MAIN")
         graph.add_edge("MAIN", END)
@@ -217,7 +217,7 @@ class QuickTest:
         agent = TestAgent(model=model, responses=[response], tools=tool_funcs)
 
         # Build graph with tool routing
-        graph = StateGraph()
+        graph = StateGraph()  # type: ignore[var-annotated]
         graph.add_node("MAIN", agent)
         graph.add_node("TOOL", tool_node)
         graph.set_entry_point("MAIN")
@@ -267,7 +267,7 @@ class QuickTest:
         Returns:
             TestResult
         """
-        graph = StateGraph()
+        graph = StateGraph()  # type: ignore[var-annotated]
         graph.add_node("MAIN", agent)
         graph.set_entry_point("MAIN")
         graph.add_edge("MAIN", END)

@@ -12,7 +12,7 @@ from typing import Any, TypeVar
 try:
     from injectq import InjectQ
 except ImportError:
-    InjectQ = Any
+    InjectQ = Any  # type: ignore[misc,assignment]
 
 
 from alcyoneus.core.exceptions.storage_exceptions import (
@@ -268,9 +268,16 @@ class PgCheckpointer(BaseCheckpointer[StateT]):
         """
         if self._pg_pool is None:
             config = self._pg_pool_config
-            self._pg_pool = await self._create_pg_pool(
-                config["pg_pool"], config["postgres_dsn"], config["pool_config"]
-            )
+            dsn = str(config["postgres_dsn"]) if config.get("postgres_dsn") else None
+            raw_pool = config.get("pool_config")
+            pool_cfg: dict[Any, Any] = raw_pool if isinstance(raw_pool, dict) else {}
+            created = self._create_pg_pool(config.get("pg_pool"), dsn, pool_cfg)
+            import inspect
+
+            if inspect.isawaitable(created):
+                self._pg_pool = await created
+            else:
+                self._pg_pool = created
         return self._pg_pool
 
     def _get_sql_type(self, type_name: str) -> str:
@@ -735,8 +742,14 @@ class PgCheckpointer(BaseCheckpointer[StateT]):
                 await self._ensure_thread_exists(thread_id, user_id, config)
 
                 # Store in PostgreSQL with retry logic
-                data = state.model_dump()
-                data["__class_path__"] = self._get_full_class_path(state)
+                if hasattr(state, "model_dump"):
+                    data = state.model_dump()
+                    data["__class_path__"] = self._get_full_class_path(state)
+                elif isinstance(state, dict):
+                    data = dict(state)
+                    data["__is_dict__"] = True
+                else:
+                    data = {"value": state, "__is_raw__": True}
                 state_json = json.dumps(data)
 
                 async def _store_state():
@@ -821,6 +834,10 @@ class PgCheckpointer(BaseCheckpointer[StateT]):
             if row:
                 data = json.loads(row["state_data"])
                 logger.debug("State found for thread_id=%s", thread_id)
+                if data.pop("__is_dict__", False):
+                    return data  # type: ignore
+                if data.pop("__is_raw__", False):
+                    return data.get("value")  # type: ignore
                 class_path = data.pop("__class_path__", None)
                 if not class_path:
                     raise ValueError("Missing '__class_path__' in JSON data")
@@ -1659,10 +1676,15 @@ class PgCheckpointer(BaseCheckpointer[StateT]):
             await self.redis.delete(cache_key)
 
             logger.debug("Thread cleaned: thread_id=%s, user_id=%s", thread_id, user_id)
+            return None
 
         except Exception as e:
             logger.error("Failed to clean thread thread_id=%s: %s", thread_id, e)
             raise
+
+    async def adelete_thread(self, config: dict[str, Any]) -> Any | None:
+        """Delete thread checkpoints and data asynchronously (alias for aclean_thread)."""
+        return await self.aclean_thread(config)
 
     ###########################
     #### RESOURCE CLEANUP #####
@@ -1679,7 +1701,7 @@ class PgCheckpointer(BaseCheckpointer[StateT]):
 
         if not self.release_resources:
             logger.info("No resources to release")
-            return
+            return None
 
         errors = []
 
@@ -1709,3 +1731,4 @@ class PgCheckpointer(BaseCheckpointer[StateT]):
             # Don't raise - cleanup should be best effort
         else:
             logger.info("All resources released successfully")
+        return None

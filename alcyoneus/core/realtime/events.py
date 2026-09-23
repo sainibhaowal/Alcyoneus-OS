@@ -121,7 +121,7 @@ class ToolApprovalRequest(RealtimeEvent):
         }
 
     @classmethod
-    def create(
+    def create(  # type: ignore[override]
         cls,
         session_id: str,
         tool_name: str,
@@ -177,7 +177,7 @@ class ToolApprovalResponse(RealtimeEvent):
         cls,
         session_id: str,
         call_id: str,
-        approved: bool,
+        approved: bool,  # type: ignore[override]
         response_data: dict[str, Any] | None = None,
     ) -> ToolApprovalResponse:
         return cls(
@@ -221,7 +221,7 @@ class HandoffEvent(RealtimeEvent):
         }
 
     @classmethod
-    def create(
+    def create(  # type: ignore[override]
         cls,
         session_id: str,
         from_agent: str,
@@ -270,7 +270,7 @@ class ItemStreamStart(RealtimeEvent):
         }
 
     @classmethod
-    def create(
+    def create(  # type: ignore[override]
         cls,
         session_id: str,
         stream_name: str,
@@ -318,7 +318,7 @@ class ItemStreamDelta(RealtimeEvent):
         }
 
     @classmethod
-    def create(
+    def create(  # type: ignore[override]
         cls, session_id: str, stream_name: str, item_index: int, data: Any, is_final: bool = False
     ) -> ItemStreamDelta:
         return cls(
@@ -362,8 +362,12 @@ class ItemStreamEnd(RealtimeEvent):
         }
 
     @classmethod
-    def create(
-        cls, session_id: str, stream_name: str, total_items: int, duration_ms: float = 0.0
+    def create(  # type: ignore[override]
+        cls,
+        session_id: str,
+        stream_name: str,
+        total_items: int,
+        duration_ms: float = 0.0,
     ) -> ItemStreamEnd:
         return cls(
             session_id=session_id,
@@ -404,7 +408,7 @@ class InterruptEvent(RealtimeEvent):
         }
 
     @classmethod
-    def create(
+    def create(  # type: ignore[override]
         cls,
         session_id: str,
         interrupt_type: str = "user",
@@ -446,7 +450,7 @@ class InterruptResume(RealtimeEvent):
         }
 
     @classmethod
-    def create(cls, session_id: str, resume_value: Any) -> InterruptResume:
+    def create(cls, session_id: str, resume_value: Any) -> InterruptResume:  # type: ignore[override]
         return cls(
             session_id=session_id,
             resume_value=resume_value,
@@ -490,7 +494,7 @@ class RealtimeEventQueue:
 
     def subscribe(self) -> asyncio.Queue:
         """Subscribe to event stream."""
-        q = asyncio.Queue(maxsize=100)
+        q = asyncio.Queue(maxsize=100)  # type: ignore[var-annotated]
         self._subscribers.add(q)
         return q
 

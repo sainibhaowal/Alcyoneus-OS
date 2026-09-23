@@ -14,18 +14,18 @@ import inspect
 import json
 import logging
 from collections.abc import AsyncGenerator, AsyncIterable, Callable
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Union, cast
 
 
 try:
-    from injectq import Inject
+    from injectq import Inject  # type: ignore[assignment]
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: Any = _DummyInject()  # type: ignore[no-redef]
 
 
 from alcyoneus.core.exceptions import NodeError
@@ -314,8 +314,8 @@ class StreamNodeHandler(BaseLoggingMixin):
         state: "AgentState",
         config: dict[str, Any],
     ) -> dict:
-        sig = inspect.signature(self.func)  # type: ignore Tool node won't come here
-        input_data = {}
+        sig = inspect.signature(cast(Callable[..., Any], self.func))
+        input_data: dict[str, Any] = {}
         default_data = {
             "state": state,
             "config": config,
@@ -475,21 +475,21 @@ class StreamNodeHandler(BaseLoggingMixin):
 
         if isinstance(self.func, Agent | BaseAgent):
             logger.debug("Node '%s' is an Agent instance, executing agent streaming", self.name)
-            async for item in self._call_agent_node(state, config):
-                yield item
+            async for agent_item in self._call_agent_node(state, config):
+                yield agent_item
             return
 
         if isinstance(self.func, ToolNode):
-            async for item in self._stream_tool_node(state, config):
-                yield item
+            async for tool_item in self._stream_tool_node(state, config):
+                yield tool_item
             return
 
-        async for item in self._call_normal_node(
+        async for normal_item in self._call_normal_node(
             state,
             config,
             callback_mgr,
         ):
-            yield item
+            yield normal_item
 
     async def _call_normal_node(  # noqa: PLR0912, PLR0915
         self,
@@ -593,7 +593,7 @@ class StreamNodeHandler(BaseLoggingMixin):
             """
             # first check its sync and not streaming
             next_node = None
-            final_result = result
+            final_result: Any = result
             stream_event = StreamChunk(
                 event=StreamEvent.MESSAGE,
                 thread_id=config.get("thread_id"),
@@ -618,7 +618,7 @@ class StreamNodeHandler(BaseLoggingMixin):
 
                 next_node = result.goto
 
-            messages = []
+            messages: list[Message] = []
             if check_non_streaming(final_result):
                 new_state, messages, next_node = await process_node_result(
                     final_result,
@@ -667,7 +667,7 @@ class StreamNodeHandler(BaseLoggingMixin):
                 final_msg = messages[-1]
                 event.data["message"] = final_msg.model_dump()
                 # Populate simple content and structured blocks when available
-                event.content = (
+                event.content = str(
                     final_msg.text() if isinstance(final_msg.content, list) else final_msg.content
                 )
                 if isinstance(final_msg.content, list):
@@ -737,7 +737,7 @@ class StreamNodeHandler(BaseLoggingMixin):
             "Node '%s' is an Agent instance, executing agent logic with streaming", self.name
         )
 
-        agent = self.func  # type: ignore - func is Agent instance here
+        agent: Any = self.func
 
         converter = await agent.execute(state, config)  # type: ignore
 
@@ -781,7 +781,7 @@ class StreamNodeHandler(BaseLoggingMixin):
         self,
         config: dict[str, Any],
         state: AgentState,
-        callback_mgr: CallbackManager = Inject[CallbackManager],
+        callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
     ) -> AsyncGenerator[dict[str, Any] | Message | StreamChunk | Command]:
         """Execute the node function with streaming output and callback support.
 

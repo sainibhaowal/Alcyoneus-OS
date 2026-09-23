@@ -318,10 +318,7 @@ class TestPublisherConnectionPooling:
     @pytest.mark.asyncio
     async def test_redis_publisher_connection_pooling_config(self):
         """Test RedisPublisher accepts connection pooling configuration."""
-        try:
-            from alcyoneus.runtime.publisher.redis_publisher import RedisPublisher
-        except ImportError:
-            pytest.skip("redis package not installed")
+        from alcyoneus.runtime.publisher.redis_publisher import RedisPublisher
 
         config = {
             "url": "redis://localhost:6379/0",
@@ -342,10 +339,7 @@ class TestPublisherConnectionPooling:
     @pytest.mark.asyncio
     async def test_kafka_publisher_connection_config(self):
         """Test KafkaPublisher accepts connection configuration."""
-        try:
-            from alcyoneus.runtime.publisher.kafka_publisher import KafkaPublisher
-        except ImportError:
-            pytest.skip("aiokafka package not installed")
+        from alcyoneus.runtime.publisher.kafka_publisher import KafkaPublisher
 
         config = {
             "bootstrap_servers": "localhost:9092",
@@ -364,10 +358,7 @@ class TestPublisherConnectionPooling:
     @pytest.mark.asyncio
     async def test_rabbitmq_publisher_connection_config(self):
         """Test RabbitMQPublisher accepts connection configuration."""
-        try:
-            from alcyoneus.runtime.publisher.rabbitmq_publisher import RabbitMQPublisher
-        except ImportError:
-            pytest.skip("aio-pika package not installed")
+        from alcyoneus.runtime.publisher.rabbitmq_publisher import RabbitMQPublisher
 
         config = {
             "url": "amqp://guest:guest@localhost/",
@@ -400,6 +391,10 @@ class TestMemoryLeakDetection:
             await asyncio.sleep(0.002)
 
         await manager.wait_for_all()
+        for _ in range(10):
+            if len(manager._tasks) == initial_task_count:
+                break
+            await asyncio.sleep(0.01)
         gc.collect()
 
         # Should return to initial state

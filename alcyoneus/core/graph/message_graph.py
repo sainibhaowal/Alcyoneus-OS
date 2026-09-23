@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 from alcyoneus.core.state import AgentState, Message
 from alcyoneus.core.state.remove_message import is_remove_message
@@ -68,7 +68,7 @@ class MessageGraph(StateGraph):
             container=container,
         )
 
-    def add_node(
+    def add_node(  # type: ignore[override]
         self,
         name_or_func: str | Callable,
         func: Callable | Any | None = None,
@@ -94,7 +94,7 @@ class MessageGraph(StateGraph):
             result = raw_func(state, config, **deps)
             return self._normalize_output(result)
 
-        return super().add_node(name, wrapper, **kwargs)
+        return cast(MessageGraph, super().add_node(name, wrapper, **kwargs))
 
     def _normalize_output(self, result: Any) -> dict[str, Any]:
         """Normalize node output into a state update dict."""
@@ -119,7 +119,7 @@ class MessageGraph(StateGraph):
         self.add_edge(START, node_name)
         return self
 
-    def set_sequence(self, sequence: list[str], **kwargs: Any) -> MessageGraph:
+    def set_sequence(self, sequence: list[str], **kwargs: Any) -> MessageGraph:  # type: ignore[override]
         """Set a linear chain of message-graph nodes."""
         super().set_sequence(sequence, **kwargs)
         return self

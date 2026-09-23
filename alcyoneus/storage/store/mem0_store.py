@@ -44,7 +44,7 @@ from typing import Any
 try:
     from injectq import InjectQ
 except ImportError:
-    InjectQ = Any
+    InjectQ = Any  # type: ignore[misc,assignment]
 
 
 from alcyoneus.core.state import Message

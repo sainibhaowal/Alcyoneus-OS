@@ -196,7 +196,7 @@ class JWTValidator:
         jwks = await _jwks_cache.get_keys(self.jwks_uri)
         for jwk in jwks.get("keys", []):
             if jwk.get("kid") == kid or not kid:
-                key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
+                key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))  # type: ignore[assignment]
                 if kid:
                     self._key_cache[kid] = key
                 return key
@@ -288,11 +288,11 @@ class MTLSValidator:
             ca_cert = x509.load_pem_x509_certificate(self._ca_cert)
             ca_public_key = ca_cert.public_key()
             try:
-                ca_public_key.verify(
+                ca_public_key.verify(  # type: ignore[call-arg, union-attr]
                     cert.signature,
                     cert.tbs_certificate_bytes,
-                    cert.signature_algorithm_parameters,
-                    cert.signature_hash_algorithm,
+                    cert.signature_algorithm_parameters,  # type: ignore[arg-type]
+                    cert.signature_hash_algorithm,  # type: ignore[arg-type]
                 )
             except Exception as e:
                 raise MTLSError(f"Certificate chain validation failed: {e}")
@@ -316,7 +316,7 @@ class MTLSValidator:
 
         # Check allowed CN/OUs
         if self.allowed_cns and cn not in self.allowed_cns:
-            raise MTLSError(f"CN not allowed: {cn}")
+            raise MTLSError(f"CN not allowed: {cn}")  # type: ignore[str-bytes-safe]
         if self.allowed_ous and not any(ou in self.allowed_ous for ou in ous):
             raise MTLSError(f"OU not allowed: {ous}")
 

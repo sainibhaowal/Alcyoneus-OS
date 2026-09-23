@@ -168,7 +168,7 @@ async def execute_with_policy(
     cache = policy.cache_policy
     if cache and cache.enabled:
         key_fn = cache.key_fn or default_node_cache_key
-        cache_key = key_fn(state, config) if key_fn else f"{node_name}:{id(state)}"
+        cache_key = key_fn(state, config)
         cache_storage = _get_node_cache(node_name)
         cached = cache_storage.get(cache_key, cache.ttl)
         if cached is not _CACHE_MISS:

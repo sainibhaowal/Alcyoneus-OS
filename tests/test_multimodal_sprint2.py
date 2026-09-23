@@ -116,10 +116,7 @@ class TestResizeImage:
         assert result is block
 
     def test_small_image_not_resized(self):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        from PIL import Image
 
         img = Image.new("RGB", (100, 100), color="red")
         buf = io.BytesIO()
@@ -132,10 +129,7 @@ class TestResizeImage:
         assert result is block
 
     def test_large_image_is_resized(self):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        from PIL import Image
 
         img = Image.new("RGB", (4000, 3000), color="blue")
         buf = io.BytesIO()
@@ -154,10 +148,7 @@ class TestResizeImage:
         assert abs(result.media.width / result.media.height - 4000 / 3000) < 0.01
 
     def test_resize_preserves_alt_text(self):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        from PIL import Image
 
         img = Image.new("RGB", (4000, 4000), color="green")
         buf = io.BytesIO()
@@ -211,10 +202,7 @@ class TestMediaProcessorProcess:
             proc.process(block)
 
     def test_process_validates_then_resizes(self):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        from PIL import Image
 
         img = Image.new("RGB", (5000, 5000), color="red")
         buf = io.BytesIO()

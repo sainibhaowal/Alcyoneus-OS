@@ -604,26 +604,157 @@ class TestSyncMethods:
 
 @pytest.mark.integration
 class TestQdrantStoreIntegration:
-    """Integration tests for QdrantStore (requires actual Qdrant instance)."""
+    """Integration tests for QdrantStore with mocked client (runs without requiring external services)."""
+
+    @pytest.fixture
+    def integration_store(self, mock_embedding_service):
+        """Create a QdrantStore with mocked client configured for integration scenarios."""
+        mock_client = AsyncMock()
+        mock_client.get_collections.return_value = MagicMock(collections=[])
+        mock_client.create_collection.return_value = None
+        mock_client.upsert.return_value = None
+        mock_client.delete.return_value = None
+
+        with patch("qdrant_client.AsyncQdrantClient", return_value=mock_client):
+            store = QdrantStore(
+                embedding=mock_embedding_service,
+                host="localhost",
+                port=6333,
+            )
+            store.client = mock_client
+            return store, mock_client
 
     @pytest.mark.asyncio
-    async def test_full_workflow(self):
-        """Test complete workflow with real embedding service."""
-        # This test would require a real Qdrant instance and API keys
-        # Skip if dependencies not available
-        pytest.skip("Integration test requires real Qdrant instance")
+    async def test_full_workflow(self, integration_store, sample_config):
+        """Test complete workflow: setup, store, retrieve, search, update, and release."""
+        store, mock_client = integration_store
+
+        # 1. Setup
+        await store.asetup()
+        assert store.collection in store._collection_cache
+
+        # 2. Store memory
+        uid = await store.astore(
+            config=sample_config,
+            content="User prefers Python for AI development",
+            memory_type=MemoryType.EPISODIC,
+            category="preferences",
+        )
+        assert isinstance(uid, str)
+        mock_client.upsert.assert_called()
+
+        # 3. Retrieve memory
+        mock_point = MagicMock()
+        mock_point.id = uid
+        mock_point.score = 0.95
+        mock_point.payload = {
+            "content": "User prefers Python for AI development",
+            "user_id": sample_config["user_id"],
+            "thread_id": sample_config["thread_id"],
+            "memory_type": "episodic",
+            "category": "preferences",
+            "timestamp": "2025-01-01T00:00:00",
+        }
+        mock_client.retrieve.return_value = [mock_point]
+
+        retrieved = await store.aget(sample_config, uid)
+        assert retrieved is not None
+        assert retrieved.content == "User prefers Python for AI development"
+        assert retrieved.user_id == sample_config["user_id"]
+
+        # 4. Search memory
+        mock_client.search.return_value = [mock_point]
+        search_results = await store.asearch(
+            config=sample_config,
+            query="AI development preferences",
+            limit=5,
+        )
+        assert len(search_results) == 1
+        assert search_results[0].id == uid
+
+        # 5. Update memory
+        await store.aupdate(
+            config=sample_config,
+            memory_id=uid,
+            content="User prefers Python and Rust for AI development",
+        )
+        assert mock_client.upsert.call_count >= 2
+
+        # 6. Delete memory
+        await store.adelete(sample_config, uid)
+        mock_client.delete.assert_called_once()
+
+        # 7. Release resources
+        await store.arelease()
 
     @pytest.mark.asyncio
-    async def test_large_batch_store(self):
-        """Test storing large batches of memories."""
-        # This test would verify performance with large datasets
-        pytest.skip("Integration test requires real Qdrant instance")
+    async def test_large_batch_store(self, integration_store, sample_config):
+        """Test storing large batches of memories efficiently."""
+        store, mock_client = integration_store
+        await store.asetup()
+
+        # Store multiple items in batch
+        items_count = 25
+        stored_ids = []
+        for i in range(items_count):
+            uid = await store.astore(
+                config=sample_config,
+                content=f"Batch memory item number {i}",
+                memory_type=MemoryType.EPISODIC,
+                category=f"batch_{i % 5}",
+            )
+            stored_ids.append(uid)
+
+        assert len(stored_ids) == items_count
+        assert len(set(stored_ids)) == items_count  # All IDs are unique
+        assert mock_client.upsert.call_count == items_count
+
+        await store.arelease()
 
     @pytest.mark.asyncio
-    async def test_complex_search_scenarios(self):
-        """Test complex search scenarios with filters and thresholds."""
-        # This test would verify advanced search functionality
-        pytest.skip("Integration test requires real Qdrant instance")
+    async def test_complex_search_scenarios(self, integration_store, sample_config):
+        """Test complex search scenarios with filters and score thresholds."""
+        store, mock_client = integration_store
+        await store.asetup()
+
+        # Create mock search results with varying scores and categories
+        mock_points = []
+        for i, score in enumerate([0.95, 0.85, 0.75, 0.65]):
+            p = MagicMock()
+            p.id = f"mem_{i}"
+            p.score = score
+            p.payload = {
+                "content": f"Search result item {i}",
+                "user_id": sample_config["user_id"],
+                "thread_id": sample_config["thread_id"],
+                "memory_type": "semantic" if i % 2 == 0 else "episodic",
+                "category": "technical" if i < 2 else "general",
+                "timestamp": "2025-01-01T00:00:00",
+            }
+            mock_points.append(p)
+
+        mock_client.search.return_value = mock_points
+
+        # Search with threshold and category filter
+        results = await store.asearch(
+            config=sample_config,
+            query="technical knowledge",
+            memory_type=MemoryType.SEMANTIC,
+            category="technical",
+            score_threshold=0.8,
+            limit=2,
+        )
+
+        assert len(results) == len(mock_points)
+        assert results[0].score == 0.95
+        assert results[1].score == 0.85
+
+        mock_client.search.assert_called_once()
+        call_kwargs = mock_client.search.call_args[1]
+        assert call_kwargs["score_threshold"] == 0.8
+        assert call_kwargs["limit"] == 2
+
+        await store.arelease()
 
 
 if __name__ == "__main__":

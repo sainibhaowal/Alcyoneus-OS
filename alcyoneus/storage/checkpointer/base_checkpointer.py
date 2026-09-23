@@ -467,6 +467,18 @@ class BaseCheckpointer[StateT: AgentState](ABC):
         """
         raise NotImplementedError
 
+    async def adelete_thread(self, config: dict[str, Any]) -> Any | None:
+        """
+        Delete thread checkpoints and data asynchronously. Defaults to aclean_thread.
+
+        Args:
+            config (dict): Configuration dictionary.
+
+        Returns:
+            Any | None: Implementation-defined result.
+        """
+        return await self.aclean_thread(config)
+
     # -------------------------
     # Thread methods sync
     # -------------------------

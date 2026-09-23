@@ -19,18 +19,18 @@ import inspect
 import json
 import logging
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Union, cast
 
 
 try:
-    from injectq import Inject
+    from injectq import Inject  # type: ignore[assignment]
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: Any = _DummyInject()  # type: ignore[no-redef]
 
 
 from alcyoneus.core.exceptions import NodeError
@@ -337,8 +337,8 @@ class InvokeNodeHandler(BaseLoggingMixin):
             TypeError: If required parameters are missing.
         """
         # Use cached signature inspection for performance
-        sig = self._get_cached_signature(self.func)  # type: ignore Tool node won't come here
-        input_data = {}
+        sig = self._get_cached_signature(cast(Callable[..., Any], self.func))
+        input_data: dict[str, Any] = {}
         default_data = {
             "state": state,
             "config": config,
@@ -462,7 +462,7 @@ class InvokeNodeHandler(BaseLoggingMixin):
                 result = await callback_mgr.execute_after_invoke(context, input_data, result)
 
             # Process result and publish END event
-            messages = []
+            messages: list[Message] = []
             new_state, messages, next_node = await process_node_result(result, state, messages)
             event.data["state"] = new_state.model_dump()
             event.event_type = EventType.END
@@ -538,7 +538,7 @@ class InvokeNodeHandler(BaseLoggingMixin):
         """
         logger.debug("Node '%s' is an Agent instance, executing agent logic", self.name)
 
-        agent = self.func  # type: ignore - func is Agent instance here
+        agent: Any = self.func
 
         # Create callback context for AI invocation
         context = CallbackContext(
@@ -647,7 +647,7 @@ class InvokeNodeHandler(BaseLoggingMixin):
         self,
         config: dict[str, Any],
         state: AgentState,
-        callback_mgr: CallbackManager = Inject[CallbackManager],
+        callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
     ) -> dict[str, Any] | list[Message] | Command:
         """
         Execute the node function or ToolNode with dependency injection and callback hooks.

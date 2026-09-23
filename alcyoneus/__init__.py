@@ -14,6 +14,14 @@
 
 """Alcyoneus OS Framework: Stateful, Distributed Multi-Agent State-Graph SDK."""
 
+try:
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as _dist_version
+
+    __version__ = _dist_version("alcyoneus")
+except (PackageNotFoundError, ImportError):
+    __version__ = "1.2.0"
+
 from alcyoneus.cache import (
     BaseCache,
     InMemoryCache,
@@ -64,7 +72,10 @@ from alcyoneus.core.guardrails import (
 from alcyoneus.core.policy.engine import (
     Decision,
     Policy,
+    PolicyAction,
+    PolicyConfig,
     PolicyEngine,
+    ToolExecutionPolicy,
     allow,
     allow_all,
     ask_user,
@@ -129,7 +140,13 @@ from alcyoneus.core.triggers.triggers import (
     TriggerContext,
     trigger,
 )
-from alcyoneus.core.voice import SIPCallConfig, SIPTelephony
+from alcyoneus.core.voice import (
+    SIPCallConfig,
+    SIPCallFailedError,
+    SIPConfigurationError,
+    SIPTelephony,
+    SIPTelephonyError,
+)
 from alcyoneus.func import TaskCall, TaskWorkflow, entrypoint, task
 from alcyoneus.prebuilt.tools import (
     CodeInterpreterTool,
@@ -194,11 +211,13 @@ __all__ = [
     "DynamicPromptFunction",
     "E2BSandbox",
     "Edge",
+    "END",
     "EventBasedTrigger",
     "EventTrigger",
     "ExecResult",
     "FileChange",
     "FileChangeKind",
+    "__version__",
     "FileSearchTool",
     "FunctionSpanData",
     "GCSMount",
@@ -225,6 +244,8 @@ __all__ = [
     "OutputGuardrailTripwireTriggered",
     "PickleSerde",
     "Policy",
+    "PolicyAction",
+    "PolicyConfig",
     "PolicyEngine",
     "Prompt",
     "PydanticToolReturn",
@@ -241,7 +262,10 @@ __all__ = [
     "RunloopSandbox",
     "S3Mount",
     "SIPCallConfig",
+    "SIPCallFailedError",
+    "SIPConfigurationError",
     "SIPTelephony",
+    "SIPTelephonyError",
     "SQLiteCache",
     "SandboxConfig",
     "SandboxManifest",
@@ -250,12 +274,14 @@ __all__ = [
     "Span",
     "SpanData",
     "Spinner",
+    "START",
     "StateGraph",
     "TaskCall",
     "TaskSpanData",
     "TaskWorkflow",
     "ToolConfirmationHook",
     "ToolExecutionConfig",
+    "ToolExecutionPolicy",
     "ToolGuardrailFunctionOutput",
     "ToolInputGuardrail",
     "ToolInputGuardrailResult",

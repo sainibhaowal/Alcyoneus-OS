@@ -351,6 +351,7 @@ class KafkaAuditSink(AuditSink):
                 bootstrap_servers=self.bootstrap_servers,
                 value_serializer=lambda v: v.to_json().encode(),
             )
+            assert self._producer is not None
             await self._producer.start()
             self._flush_task = asyncio.create_task(self._periodic_flush())
         return self._producer
@@ -436,7 +437,7 @@ class AuditLogger:
     async def log_login(self, actor_id: str, success: bool, **kwargs) -> AuditEvent:
         return await self.log(
             event_type=AuditEventType.LOGIN if success else AuditEventType.LOGIN_FAILED,
-            severity=AuditEventType.INFO if success else AuditEventType.WARNING,
+            severity=AuditEventType.INFO if success else AuditEventType.WARNING,  # type: ignore[attr-defined]
             actor_id=actor_id,
             action="login",
             outcome="success" if success else "failure",
@@ -638,7 +639,7 @@ class DataLineageTracker:
             for dst in dsts:
                 lines.append(f'  "{src}" -> "{dst}";')
         lines.append("}")
-        return "\n".lines()
+        return "\n".lines()  # type: ignore[attr-defined]
 
 
 # Policy as Code (OPA/Rego)

@@ -206,6 +206,7 @@ def file_write(
     root = _configured_root(config)
     try:
         target = _resolve_under_root(path, root)
+        result: dict[str, Any]
         if len(content) > _DEFAULT_MAX_WRITE_CHARS:
             result = {"error": "content is too large"}
         elif target.exists() and not target.is_file():

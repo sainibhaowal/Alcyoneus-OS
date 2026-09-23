@@ -433,7 +433,7 @@ def create_a2a_client_node(
             return [
                 AFMessage.text_message(
                     "No input provided.",
-                    role=response_role,
+                    role=response_role,  # type: ignore[arg-type]
                 ),
             ]
 
@@ -442,7 +442,7 @@ def create_a2a_client_node(
             return [
                 AFMessage.text_message(
                     "Empty input.",
-                    role=response_role,
+                    role=response_role,  # type: ignore[arg-type]
                 ),
             ]
 
@@ -461,14 +461,14 @@ def create_a2a_client_node(
             return [
                 AFMessage.text_message(
                     f"A2A call failed: {exc!s}",
-                    role=response_role,
+                    role=response_role,  # type: ignore[arg-type]
                 ),
             ]
 
         return [
             AFMessage.text_message(
                 response,
-                role=response_role,
+                role=response_role,  # type: ignore[arg-type]
             ),
         ]
 

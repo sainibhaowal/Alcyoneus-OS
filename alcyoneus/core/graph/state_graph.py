@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import logging
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar
 
 
 try:
@@ -37,7 +39,7 @@ except ImportError:
         def try_get(self, *a, **kw):
             return None
 
-    InjectQ = DummyContainer
+    InjectQ: Any = DummyContainer  # type: ignore[misc,assignment,no-redef]
 
 
 from alcyoneus.core.exceptions import GraphError
@@ -50,7 +52,6 @@ from alcyoneus.utils import END, START, CallbackManager
 from alcyoneus.utils.background_task_manager import BackgroundTaskManager
 from alcyoneus.utils.id_generator import BaseIDGenerator, DefaultIDGenerator
 
-from .agent import Agent
 from .base_agent import BaseAgent
 from .edge import Edge
 from .node import Node
@@ -143,13 +144,14 @@ class StateGraph[StateT: AgentState]:
         )
 
         # State handling - accept both a class (e.g. AgentState) and an instance
+        self._state: StateT
         if state is not None:
             if isinstance(state, type) and issubclass(state, AgentState):
-                self._state: StateT = state()  # type: ignore[assignment]
+                self._state = state()  # type: ignore[assignment]
             else:
-                self._state: StateT = state  # type: ignore[assignment]
+                self._state = state  # type: ignore[assignment]
         else:
-            self._state: StateT = AgentState()  # type: ignore[assignment]
+            self._state = AgentState()  # type: ignore[assignment]
 
         # Graph structure
         self.nodes: dict[str, Node] = {}
@@ -235,12 +237,12 @@ class StateGraph[StateT: AgentState]:
     def add_node(
         self,
         name_or_func: str | Callable,
-        func: Union[Callable, "ToolNode", "Agent", None] = None,
+        func: Callable | ToolNode | BaseAgent | None = None,
         retry_policy: Any | None = None,
         cache_policy: Any | None = None,
         error_handler: Any | None = None,
         timeout: float | None = None,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Add a node to the graph.
 
         This method supports multiple calling patterns:
@@ -324,7 +326,7 @@ class StateGraph[StateT: AgentState]:
         self,
         from_node: str,
         to_node: str,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Add a static edge between two nodes.
 
         Creates a direct connection from one node to another. If the source
@@ -355,7 +357,7 @@ class StateGraph[StateT: AgentState]:
         from_node: str,
         condition: Callable,
         path_map: dict[str, str] | None = None,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Add conditional routing between nodes based on runtime evaluation.
 
         Creates dynamic routing logic where the next node is determined by evaluating
@@ -426,7 +428,7 @@ class StateGraph[StateT: AgentState]:
             self.edges.append(Edge(from_node, "", condition))
         return self
 
-    def set_entry_point(self, node_name: str) -> "StateGraph":
+    def set_entry_point(self, node_name: str) -> StateGraph:
         """Set the entry point for the graph."""
         self.entry_point = node_name
         self.add_edge(START, node_name)
@@ -437,7 +439,7 @@ class StateGraph[StateT: AgentState]:
         self,
         sequence: list[str],
         conditional_edges: list[tuple[Callable, dict[str, str]]] | None = None,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Set a linear sequence of nodes as the graph's execution flow.
 
         Creates a straight-line chain: ``START -> seq[0] -> seq[1] -> ... -> END``.
@@ -493,7 +495,7 @@ class StateGraph[StateT: AgentState]:
         self,
         condition: Callable,
         path_map: dict[str, str] | None = None,
-    ) -> "StateGraph":
+    ) -> StateGraph:
         """Set a conditional entry point: the first node is chosen at runtime.
 
         Args:
@@ -515,7 +517,7 @@ class StateGraph[StateT: AgentState]:
         logger.info("Set conditional entry point")
         return self
 
-    def set_finish_point(self, node_name: str) -> "StateGraph":
+    def set_finish_point(self, node_name: str) -> StateGraph:
         """Set the finish point for the graph (edge from node to END).
 
         Args:
@@ -539,8 +541,8 @@ class StateGraph[StateT: AgentState]:
     def override_node(
         self,
         name: str,
-        func: Union[Callable, "ToolNode", "Agent"],
-    ) -> "StateGraph":
+        func: Callable | ToolNode | BaseAgent,
+    ) -> StateGraph:
         """Override an existing node with a different function.
 
         Use this in tests to swap production nodes with test doubles.
@@ -578,14 +580,14 @@ class StateGraph[StateT: AgentState]:
         self,
         checkpointer: BaseCheckpointer[StateT] | None = None,
         store: BaseStore | None = None,
-        media_store: "BaseMediaStore | None" = None,
+        media_store: BaseMediaStore | None = None,
         interrupt_before: list[str] | None = None,
         interrupt_after: list[str] | None = None,
         callback_manager: CallbackManager = CallbackManager(),
         shutdown_timeout: float = 30.0,
         debug: bool = False,
         durability: str | None = None,
-    ) -> "CompiledGraph[StateT]":
+    ) -> CompiledGraph[StateT]:
         """Compile the graph for execution.
 
         Args:
@@ -669,7 +671,36 @@ class StateGraph[StateT: AgentState]:
         # Import the CompiledGraph class
         from .compiled_graph import CompiledGraph
 
-        # Setup dependencies
+        # Setup dependencies - clear cached singletons so new bindings take immediate effect
+        try:
+            singleton_scope = self._container._scope_manager.get_scope("singleton")
+            instances = getattr(singleton_scope, "_instances", None)
+            if isinstance(instances, dict):
+                instances.pop(BaseCheckpointer, None)
+                instances.pop(BaseStore, None)
+        except Exception as e:
+            logger.debug("Could not evict singleton instances: %s", e)
+
+        # Reset any cached _injected_value on function default Inject proxies
+        from alcyoneus.core.graph.utils.utils import (
+            call_realtime_sync,
+            load_or_create_state,
+            reload_state,
+            sync_data,
+        )
+
+        for fn in (sync_data, reload_state, load_or_create_state, call_realtime_sync):
+            if fn.__defaults__:
+                for d in fn.__defaults__:
+                    if hasattr(d, "_injected_value") and getattr(d, "service_type", None) in (
+                        BaseCheckpointer,
+                        BaseStore,
+                    ):
+                        try:
+                            object.__setattr__(d, "_injected_value", None)
+                        except Exception as e:
+                            logger.debug("Could not reset proxy _injected_value: %s", e)
+
         self._container.bind_instance(
             BaseCheckpointer,
             checkpointer,
@@ -777,7 +808,7 @@ class StateGraph[StateT: AgentState]:
         from alcyoneus.core.graph.tool_node import ToolNode
 
         for node in self.nodes.values():
-            agent = node.func
+            agent: Any = node.func
             tool_node_name = getattr(agent, "tool_node_name", None)
             if not tool_node_name:
                 continue

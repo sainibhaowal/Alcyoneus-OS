@@ -219,9 +219,9 @@ class MCPMixin:
                         if user_id:
                             input_data["user"] = {"user_id": user_id}
 
-                res: t.Any = await self._client.call_tool(name, input_data)
+                raw_tool_res = await self._client.call_tool(name, input_data)
 
-                final_res = self._serialize_result(tool_call_id, res)
+                final_res = self._serialize_result(tool_call_id, raw_tool_res)
 
                 result = Message.tool_message(
                     content=final_res,

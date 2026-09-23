@@ -90,7 +90,7 @@ from typing import Any, Protocol, TypeVar, runtime_checkable
 try:
     from injectq import InjectQ
 except ImportError:
-    InjectQ = Any
+    InjectQ = Any  # type: ignore[misc,assignment]
 
 
 from alcyoneus.core.graph.base_agent import BaseAgent
@@ -409,7 +409,8 @@ class RAGAgent[StateT: AgentState]:
             )
 
             # Retrieve from all stores
-            if parallel_retrieval and len(stores) > 1:
+            valid_stores = [s for s in stores if s is not None]
+            if parallel_retrieval and len(valid_stores) > 1:
                 # Parallel retrieval
                 tasks = [
                     store.asearch(
@@ -419,21 +420,21 @@ class RAGAgent[StateT: AgentState]:
                         score_threshold=score_threshold,
                         retrieval_strategy=retrieval_strategy,
                     )
-                    for store in stores
+                    for store in valid_stores
                 ]
                 all_results = await asyncio.gather(*tasks, return_exceptions=True)
 
                 # Flatten results and handle exceptions
                 docs = []
                 for i, results in enumerate(all_results):
-                    if isinstance(results, Exception):
+                    if isinstance(results, BaseException):
                         logger.error(f"RAGAgent RETRIEVE: store {i} failed: {results}")
                         continue
                     docs.extend([r.content for r in results if r.content])
             else:
                 # Sequential retrieval (single store or disabled parallel)
                 docs = []
-                for store in stores:
+                for store in valid_stores:
                     results = await store.asearch(
                         config=store_config,
                         query=query,
@@ -511,6 +512,7 @@ class RAGAgent[StateT: AgentState]:
                     ]
                     logger.debug("RAGAgent SYNTHESIZE: injected %d docs.", len(docs))
 
+            assert agent is not None
             return await agent.execute(state, config)
 
         return _synthesize

@@ -8,17 +8,17 @@ from typing import Any
 
 
 try:
-    from injectq import Inject, InjectQ
+    from injectq import Inject, InjectQ  # type: ignore[assignment]
     from injectq.utils.exceptions import DependencyNotFoundError
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
-    InjectQ = None
-    DependencyNotFoundError = Exception
+    Inject: Any = _DummyInject()  # type: ignore[no-redef]
+    InjectQ: Any = None  # type: ignore[no-redef]
+    DependencyNotFoundError: Any = Exception  # type: ignore[no-redef]
 
 
 from alcyoneus.core.graph.tool_node import ToolNode
@@ -174,6 +174,22 @@ class AgentExecutionMixin:
     # Set by ``Agent.__init__``; declared here so the mixin can read it when
     # lazily building fallback clients (the mixin never assigns it itself).
     use_vertex_ai: bool
+    tool_node: str | ToolNode | None
+    tool_node_name: str | None
+    _tool_node: ToolNode | None
+    _extra_tools: list[Any]
+    model: str
+    provider: str
+    client: Any
+    base_url: str | None
+    trim_context: bool
+    system_prompt: list[dict[str, Any]]
+    extra_messages: list[Any] | None
+    tools_tags: set[str] | None
+    llm_kwargs: dict[str, Any]
+    output_type: str | None
+    api_style: str
+    reasoning_config: dict[str, Any] | None
 
     def _setup_tools(self) -> ToolNode | None:
         """Normalize the tool_node input and wire internal state.
@@ -207,7 +223,7 @@ class AgentExecutionMixin:
     async def _trim_context(
         self,
         state: AgentState,
-        context_manager: BaseContextManager | None = Inject[BaseContextManager],
+        context_manager: BaseContextManager | None = Inject[BaseContextManager],  # type: ignore[assignment]
     ) -> AgentState:
         """Trim state context when a context manager is configured."""
         if not self.trim_context:
@@ -369,7 +385,7 @@ class AgentExecutionMixin:
                         if active_client is None:
                             # Lazily build the fallback client, honouring the
                             # agent's Vertex AI selection (only affects google).
-                            active_client = self._create_client(
+                            active_client = self._create_client(  # type: ignore[attr-defined]
                                 provider,
                                 base_url,
                                 self.use_vertex_ai,
@@ -470,11 +486,11 @@ class AgentExecutionMixin:
                         existing_extra = kwargs.get("extra_body", {})
                         existing_extra["reasoning"] = self.reasoning_config
                         kwargs["extra_body"] = existing_extra
-                    return await self._call_openai(messages, tools, stream, **kwargs)
+                    return await self._call_openai(messages, tools, stream, **kwargs)  # type: ignore[attr-defined]
 
                 if self.base_url:
                     try:
-                        result = await self._call_openai_responses(
+                        result = await self._call_openai_responses(  # type: ignore[attr-defined]
                             messages, tools, stream, **kwargs
                         )
                         self._effective_api_style = "responses"
@@ -489,10 +505,10 @@ class AgentExecutionMixin:
                         self._effective_api_style = "chat"
                         if self.reasoning_config and self.reasoning_config.get("effort"):
                             kwargs.setdefault("reasoning_effort", self.reasoning_config["effort"])
-                        return await self._call_openai(messages, tools, stream, **kwargs)
+                        return await self._call_openai(messages, tools, stream, **kwargs)  # type: ignore[attr-defined]
 
                 self._effective_api_style = "responses"
-                return await self._call_openai_responses(messages, tools, stream, **kwargs)
+                return await self._call_openai_responses(messages, tools, stream, **kwargs)  # type: ignore[attr-defined]
 
             self._effective_api_style = "chat"
             if self.reasoning_config and self.reasoning_config.get("effort"):
@@ -501,10 +517,10 @@ class AgentExecutionMixin:
                 existing_extra = kwargs.get("extra_body", {})
                 existing_extra["reasoning"] = self.reasoning_config
                 kwargs["extra_body"] = existing_extra
-            return await self._call_openai(messages, tools, stream, **kwargs)
+            return await self._call_openai(messages, tools, stream, **kwargs)  # type: ignore[attr-defined]
 
         if self.provider == "google":
-            return await self._call_google(messages, tools, stream, **kwargs)
+            return await self._call_google(messages, tools, stream, **kwargs)  # type: ignore[attr-defined]
 
         raise ValueError(f"Unsupported provider: {self.provider}")
 

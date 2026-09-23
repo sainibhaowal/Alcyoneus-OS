@@ -51,13 +51,13 @@ class ModelResponseConverter:
             elif converter == "openai_responses":
                 from .openai_responses_converter import OpenAIResponsesConverter
 
-                self.converter = OpenAIResponsesConverter()
+                self.converter = OpenAIResponsesConverter()  # type: ignore[assignment]
                 logger.debug("Using OpenAIResponsesConverter for response conversion")
 
             elif converter == "google":
                 from .google_genai_converter import GoogleGenAIConverter
 
-                self.converter = GoogleGenAIConverter()
+                self.converter = GoogleGenAIConverter()  # type: ignore[assignment]
                 logger.debug("Using GoogleGenAIConverter for response conversion")
 
             else:
@@ -68,7 +68,7 @@ class ModelResponseConverter:
                 )
 
         elif isinstance(converter, BaseConverter):
-            self.converter = converter
+            self.converter = converter  # type: ignore[assignment]
             logger.debug(f"Using custom converter: {type(converter).__name__}")
         else:
             logger.error(f"Unsupported converter: {converter}")

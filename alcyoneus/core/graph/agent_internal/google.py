@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import json
 import logging
+from collections.abc import Callable
 from typing import Any
 
 from .constants import GOOGLE_THINKING_BUDGET_BY_EFFORT
@@ -15,6 +16,13 @@ logger = logging.getLogger("alcyoneus.agent")
 
 class AgentGoogleMixin:
     """Google GenAI message conversion and request helpers."""
+
+    model: str
+    client: Any
+    llm_kwargs: dict[str, Any]
+    output_type: str | None
+    reasoning_config: dict[str, Any] | None
+    _extract_prompt: Callable[..., str]
 
     def _convert_to_google_format(
         self,

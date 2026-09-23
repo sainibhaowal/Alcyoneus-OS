@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from typing import Any
 
 from .constants import CALL_EXCLUDED_KWARGS
@@ -80,6 +81,13 @@ def _to_responses_content(content: Any) -> Any:
 
 class AgentOpenAIMixin:
     """OpenAI and OpenAI-compatible API request helpers."""
+
+    model: str
+    client: Any
+    llm_kwargs: dict[str, Any]
+    output_type: str | None
+    reasoning_config: dict[str, Any] | None
+    _extract_prompt: Callable[..., str]
 
     async def _call_openai(
         self,

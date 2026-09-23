@@ -1,6 +1,6 @@
 [project]
 name = "alcyoneus"
-version = "1.1.1"
+version = "1.2.0"
 description = "Alcyoneus OS: Production-grade Python operating system & framework for building, orchestrating, and deploying multi-agent LLM systems."
 readme = "README.md"
 keywords = [
@@ -101,6 +101,7 @@ build-backend = "setuptools.build_meta"
 
 [project.scripts]
 alc = "alcyoneus.cli:cli"
+alcyoneus = "alcyoneus.cli:cli"
 
 [project.optional-dependencies]
 google-genai = ["google-genai>=1.56.0"]
@@ -245,7 +246,7 @@ line-ending = "auto"
 docstring-code-format = true
 
 [tool.bandit]
-exclude_dirs = ["*/tests/*", "*/migrations", "*/scripts/*", "docs/*", "examples/*"]
+exclude_dirs = ["*/tests/*", "*/migrations", "*/scripts/*", "docs/*", "examples/*", ".venv", "./.venv"]
 skips = ["B101", "B611", "B601", "B608", "B102", "B307", "B405"]
 
 
@@ -255,132 +256,13 @@ ignore_missing_imports = true
 namespace_packages = true
 explicit_package_bases = true
 warn_unused_configs = true
+check_untyped_defs = true
 exclude = [
     "normal_tests/*",
     "tests/*",
     "examples/*",
     "docs/*",
 ]
-
-# Phased adoption: mypy was wired into CI after the codebase already existed, so
-# it does not block on the modules that still carry pre-existing type errors.
-# These are still parsed (so downstream type info is available) but their own
-# errors are silenced. Burn the list down by cleaning a module's types and
-# deleting its entry here; everything NOT listed is already gating.
-[[tool.mypy.overrides]]
-module = [
-    "alcyoneus.cli",
-    "alcyoneus.core.audit",
-    "alcyoneus.core.auth",
-    "alcyoneus.core.graph.agent",
-    "alcyoneus.core.graph.agent_internal.execution",
-    "alcyoneus.core.graph.agent_internal.google",
-    "alcyoneus.core.graph.agent_internal.memory",
-    "alcyoneus.core.graph.agent_internal.openai",
-    "alcyoneus.core.graph.compiled_graph",
-    "alcyoneus.core.graph.dynamic_prompt",
-    "alcyoneus.core.graph.message_graph",
-    "alcyoneus.core.graph.node",
-    "alcyoneus.core.graph.node_execution_policy",
-    "alcyoneus.core.graph.remote_graph",
-    "alcyoneus.core.graph.state_graph",
-    "alcyoneus.core.graph.stream_transformers",
-    "alcyoneus.core.graph.tool_node.base",
-    "alcyoneus.core.graph.tool_node.mcp_exec",
-    "alcyoneus.core.graph.tool_node.schema",
-    "alcyoneus.core.graph.utils.handler_utils",
-    "alcyoneus.core.graph.utils.invoke_handler",
-    "alcyoneus.core.graph.utils.invoke_node_handler",
-    "alcyoneus.core.graph.utils.stream_handler",
-    "alcyoneus.core.graph.utils.stream_node_handler",
-    "alcyoneus.core.graph.utils.utils",
-    "alcyoneus.core.guardrails.tool_guardrails",
-    "alcyoneus.core.mcp.transport",
-    "alcyoneus.core.multitenancy",
-    "alcyoneus.core.ratelimit",
-    "alcyoneus.core.realtime.events",
-    "alcyoneus.core.realtime.providers.azure_realtime",
-    "alcyoneus.core.realtime.providers.local_whisper_tts",
-    "alcyoneus.core.realtime.providers.openai_realtime",
-    "alcyoneus.core.secrets",
-    "alcyoneus.core.state.channels",
-    "alcyoneus.core.state.managed_values",
-    "alcyoneus.core.state.message",
-    "alcyoneus.core.state.serde",
-    "alcyoneus.core.triggers.triggers",
-    "alcyoneus.core.voice.pipeline",
-    "alcyoneus.core.voice.providers.openai_tts",
-    "alcyoneus.extensions.experimental.codex",
-    "alcyoneus.prebuilt.agent.plan_act_reflect",
-    "alcyoneus.prebuilt.agent.rag",
-    "alcyoneus.prebuilt.agent.react",
-    "alcyoneus.prebuilt.agent.router",
-    "alcyoneus.prebuilt.agent.structured_output",
-    "alcyoneus.prebuilt.agent.supervisor_team",
-    "alcyoneus.prebuilt.agent.swarm",
-    "alcyoneus.prebuilt.tools.browser",
-    "alcyoneus.prebuilt.tools.calculator",
-    "alcyoneus.prebuilt.tools.calendar",
-    "alcyoneus.prebuilt.tools.code_interpreter",
-    "alcyoneus.prebuilt.tools.command",
-    "alcyoneus.prebuilt.tools.computer",
-    "alcyoneus.prebuilt.tools.computer_backends",
-    "alcyoneus.prebuilt.tools.directory",
-    "alcyoneus.prebuilt.tools.edit",
-    "alcyoneus.prebuilt.tools.fetch",
-    "alcyoneus.prebuilt.tools.file_search",
-    "alcyoneus.prebuilt.tools.files",
-    "alcyoneus.prebuilt.tools.finish",
-    "alcyoneus.prebuilt.tools.image",
-    "alcyoneus.prebuilt.tools.interaction",
-    "alcyoneus.prebuilt.tools.memory",
-    "alcyoneus.prebuilt.tools.registry",
-    "alcyoneus.prebuilt.tools.scheduler",
-    "alcyoneus.prebuilt.tools.search",
-    "alcyoneus.prebuilt.tools.shell_tool",
-    "alcyoneus.prebuilt.tools.subagent",
-    "alcyoneus.qa.evaluation.criteria.llm_utils",
-    "alcyoneus.qa.evaluation.evaluator",
-    "alcyoneus.qa.evaluation.quick_eval",
-    "alcyoneus.qa.evaluation.reporters._html_render",
-    "alcyoneus.qa.evaluation.reporters.console",
-    "alcyoneus.qa.evaluation.simulators.user_simulator",
-    "alcyoneus.qa.testing.in_memory_store",
-    "alcyoneus.qa.testing.mock_mcp",
-    "alcyoneus.qa.testing.mock_tools",
-    "alcyoneus.qa.testing.quick_test",
-    "alcyoneus.qa.testing.test_agent",
-    "alcyoneus.runtime.adapters.llm.anyllm_converter",
-    "alcyoneus.runtime.adapters.llm.google_genai_converter",
-    "alcyoneus.runtime.adapters.llm.litellm_converter",
-    "alcyoneus.runtime.adapters.llm.model_response_converter",
-    "alcyoneus.runtime.adapters.llm.multi_provider",
-    "alcyoneus.runtime.adapters.llm.openai_converter",
-    "alcyoneus.runtime.adapters.llm.openai_responses_converter",
-    "alcyoneus.runtime.protocols.a2a.client",
-    "alcyoneus.runtime.protocols.a2a.executor",
-    "alcyoneus.runtime.protocols.acp",
-    "alcyoneus.runtime.publisher.publish",
-    "alcyoneus.sandbox.docker",
-    "alcyoneus.sandbox.k8s_sandbox",
-    "alcyoneus.sandbox.remote_file_sync",
-    "alcyoneus.sandbox.snapshot",
-    "alcyoneus.storage.checkpointer.conformance.base",
-    "alcyoneus.storage.checkpointer.in_memory_checkpointer",
-    "alcyoneus.storage.checkpointer.pg_checkpointer",
-    "alcyoneus.storage.checkpointer.sqlite_checkpointer",
-    "alcyoneus.storage.media.processor",
-    "alcyoneus.storage.sessions.sqlalchemy_session",
-    "alcyoneus.storage.store.base_store",
-    "alcyoneus.storage.store.embedding.google_embedding",
-    "alcyoneus.storage.store.long_term_memory",
-    "alcyoneus.storage.store.mem0_store",
-    "alcyoneus.storage.store.qdrant_store",
-    "alcyoneus.storage.store.store_schema",
-    "alcyoneus.utils.callbacks",
-    "alcyoneus.utils.shutdown",
-]
-ignore_errors = true
 
 [tool.pytest.ini_options]
 env = [
@@ -431,6 +313,7 @@ omit = [
 ]
 
 [tool.coverage.report]
+fail_under = 90
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",

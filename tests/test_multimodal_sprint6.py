@@ -223,10 +223,6 @@ class TestFixOrientation:
         result = proc.fix_orientation(block)
         assert result is block
 
-    @pytest.mark.skipif(
-        not _can_import("piexif"),
-        reason="piexif not installed",
-    )
     def test_exif_rotation_applied(self):
         block = _make_exif_rotated_image()
         proc = MediaProcessor()

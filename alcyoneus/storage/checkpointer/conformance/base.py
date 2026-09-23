@@ -45,9 +45,9 @@ def checkpointer_test(
     """
 
     def decorator(func: Callable) -> Callable:
-        func._checkpointer_test_name = name
-        func._checkpointer_test_skip = skip_capabilities or []
-        func._checkpointer_test_lifespan = lifespan
+        func._checkpointer_test_name = name  # type: ignore[attr-defined]
+        func._checkpointer_test_skip = skip_capabilities or []  # type: ignore[attr-defined]
+        func._checkpointer_test_lifespan = lifespan  # type: ignore[attr-defined]
         return func
 
     return decorator

@@ -1,33 +1,28 @@
 # Copyright 2026 Alcyoneus Authors
 
-import asyncio
-import os
 import tempfile
 import unittest
 from pathlib import Path
 
 from alcyoneus import (
     Decision,
-    Policy,
     PolicyEngine,
     allow,
-    deny,
-    ask_user,
     allow_all,
-    deny_all,
+    ask_user,
     confirm_run_command,
+    deny,
     workspace_only,
 )
 
 
 class TestPolicyEngine(unittest.IsolatedAsyncioTestCase):
-
     async def test_policy_priority_tiers(self):
         policies = [
-            allow_all(),                                            # tier 9
-            deny("shell_command"),                                  # tier 1
-            ask_user("view_file", handler=lambda name, args: True), # tier 2
-            allow("read_file"),                                     # tier 3
+            allow_all(),  # tier 9
+            deny("shell_command"),  # tier 1
+            ask_user("view_file", handler=lambda name, args: True),  # tier 2
+            allow("read_file"),  # tier 3
         ]
 
         engine = PolicyEngine(policies)

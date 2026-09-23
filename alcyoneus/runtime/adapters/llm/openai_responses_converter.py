@@ -168,7 +168,7 @@ class OpenAIResponsesConverter(BaseConverter):
 
     # ---- streaming ------------------------------------------------------
 
-    async def convert_streaming_response(
+    async def convert_streaming_response(  # type: ignore[override]
         self,
         config: dict,
         node_name: str,
@@ -509,9 +509,9 @@ class OpenAIResponsesConverter(BaseConverter):
         if isinstance(result, str):
             b64 = result
         else:
-            b64 = getattr(result, "b64_json", None) or getattr(result, "data", None)
+            b64 = getattr(result, "b64_json", None) or getattr(result, "data", None)  # type: ignore[assignment]
             if not b64 and isinstance(result, dict):
-                b64 = result.get("b64_json") or result.get("data")
+                b64 = result.get("b64_json") or result.get("data")  # type: ignore[assignment]
 
         if not b64:
             return None

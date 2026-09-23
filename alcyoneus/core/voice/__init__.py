@@ -32,7 +32,13 @@ from .providers.google_stt import GoogleSTTModel
 from .providers.openai_stt import OpenAISTTModel
 from .providers.openai_tts import OpenAITTSModel
 from .result import StreamedAudioResult
-from .sip import SIPCallConfig, SIPTelephony
+from .sip import (
+    SIPCallConfig,
+    SIPCallFailedError,
+    SIPConfigurationError,
+    SIPTelephony,
+    SIPTelephonyError,
+)
 from .workflow import (
     SingleAgentVoiceWorkflow,
     VoiceWorkflowBase,
@@ -46,7 +52,10 @@ __all__ = [
     "OpenAISTTModel",
     "OpenAITTSModel",
     "SIPCallConfig",
+    "SIPCallFailedError",
+    "SIPConfigurationError",
     "SIPTelephony",
+    "SIPTelephonyError",
     "STTModel",
     "STTModelSettings",
     "SingleAgentVoiceWorkflow",

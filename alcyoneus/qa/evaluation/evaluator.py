@@ -342,7 +342,7 @@ class AgentEvaluator:
                     )
                 )
             else:
-                results.append(item)
+                results.append(item)  # type: ignore[arg-type]
         return results
 
     # ------------------------------------------------------------------

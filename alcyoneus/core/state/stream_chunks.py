@@ -24,6 +24,16 @@ class StreamEvent(enum.StrEnum):
     MESSAGE = "message"
     ERROR = "error"
     UPDATES = "updates"
+    TOOL_EXECUTION = "tool_execution"
+    TOOL_CALL = "tool_call"
+    TOOL_PROGRESS = "tool_progress"
+    TOOL_RESULT = "tool_result"
+    MESSAGE_DELTA = "message_delta"
+    STATE_UPDATE = "state_update"
+    STATE_DELTA = "state_delta"
+    VALUES = "values"
+    CUSTOM = "custom"
+    HEARTBEAT = "heartbeat"
 
 
 class StreamChunk(BaseModel):
@@ -45,8 +55,11 @@ class StreamChunk(BaseModel):
     state: AgentState | None = None
     # Placeholder for other chunk types
     data: dict | None = None
+    content: str | None = None
 
     # Optional identifiers
+    id: str | None = None
+    type: str | None = None
     thread_id: str | None = None
     run_id: str | None = None
     # Optional metadata

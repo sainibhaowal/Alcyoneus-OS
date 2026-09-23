@@ -31,7 +31,11 @@ class _ProviderAgentLike(Protocol):
 class AgentProviderMixin:
     """Provider-specific validation and client creation helpers."""
 
-    def _validate_output_type(self: _ProviderAgentLike) -> None:
+    output_type: str | None
+    provider: str
+    llm_kwargs: dict[str, Any]
+
+    def _validate_output_type(self) -> None:
         """Validate that the selected provider supports the requested output type."""
         if self.output_type not in VALID_OUTPUT_TYPES:
             raise ValueError(
@@ -73,7 +77,7 @@ class AgentProviderMixin:
         return create_llm_client("google", use_vertex_ai=True)
 
     def _create_client(
-        self: _ProviderAgentLike,
+        self,
         provider: str,
         base_url: str | None = None,
         use_vertex_ai: bool = False,

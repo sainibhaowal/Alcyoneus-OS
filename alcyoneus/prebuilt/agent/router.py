@@ -43,8 +43,18 @@ class RouterAgent(Generic[TState]):
     def __init__(
         self,
         state: TState | None = None,
-        router_node: Callable[[TState], TState] | None = None,
-        routes: dict[str, Callable[[TState], TState] | ToolNode] | None = None,
+        router_node: Callable[[TState], TState]
+        | tuple[Callable[[TState], TState], str]
+        | None = None,
+        routes: (
+            dict[
+                str,
+                Callable[[TState], TState]
+                | ToolNode
+                | tuple[Callable[[TState], TState] | ToolNode, str],
+            ]
+            | None
+        ) = None,
         condition: Callable[[TState], str] | None = None,
         checkpointer: Any = None,
         store: Any = None,
@@ -55,7 +65,7 @@ class RouterAgent(Generic[TState]):
         Initialize RouterAgent.
 
         Args:
-            state: Optional initial state. If not provided, a new AgentState is created.
+            state: Optional initial state. Defaults to empty AgentState.
             router_node: Optional router function. If provided with routes, compiles immediately.
             routes: Optional route handlers. If provided with router_node, compiles immediately.
             condition: Optional condition function for routing.
@@ -64,7 +74,7 @@ class RouterAgent(Generic[TState]):
             interrupt_before: Nodes to interrupt before.
             interrupt_after: Nodes to interrupt after.
         """
-        self.state = state or AgentState()
+        self.state = state or AgentState()  # type: ignore[assignment]
         self._graph: CompiledGraph | None = None
 
         # Compile immediately if router_node and routes provided
@@ -84,7 +94,7 @@ class RouterAgent(Generic[TState]):
 
     def _compile_default(self) -> CompiledGraph:
         """Compile a default pass-through graph."""
-        graph = StateGraph(self.state.__class__ if self.state else AgentState)
+        graph: StateGraph[Any] = StateGraph(self.state)
 
         def passthrough(state: TState) -> TState:
             return state
@@ -161,7 +171,7 @@ class RouterAgent(Generic[TState]):
             elif not (callable(handler) or isinstance(handler, ToolNode)):
                 raise ValueError(f"Route '{route_key}' must be callable or ToolNode")
 
-        graph = StateGraph(self.state.__class__ if self.state else AgentState)
+        graph: StateGraph[Any] = StateGraph(self.state)
 
         graph.add_node(router_name, router_callable)
 
@@ -185,9 +195,9 @@ class RouterAgent(Generic[TState]):
             def default_condition(state: TState) -> str:
                 if hasattr(state, "context") and state.context:
                     for msg in state.context:
-                        if hasattr(msg, "content") and isinstance(msg.content, dict):
-                            if "route" in msg.content:
-                                return msg.content["route"]
+                        content = getattr(msg, "content", None)
+                        if isinstance(content, dict) and "route" in content:
+                            return str(content["route"])
                 return END
 
             condition = default_condition
@@ -222,9 +232,12 @@ class RouterAgent(Generic[TState]):
 
 # Convenience function for simple routing
 def create_router_agent(
-    router_fn: Callable[[TState], TState],
-    routes: dict[str, Callable[[TState], TState] | ToolNode],
-    **compile_kwargs,
+    router_fn: Callable[[Any], Any],
+    routes: dict[
+        str,
+        Callable[[Any], Any] | ToolNode | tuple[Callable[[Any], Any] | ToolNode, str],
+    ],
+    **compile_kwargs: Any,
 ) -> CompiledGraph:
     """
     Create and compile a router agent in one call.
@@ -237,7 +250,7 @@ def create_router_agent(
     Returns:
         Compiled graph
     """
-    agent = RouterAgent()
+    agent: RouterAgent[Any] = RouterAgent()
     return agent.compile(router_fn, routes, **compile_kwargs)
 
 

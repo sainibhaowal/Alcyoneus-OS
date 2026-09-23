@@ -101,6 +101,7 @@ class KafkaPublisher(BasePublisher):
                 compression_type=self.compression_type,
                 request_timeout_ms=self.request_timeout_ms,
             )
+            assert self._producer is not None
             await self._producer.start()
             logger.info(
                 "KafkaPublisher connected successfully (batch_size=%d, linger_ms=%d)",

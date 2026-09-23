@@ -57,7 +57,7 @@ class LiteLLMConverter(BaseConverter):
             **kwargs,
         }
 
-    def convert_response(self, raw_response: Any) -> dict[str, Any]:
+    def convert_response(self, raw_response: Any) -> dict[str, Any]:  # type: ignore[override]
         """Convert LiteLLM completion response into Alcyoneus OS standard structure."""
         if hasattr(raw_response, "choices") and raw_response.choices:
             choice = raw_response.choices[0]
@@ -72,9 +72,18 @@ class LiteLLMConverter(BaseConverter):
             }
         return {"content": str(raw_response), "role": "assistant", "raw": raw_response}
 
-    def convert_streaming_response(self, raw_chunk: Any) -> dict[str, Any] | None:
-        if hasattr(raw_chunk, "choices") and raw_chunk.choices:
-            delta = raw_chunk.choices[0].delta
+    def convert_streaming_response(  # type: ignore[override]
+        self,
+        raw_chunk: Any = None,
+        node_name: str = "",
+        response: Any = None,
+        meta: dict | None = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> dict[str, Any] | None:
+        chunk = response if response is not None else raw_chunk
+        if hasattr(chunk, "choices") and chunk.choices:
+            delta = chunk.choices[0].delta
             content = getattr(delta, "content", "")
             return {"content": content, "role": getattr(delta, "role", "assistant")}
         return None

@@ -24,8 +24,13 @@
 | Dynamic skill injection | `SkillConfig` + `SkillsRegistry` |
 | Input validation | `InputGuardrail` |
 | Output validation | `OutputGuardrail` |
-| Tool access control | `ToolGuardrail` |
-| Access control (RBAC) | `PolicyEngine` |
+| Tool access control | `PolicyEngine` + `ToolNode` |
+| Access control & RBAC | `PolicyEngine` (9-tier hierarchy) |
+| Workspace path isolation | `workspace_only()` in `PolicyEngine` |
+| VoIP & SIP phone call agent | `SIPTelephonyAdapter` (`alcyoneus.core.voice.sip`) |
+| Interactive terminal / PTY code exec | `PTYSandboxSession` (`alcyoneus.sandbox.pty_sandbox`) |
+| Diagnose system & dependencies | CLI: `alcyoneus doctor` |
+| Scaffold new project | CLI: `alcyoneus init <dir> --template <name>` |
 | A2A protocol (task-based) | `a2a.A2AClient` / `A2AServer` |
 | ACP protocol (conversational) | `acp.ACPClient` / `ACPServer` |
 | Custom tool | `@tool` decorator |

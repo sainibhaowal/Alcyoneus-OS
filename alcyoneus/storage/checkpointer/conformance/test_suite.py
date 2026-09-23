@@ -24,7 +24,7 @@ from alcyoneus.storage.checkpointer.conformance import Capability, validate_chec
 @pytest.mark.asyncio
 async def test_in_memory_checkpointer_conformance():
     """Test InMemoryCheckpointer conformance."""
-    checkpointer = InMemoryCheckpointer()
+    checkpointer: InMemoryCheckpointer = InMemoryCheckpointer()
     report = await validate_checkpointer(checkpointer, "InMemoryCheckpointer")
     assert report.passed_all_base, f"Base capabilities failed: {report.to_dict()}"
 
@@ -32,7 +32,7 @@ async def test_in_memory_checkpointer_conformance():
 @pytest.mark.asyncio
 async def test_sqlite_checkpointer_conformance():
     """Test SqliteCheckpointer conformance."""
-    checkpointer = SqliteCheckpointer(":memory:")
+    checkpointer: SqliteCheckpointer = SqliteCheckpointer(":memory:")
     report = await validate_checkpointer(checkpointer, "SqliteCheckpointer")
     assert report.passed_all_base, f"Base capabilities failed: {report.to_dict()}"
 
@@ -42,14 +42,14 @@ async def test_checkpointer_capabilities():
     """Test individual capability detection."""
     from alcyoneus.storage.checkpointer.conformance.capabilities import DetectedCapabilities
 
-    mem_cp = InMemoryCheckpointer()
+    mem_cp: InMemoryCheckpointer = InMemoryCheckpointer()
     detected = DetectedCapabilities.from_instance(mem_cp)
     assert Capability.PUT in detected.capabilities
     assert Capability.GET_TUPLE in detected.capabilities
     assert Capability.LIST in detected.capabilities
     assert Capability.DELETE_THREAD in detected.capabilities
 
-    sqlite_cp = SqliteCheckpointer(":memory:")
+    sqlite_cp: SqliteCheckpointer = SqliteCheckpointer(":memory:")
     detected = DetectedCapabilities.from_instance(sqlite_cp)
     assert Capability.PUT in detected.capabilities
     assert Capability.GET_TUPLE in detected.capabilities

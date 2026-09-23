@@ -116,103 +116,104 @@ agent = Agent(
 
 ---
 
-## 4. Policy Engine (Access Control)
+## 4. Unified Safety & Policy Engine
+
+Alcyoneus OS provides an enterprise-grade, declarative Policy Engine for fine-grained tool authorization, path traversal sandboxing, and Human-in-the-Loop (HITL) confirmation.
+
+### 9-Tier Priority Evaluation Hierarchy
+
+Policies are evaluated strictly from highest to lowest specificity:
+1. **Specific Deny** (`tool="delete_database"`, `decision=DENY`)
+2. **Specific Ask** (`tool="drop_table"`, `decision=ASK_USER`)
+3. **Specific Allow** (`tool="safe_calculator"`, `decision=APPROVE`)
+4. **Prefix Deny** (`tool="aws/*"`, `decision=DENY`)
+5. **Prefix Ask** (`tool="git/*"`, `decision=ASK_USER`)
+6. **Prefix Allow** (`tool="read/*"`, `decision=APPROVE`)
+7. **Global Deny** (`tool="*"`, `decision=DENY`)
+8. **Global Ask** (`tool="*"`, `decision=ASK_USER`)
+9. **Global Allow** (`tool="*"`, `decision=APPROVE`)
+
+### Quick Setup with Safe Defaults
 
 ```python
-from alcyoneus.core.policy import PolicyEngine, allow, deny, ask_user
+from alcyoneus.core.policy import PolicyEngine, safe_defaults, ask_user, deny
+
+# safe_defaults restricts file tools to workspace_path and prompts for shell execution
+engine = PolicyEngine(
+    policies=[
+        *safe_defaults(workspace_path="./workspace"),
+        # Deny dangerous tools explicitly
+        deny("eval_arbitrary_python"),
+        # Ask for approval on production deployments
+        ask_user("deploy_to_production"),
+    ]
+)
+```
+
+### ToolNode Policy Enforcement
+
+Attach the `PolicyEngine` directly to any `ToolNode` in your `StateGraph` or `Agent`:
+
+```python
+from alcyoneus.core import ToolNode, StateGraph
+from alcyoneus.core.policy import (
+    PolicyEngine,
+    allow,
+    deny,
+    ask_user,
+    workspace_only,
+)
+from alcyoneus.prebuilt.tools import (
+    file_read,
+    file_write,
+    shell_command,
+    safe_calculator,
+)
+
+# Custom interactive confirmation handler for HITL
+async def my_hitl_handler(tool_name: str, args: dict) -> bool:
+    print(f"⚠️ Tool requested approval: {tool_name} with {args}")
+    # In web UI / CLI: prompt user or return boolean
+    return True
 
 engine = PolicyEngine(
-    rules=[
-        # Admin: full access
-        allow("read").when(user_role="admin"),
-        allow("write").when(user_role="admin"),
-        allow("delete").when(user_role="admin"),
+    policies=[
+        # Sandboxing: Restrict all file reads and writes inside the workspace
+        workspace_only(workspace_path="/app/sandbox", tools=["file_read", "file_write"]),
         
-        # Editor: read/write own resources
-        allow("read").when(user_role="editor").and_(resource_owner=True),
-        allow("write").when(user_role="editor").and_(resource_owner=True),
+        # Always allow pure computational tools
+        allow("safe_calculator"),
         
-        # Viewer: read only
-        allow("read").when(user_role="viewer"),
-        deny("write").when(user_role="viewer"),
-        deny("delete").when(user_role="viewer"),
+        # Human approval required for shell execution
+        ask_user("shell_command", handler=my_hitl_handler),
         
-        # Default deny
-        deny("all"),
+        # Global fallback: deny everything else by default
+        deny("*"),
     ]
 )
 
-# Check permission
-allowed = engine.check(
-    action="write",
-    user={"role": "editor", "id": "user_123"},
-    resource={"owner_id": "user_123"},
+# Wrap tools with the policy engine
+tool_node = ToolNode(
+    tools=[file_read, file_write, shell_command, safe_calculator],
+    policy=engine,
 )
-# Returns: True
 ```
 
-### Policy DSL
+### Multi-Tenant & Scoped Access
+
+Policies can be scoped to specific tenants, user IDs, or MCP servers:
 
 ```python
-from alcyoneus.core.policy import (
-    allow, deny, ask_user,
-    when, and_, or_, not_,
-    user_role, resource_owner, resource_type,
-    time_between, ip_in_range,
+from alcyoneus.core.policy import Policy, Decision
+
+tenant_policy = Policy(
+    tool="query_customer_db",
+    decision=Decision.APPROVE,
+    tenant_ids=("tenant_enterprise_42",),
+    argument_predicate=lambda args: args.get("limit", 0) <= 100,
 )
 
-rules = [
-    # Time-based
-    allow("write").when(
-        time_between("09:00", "17:00")
-    ).and_(user_role="editor"),
-    
-    # IP-based
-    allow("admin").when(
-        ip_in_range("10.0.0.0/8")
-    ),
-    
-    # Resource-based
-    allow("read").when(
-        resource_type="public"
-    ).or_(resource_owner=True),
-    
-    # Conditional
-    ask_user("confirm_delete").when(
-        user_role="editor"
-    ).and_(action="delete"),
-]
-
-engine = PolicyEngine(rules=rules)
-```
-
----
-
-## 4. Policy Engine in Graph
-
-```python
-from alcyoneus.core.policy import PolicyEngine
-from alcyoneus.core.graph import StateGraph
-
-engine = PolicyEngine(rules=[...])
-
-graph = StateGraph(MyState)
-graph.add_node("process", process_node)
-
-# Add policy check node
-async def check_permission(state: MyState) -> MyState:
-    allowed = engine.check(
-        action="process",
-        user={"role": state.user_role, "id": state.user_id},
-        resource={"owner_id": state.resource_owner},
-    )
-    if not allowed:
-        raise PermissionError("Access denied")
-    return state
-
-graph.add_node("check_perm", check_permission)
-graph.add_edge(START, "check_perm")
-graph.add_edge("check_perm", "process")
+engine = PolicyEngine(policies=[tenant_policy])
 ```
 
 ---

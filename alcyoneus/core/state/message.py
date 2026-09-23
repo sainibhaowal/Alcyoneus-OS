@@ -32,27 +32,27 @@ import pydantic
 
 
 try:
-    from injectq import Inject, InjectQ
+    from injectq import InjectQ  # type: ignore[assignment]
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
     class _DummyInjectQ:
         _instance = None
 
         @classmethod
-        def get_instance(cls):
+        def get_instance(cls: Any) -> Any:
             if cls._instance is None:
                 cls._instance = cls()
             return cls._instance
 
-        def try_get(self, *a, **kw):
+        def try_get(self, *a: Any, **kw: Any) -> Any:
             return kw.get("default") if len(a) < 2 else a[1]
 
-    Inject = _DummyInject()
-    InjectQ = _DummyInjectQ
+    Inject: Any = _DummyInject()  # type: ignore[no-redef]
+    InjectQ: Any = _DummyInjectQ  # type: ignore[no-redef]
 
 
 from pydantic import BaseModel, Field

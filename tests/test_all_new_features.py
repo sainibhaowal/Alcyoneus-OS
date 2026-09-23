@@ -164,6 +164,12 @@ class TestAllNewFeatures(unittest.IsolatedAsyncioTestCase):
         patch_tool = ApplyPatchTool()
         res = patch_tool.apply_patch("--- a/file.py\n+++ b/file.py\n@@ -1 +1 @@\n")
         self.assertTrue(res.success)
+        # Clean up the stray file created by the patch tool
+        import pathlib
+        _stray = pathlib.Path("file.py")
+        if _stray.exists():
+            _stray.unlink()
+
 
         def sample_tool():
             return "ok"

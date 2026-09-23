@@ -381,7 +381,7 @@ async def multi_search(
         return json.dumps({"error": "query is required"})
     if providers is None:
         providers = ["google", "bing", "brave"]
-    provider_map = {
+    provider_map: dict[str, Any] = {
         "google": google_web_search,
         "bing": bing_search,
         "brave": brave_search,

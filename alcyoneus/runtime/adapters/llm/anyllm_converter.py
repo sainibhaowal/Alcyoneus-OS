@@ -39,7 +39,21 @@ class AnyLLMConverter(OpenAIConverter):
     def convert_request(
         self, messages: list[Any], model: str | None = None, **kwargs: Any
     ) -> dict[str, Any]:
-        req = super().convert_request(messages=messages, model=model, **kwargs)
+        formatted_messages = []
+        for msg in messages:
+            if hasattr(msg, "model_dump"):
+                formatted_messages.append(msg.model_dump())
+            elif isinstance(msg, dict):
+                formatted_messages.append(msg)
+            else:
+                formatted_messages.append(
+                    {"role": getattr(msg, "role", "user"), "content": str(msg)}
+                )
+        req: dict[str, Any] = {
+            "model": model or "default",
+            "messages": formatted_messages,
+            **kwargs,
+        }
         if self.base_url:
             req["base_url"] = self.base_url
         if self.api_key:

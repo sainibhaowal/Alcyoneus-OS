@@ -16,11 +16,14 @@
 | **Testing** | [TESTING.md](TESTING.md) | QuickTest, TestAgent, mocks |
 | **Evaluation** | [EVALUATION.md](EVALUATION.md) | AgentEvaluator, criteria, simulators |
 | **Skills** | [SKILLS.md](SKILLS.md) | Dynamic capability injection |
-| **Security** | [SECURITY.md](SECURITY.md) | Guardrails, policies, policies |
+| **Security & Policy** | [SECURITY.md](SECURITY.md) | Guardrails, PolicyEngine (RBAC/ABAC), path sandboxing |
 | **Protocols** | [PROTOCOLS.md](PROTOCOLS.md) | A2A, ACP |
+| **Voice & Telephony** | [VOICE.md](VOICE.md) | SIP VoIP adapters, RTP streams, DTMF, phone agents |
+| **Sandboxes** | [SANDBOX.md](SANDBOX.md) | PTY terminal emulation, Docker, Firecracker, file sync |
 | **Configuration** | [CONFIGURATION.md](CONFIGURATION.md) | All compile/runtime options |
 | **Deployment** | [DEPLOYMENT.md](DEPLOYMENT.md) | Docker, K8s, env vars |
 | **Quick Decision** | [QUICK_DECISION.md](QUICK_DECISION.md) | Feature → import mapping |
+| **CLI Reference** | [CLI.md](CLI.md) | Commands: init, doctor, completion, version |
 | **Project Structure** | [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | Recommended file layout |
 | **Gotchas** | [GOTCHAS.md](GOTCHAS.md) | Common issues & fixes |
 
@@ -49,9 +52,13 @@ StateGraph → add_node() → add_edge() → compile() → invoke()
 | Write tests | [TESTING.md](TESTING.md) |
 | Add eval/CI | [EVALUATION.md](EVALUATION.md) |
 | Deploy to prod | [DEPLOYMENT.md](DEPLOYMENT.md) |
+| Scaffold a new project | [CLI.md](CLI.md) |
+| Diagnose my environment | [CLI.md](CLI.md#2-alcyoneus-doctor--system-diagnostics) |
+| Build a voice/phone agent | [VOICE.md](VOICE.md) |
+| Execute code in sandboxed PTY | [SANDBOX.md](SANDBOX.md) |
 
 ---
 
 ## Version
 
-**Alcyoneus OS v1.1.0** — Apache 2.0 Licensed — Package: `pip install alcyoneus`
+**Alcyoneus OS v1.2.0** — Apache 2.0 Licensed — Package: `pip install alcyoneus`

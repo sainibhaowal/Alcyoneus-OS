@@ -33,10 +33,10 @@ try:
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: Any = _DummyInject()  # type: ignore[misc,assignment,no-redef]
 
 
 from alcyoneus.storage.store.base_store import BaseStore
@@ -173,8 +173,8 @@ async def memory_tool(  # noqa: PLR0911, PLR0913
     write_mode: Literal["merge", "replace"] = "merge",
     # Injectable params (excluded from LLM schema automatically)
     config: dict[str, Any] | None = None,
-    store: BaseStore | None = Inject[BaseStore],
-    task_manager: BackgroundTaskManager = Inject[BackgroundTaskManager],
+    store: BaseStore | None = Inject[BaseStore],  # type: ignore[assignment]
+    task_manager: BackgroundTaskManager = Inject[BackgroundTaskManager],  # type: ignore[assignment]
 ) -> str:
     """Search, store, update, or delete long-term memories."""
     if store is None:
@@ -273,8 +273,8 @@ def make_user_memory_tool(memory_config: Any) -> Callable:
         category: str | None = None,
         limit: int | None = None,
         config: dict[str, Any] | None = None,
-        store: BaseStore | None = Inject[BaseStore],
-        task_manager: BackgroundTaskManager = Inject[BackgroundTaskManager],
+        store: BaseStore | None = Inject[BaseStore],  # type: ignore[assignment]
+        task_manager: BackgroundTaskManager = Inject[BackgroundTaskManager],  # type: ignore[assignment]
     ) -> str:
         if user_config is None or not user_config.enabled:
             return json.dumps({"error": "user memory is disabled"})
@@ -352,8 +352,8 @@ def make_agent_memory_tool(memory_config: Any) -> Callable:
         category: str | None = None,
         limit: int | None = None,
         config: dict[str, Any] | None = None,
-        store: BaseStore | None = Inject[BaseStore],
-        task_manager: BackgroundTaskManager = Inject[BackgroundTaskManager],
+        store: BaseStore | None = Inject[BaseStore],  # type: ignore[assignment]
+        task_manager: BackgroundTaskManager = Inject[BackgroundTaskManager],  # type: ignore[assignment]
     ) -> str:
         if agent_config is None or not agent_config.enabled:
             return json.dumps({"error": "agent memory is disabled"})

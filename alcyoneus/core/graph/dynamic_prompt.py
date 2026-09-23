@@ -68,7 +68,7 @@ class PromptTemplate:
         custom_filters: dict[str, Callable] | None = None,
         custom_tests: dict[str, Callable] | None = None,
         custom_globals: dict[str, Any] | None = None,
-        undefined: type = jinja2.StrictUndefined if JINJA2_AVAILABLE else None,
+        undefined: Any = jinja2.StrictUndefined if JINJA2_AVAILABLE else None,
         lstrip_blocks: bool = True,
         trim_blocks: bool = True,
     ):
@@ -89,7 +89,7 @@ class PromptTemplate:
         )
 
         # Add custom filters
-        default_filters = {
+        default_filters: dict[str, Any] = {
             "truncate": lambda s, length=100, suffix="...": (
                 (s[:length] + suffix) if len(s) > length else s
             ),
@@ -273,7 +273,10 @@ class Prompt:
             if isinstance(result, Awaitable):
                 import asyncio
 
-                return asyncio.run(result)
+                async def _eval(aw: Awaitable[str]) -> str:
+                    return await aw
+
+                return asyncio.run(_eval(result))
             return result
 
         if self._template is not None:

@@ -21,18 +21,18 @@ from __future__ import annotations
 import copy
 import logging
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 
 try:
-    from injectq import Inject
+    from injectq import Inject  # type: ignore[assignment]
 except ImportError:
 
     class _DummyInject:
-        def __getitem__(self, item):
+        def __getitem__(self, item: Any) -> Any:
             return None
 
-    Inject = _DummyInject()
+    Inject: Any = _DummyInject()  # type: ignore[no-redef]
 
 
 from alcyoneus.core.state import AgentState, ExecutionStatus, Message
@@ -124,7 +124,7 @@ def _update_state_fields(state, partial: dict):
 async def validate_message_content(
     message: list[Message],
     config: dict[str, Any] | None = None,
-    callback_mgr: CallbackManager = Inject[CallbackManager],  # will be auto-injected
+    callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
 ) -> bool:
     """Validate message content using registered validators in callback manager.
 
@@ -158,7 +158,7 @@ async def load_or_create_state[StateT: AgentState](  # noqa: PLR0912, PLR0915
     input_data: dict[str, Any],
     config: dict[str, Any],
     old_state: StateT,
-    checkpointer: BaseCheckpointer = Inject[BaseCheckpointer],  # will be auto-injected
+    checkpointer: BaseCheckpointer = Inject[BaseCheckpointer],  # type: ignore[assignment]
 ) -> StateT:
     """Load existing state from checkpointer or create new state.
 
@@ -302,7 +302,7 @@ async def load_or_create_state[StateT: AgentState](  # noqa: PLR0912, PLR0915
 async def reload_state[StateT: AgentState](
     config: dict[str, Any],
     old_state: StateT,
-    checkpointer: BaseCheckpointer = Inject[BaseCheckpointer],  # will be auto-injected
+    checkpointer: BaseCheckpointer = Inject[BaseCheckpointer],  # type: ignore[assignment]
 ) -> StateT:
     """Load existing state from checkpointer or create new state.
 
@@ -347,7 +347,7 @@ async def reload_state[StateT: AgentState](
     elif existing_state.execution_meta.current_node == "__end__":
         existing_state.execution_meta.current_node = END
         logger.debug("Normalized legacy current_node '__end__' to '%s'", END)
-    return existing_state
+    return cast(StateT, existing_state)
 
 
 async def process_node_result[StateT: AgentState](  # noqa: PLR0915
@@ -389,7 +389,7 @@ async def process_node_result[StateT: AgentState](  # noqa: PLR0915
             new_messages.append(msg)
             existing_ids.add(msg.message_id)
 
-    async def create_and_add_message(content: Any) -> Message:
+    async def create_and_add_message(content: Any) -> Message | None:
         """Create message from content and add if unique."""
         from alcyoneus.core.state.remove_message import is_remove_message
 
@@ -433,7 +433,7 @@ async def process_node_result[StateT: AgentState](  # noqa: PLR0915
         add_unique_message(msg)
         return msg
 
-    def handle_state_message(old_state: StateT, new_state: StateT) -> None:
+    def handle_state_message(old_state: AgentState, new_state: AgentState) -> None:
         """Handle state messages by updating the context."""
         old_messages = {}
         if old_state.context:
@@ -453,7 +453,7 @@ async def process_node_result[StateT: AgentState](  # noqa: PLR0915
         # Handle state updates
         if result.update:
             if isinstance(result.update, AgentState):
-                handle_state_message(state, result.update)  # type: ignore[assignment]
+                handle_state_message(state, result.update)
                 state = result.update  # type: ignore[assignment]
             elif isinstance(result.update, list):
                 for item in result.update:
@@ -503,7 +503,7 @@ async def process_node_result[StateT: AgentState](  # noqa: PLR0915
         logger.debug("Subgraph result merged: %d messages", len(sub_messages))
 
     elif isinstance(result, AgentState):
-        handle_state_message(state, result)  # type: ignore[assignment]
+        handle_state_message(state, result)
         state = result  # type: ignore[assignment]
 
     elif isinstance(result, Message):
@@ -638,7 +638,7 @@ def get_next_node(
 async def call_realtime_sync(
     state: AgentState,
     config: dict[str, Any],
-    checkpointer: BaseCheckpointer = Inject[BaseCheckpointer],  # will be auto-injected
+    checkpointer: BaseCheckpointer = Inject[BaseCheckpointer],  # type: ignore[assignment]
 ) -> None:
     """Call the realtime state sync hook if provided."""
     if checkpointer:
@@ -652,9 +652,9 @@ async def sync_data(
     config: dict[str, Any],
     messages: list[Message],
     trim: bool = False,
-    checkpointer: BaseCheckpointer = Inject[BaseCheckpointer],  # will be auto-injected
-    context_manager: BaseContextManager = Inject[BaseContextManager],  # will be auto-injected
-    callback_mgr: CallbackManager = Inject[CallbackManager],  # will be auto-injected
+    checkpointer: BaseCheckpointer = Inject[BaseCheckpointer],  # type: ignore[assignment]
+    context_manager: BaseContextManager = Inject[BaseContextManager],  # type: ignore[assignment]
+    callback_mgr: CallbackManager = Inject[CallbackManager],  # type: ignore[assignment]
 ) -> bool:
     """Sync the current state and messages to the checkpointer."""
     is_context_trimmed = False

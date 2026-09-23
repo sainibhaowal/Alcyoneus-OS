@@ -39,11 +39,8 @@ def _root(config: dict[str, Any] | None) -> Path:
 
 
 def _cwd(value: str | None, root: Path) -> Path:
-    candidate = (
-        (root / (value or ".")).resolve()
-        if not Path(value or ".").is_absolute()
-        else Path(value).resolve()
-    )
+    val = value or "."
+    candidate = (root / val).resolve() if not Path(val).is_absolute() else Path(val).resolve()
     try:
         candidate.relative_to(root)
     except ValueError:

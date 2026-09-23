@@ -37,7 +37,8 @@ class ToolRegistry:
         metadata = get_tool_metadata(tool)
         name = metadata["name"] or tool.__name__
         signature = inspect.signature(tool)
-        schema = {"type": "object", "properties": {}}
+        properties: dict[str, Any] = {}
+        schema: dict[str, Any] = {"type": "object", "properties": properties}
         required: list[str] = []
         for parameter in signature.parameters.values():
             if parameter.name in {"config", "state", "emit", "tool_call_id"} or parameter.kind in (
@@ -45,7 +46,7 @@ class ToolRegistry:
                 parameter.VAR_KEYWORD,
             ):
                 continue
-            schema["properties"][parameter.name] = {"type": "string"}
+            properties[parameter.name] = {"type": "string"}
             if parameter.default is parameter.empty:
                 required.append(parameter.name)
         if required:

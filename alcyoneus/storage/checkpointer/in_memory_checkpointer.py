@@ -496,7 +496,7 @@ class InMemoryCheckpointer[StateT: AgentState](BaseCheckpointer[StateT]):
 
     async def aclean_thread(self, config: dict[str, Any]) -> bool:
         """
-        Clean/delete thread asynchronously.
+        Clean/delete thread and its associated states and messages asynchronously.
 
         Args:
             config (dict): Configuration dictionary.
@@ -505,12 +505,29 @@ class InMemoryCheckpointer[StateT: AgentState](BaseCheckpointer[StateT]):
             bool: True if cleaned.
         """
         key = self._get_config_key(config)
+        cleaned = False
         async with self._threads_lock:
             if key in self._threads:
                 del self._threads[key]
-                logger.debug(f"Cleaned thread for key: {key}")
-                return True
-        return False
+                cleaned = True
+        async with self._state_lock:
+            if key in self._states:
+                del self._states[key]
+                cleaned = True
+            if key in self._state_cache:
+                del self._state_cache[key]
+        async with self._messages_lock:
+            if key in self._messages:
+                del self._messages[key]
+                cleaned = True
+            if key in self._message_metadata:
+                del self._message_metadata[key]
+        logger.debug(f"Cleaned thread data for key: {key}")
+        return cleaned
+
+    async def adelete_thread(self, config: dict[str, Any]) -> bool:
+        """Alias for aclean_thread for storage conformance."""
+        return await self.aclean_thread(config)
 
     async def adelete_for_runs(
         self,

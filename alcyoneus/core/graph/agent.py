@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any
 from alcyoneus.core.graph.base_agent import BaseAgent
 from alcyoneus.core.graph.tool_node import ToolNode
 from alcyoneus.core.skills.models import SkillConfig
+from alcyoneus.core.state import AgentState
 from alcyoneus.core.state.message import Message
 from alcyoneus.storage.media.config import MultimodalConfig
 
@@ -396,7 +397,7 @@ class Agent(
         }
         # Override with provided kwargs
         config.update(kwargs)
-        return Agent(**config)
+        return Agent(**config)  # type: ignore[arg-type]
 
     def as_tool(self, name: str | None = None, description: str | None = None) -> Any:
         """Convert this agent into a callable tool.
@@ -438,6 +439,35 @@ class Agent(
 
         return agent_tool
 
+    async def ainvoke(
+        self,
+        input_data: dict[str, Any] | AgentState,
+        config: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Execute the agent standalone against the given input.
+
+        Args:
+            input_data: Input dict or AgentState.
+            config: Optional runtime configuration.
+
+        Returns:
+            Execution result dict containing messages and state updates.
+        """
+        import importlib
+
+        from alcyoneus.utils import END, START
+
+        state_graph_module = importlib.import_module("alcyoneus.core.graph.state_graph")
+        StateGraphClass = state_graph_module.StateGraph
+
+        graph = StateGraphClass()
+        graph.add_node("agent", self)
+        graph.add_edge(START, "agent")
+        graph.add_edge("agent", END)
+        compiled = graph.compile()
+        payload = input_data.model_dump() if isinstance(input_data, AgentState) else input_data
+        return await compiled.ainvoke(payload, config)
+
     def get_system_prompt(self) -> list[dict[str, Any]]:
         """Get the system prompt for this agent.
 
@@ -454,7 +484,17 @@ class Agent(
         """
         prompt = list(self.system_prompt)
         if self.extra_messages:
-            prompt.extend(self.extra_messages)
+            prompt.extend(
+                [
+                    m.model_dump()
+                    if hasattr(m, "model_dump")
+                    else {
+                        "role": getattr(m, "role", "user"),
+                        "content": getattr(m, "content", str(m)),
+                    }
+                    for m in self.extra_messages
+                ]
+            )
         return prompt
 
     def _validate_output_schema_output_type(self) -> None:

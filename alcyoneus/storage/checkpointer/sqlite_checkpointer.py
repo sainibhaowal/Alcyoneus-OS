@@ -73,7 +73,8 @@ class SqliteCheckpointer(BaseCheckpointer[StateT]):
         """
         # Create tables on the persistent connection
         await self._ensure_connection()
-        conn = self._conn  # type: ignore[assignment]
+        assert self._conn is not None
+        conn = self._conn
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS checkpoints (
@@ -356,11 +357,12 @@ checkpoint_metadata, created_at, run_id)
             conn.commit()
             self._state = None
 
-    async def aprune(self, strategy: str = "keep_latest") -> None:
+    async def aprune(self, strategy: str = "keep_latest", **kwargs: Any) -> Any | None:
         """Prune checkpoints based on strategy.
 
         Args:
             strategy: Prune strategy ("keep_latest", "delete_all").
+            **kwargs: Additional keyword arguments.
         """
         async with self._lock:
             await self._ensure_setup()
@@ -377,6 +379,7 @@ checkpoint_metadata, created_at, run_id)
             elif strategy == "delete_all":
                 conn.execute("DELETE FROM checkpoints")
             conn.commit()
+            return None
 
     async def adelete_for_runs(
         self,
@@ -517,8 +520,8 @@ write_index, value)
                 for row in rows
             ]
 
-    async def aget_thread(self) -> list[Any]:
-        """List all thread IDs.
+    async def aget_thread(self, config: dict[str, Any] | None = None) -> Any:
+        """List all thread IDs or retrieve thread info.
 
         Returns:
             List of thread IDs.
@@ -529,13 +532,20 @@ write_index, value)
             rows = conn.execute("SELECT DISTINCT thread_id FROM checkpoints").fetchall()
             return [row[0] for row in rows]
 
-    async def alist_threads(self) -> list[Any]:
+    async def alist_threads(
+        self,
+        config: dict[str, Any] | None = None,
+        search: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        **kwargs: Any,
+    ) -> Any:
         """List all thread IDs (alias for aget_thread).
 
         Returns:
             List of thread IDs.
         """
-        return await self.aget_thread()
+        return await self.aget_thread(config)
 
     async def alist(self, filter: dict[str, Any] | None = None, **kwargs: Any) -> list[Any]:  # noqa: A002
         """List checkpoints.
@@ -650,7 +660,14 @@ write_index, value)
 
             return types.SimpleNamespace(**json.loads(row[0]))
 
-    async def alist_messages(self, config: dict[str, Any], **kwargs: Any) -> list[Any]:
+    async def alist_messages(
+        self,
+        config: dict[str, Any],
+        search: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        **kwargs: Any,
+    ) -> list[Any]:
         """List all message checkpoints.
 
         Args:
@@ -728,7 +745,7 @@ write_index, value)
             conn.commit()
             return None
 
-    async def aput_thread(self, config: dict[str, Any], state: StateT) -> StateT:
+    async def aput_thread(self, config: dict[str, Any], state: Any) -> Any:  # type: ignore[override]
         """Persist thread state.
 
         Args:

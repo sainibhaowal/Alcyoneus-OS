@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 import redis.asyncio as redis
 from redis.asyncio import Redis
@@ -337,7 +338,7 @@ class DistributedRateLimiter:
     ) -> RateLimitResult:
         """Check rate limit for a key."""
         cfg = config or self.default_config
-        limiter = self._get_limiter(cfg)
+        limiter = await self._get_limiter(cfg)
 
         # Build composite key with tenant
         if tenant_id:
@@ -379,12 +380,12 @@ class DistributedRateLimiter:
 
     async def get_usage(self, key: str, config: RateLimitConfig | None = None) -> int:
         cfg = config or self.default_config
-        limiter = self._get_limiter(cfg)
+        limiter = await self._get_limiter(cfg)
         return await limiter.get_current_usage(key)
 
     async def reset_limit(self, key: str, config: RateLimitConfig | None = None) -> bool:
         cfg = config or self.default_config
-        limiter = self._get_limiter(cfg)
+        limiter = await self._get_limiter(cfg)
         return await limiter.reset(key)
 
     async def close(self) -> None:
@@ -398,10 +399,10 @@ class RateLimitMiddleware:
 
     def __init__(
         self,
-        app,
+        app: Any,
         rate_limiter: DistributedRateLimiter,
         key_extractor: Callable[[dict], str] | None = None,
-        excluded_paths: list[str] = None,
+        excluded_paths: list[str] | None = None,
         default_config: RateLimitConfig | None = None,
     ):
         self.app = app

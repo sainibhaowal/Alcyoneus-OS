@@ -60,7 +60,7 @@ repos:
         additional_dependencies: ["bandit[toml]"]
         exclude: ^(tests|docs|examples)/
         verbose: true
-        entry: bash -c '.venv/bin/python -m bandit -c pyproject.toml -r . || true'
+        entry: bash -c '.venv/bin/python -m bandit -c pyproject.toml -r alcyoneus/ || true'
 
   # Dependency vulnerability scans (non-blocking, report only).
   # Local/system hooks: upstream manifests (pycqa/pip-audit 404s,
@@ -78,7 +78,7 @@ repos:
 
       - id: safety
         name: safety
-        entry: bash -c '.venv/bin/python -m safety check --json || true'
+        entry: bash -c 'timeout 5 .venv/bin/python -m safety check --json || true'
         language: system
         pass_filenames: false
         require_serial: true
