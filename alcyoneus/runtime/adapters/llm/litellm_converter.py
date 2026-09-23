@@ -73,10 +73,17 @@ class LiteLLMConverter(BaseConverter):
         return {"content": str(raw_response), "role": "assistant", "raw": raw_response}
 
     def convert_streaming_response(  # type: ignore[override]
-        self, raw_chunk: Any
+        self,
+        raw_chunk: Any = None,
+        node_name: str = "",
+        response: Any = None,
+        meta: dict | None = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> dict[str, Any] | None:
-        if hasattr(raw_chunk, "choices") and raw_chunk.choices:
-            delta = raw_chunk.choices[0].delta
+        chunk = response if response is not None else raw_chunk
+        if hasattr(chunk, "choices") and chunk.choices:
+            delta = chunk.choices[0].delta
             content = getattr(delta, "content", "")
             return {"content": content, "role": getattr(delta, "role", "assistant")}
         return None

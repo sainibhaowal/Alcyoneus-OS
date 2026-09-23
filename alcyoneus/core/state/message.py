@@ -32,7 +32,7 @@ import pydantic
 
 
 try:
-    from injectq import Inject, InjectQ  # type: ignore[assignment]
+    from injectq import InjectQ  # type: ignore[assignment]
 except ImportError:
 
     class _DummyInject:

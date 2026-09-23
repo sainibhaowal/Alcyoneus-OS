@@ -353,10 +353,30 @@ class TenantAwareStore(BaseStore):
     async def put(self, key: str, value: bytes, metadata: dict | None = None) -> str:
         return await self.base.put(self._tenant_key(key), value, metadata)  # type: ignore[attr-defined]
 
-    async def get(self, key: str) -> bytes | None:  # type: ignore[override]
+    async def get(  # type: ignore[override]
+        self,
+        config: Any,
+        memory_id: str | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        key = (
+            memory_id
+            if memory_id is not None
+            else (config if isinstance(config, str) else str(config))
+        )
         return await self.base.get(self._tenant_key(key))  # type: ignore[arg-type, call-arg, misc]
 
-    async def delete(self, key: str) -> bool:  # type: ignore[override]
+    async def delete(  # type: ignore[override]
+        self,
+        config: Any,
+        memory_id: str | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        key = (
+            memory_id
+            if memory_id is not None
+            else (config if isinstance(config, str) else str(config))
+        )
         return await self.base.delete(self._tenant_key(key))  # type: ignore[arg-type, call-arg, func-returns-value, misc]
 
     async def search(self, query: str, top_k: int = 10, **kwargs) -> list[dict]:  # type: ignore[override]

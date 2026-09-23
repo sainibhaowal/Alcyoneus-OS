@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from typing import Any
 
 from .constants import CALL_EXCLUDED_KWARGS
@@ -86,9 +87,7 @@ class AgentOpenAIMixin:
     llm_kwargs: dict[str, Any]
     output_type: str | None
     reasoning_config: dict[str, Any] | None
-
-    def _extract_prompt(self, messages: list[dict[str, Any]]) -> str:
-        raise NotImplementedError
+    _extract_prompt: Callable[..., str]
 
     async def _call_openai(
         self,

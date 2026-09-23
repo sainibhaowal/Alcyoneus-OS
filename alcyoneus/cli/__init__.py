@@ -52,10 +52,10 @@ cli_config = CLIConfig()
 def _get_version() -> str:
     """Dynamically resolve version from package metadata with fallback."""
     try:
-        from importlib.metadata import PackageNotFoundError, version
+        import importlib.metadata
 
-        return version("alcyoneus")
-    except (PackageNotFoundError, ImportError):
+        return importlib.metadata.version("alcyoneus")
+    except Exception:
         return "1.2.0"
 
 

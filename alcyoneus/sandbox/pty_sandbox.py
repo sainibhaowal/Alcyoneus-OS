@@ -97,6 +97,7 @@ class UnixPTYSandbox(BaseSandbox):
                 try:
                     proc.kill()
                 except ProcessLookupError:
+                    # Process already exited before kill
                     pass
                 await proc.wait()
                 raise ExecTimeoutError(f"Command '{command}' timed out after {timeout_sec}s")
@@ -123,11 +124,13 @@ class UnixPTYSandbox(BaseSandbox):
                         break
                     output.extend(data)
             except OSError:
+                # Non-blocking buffer drained or file descriptor already closed
                 pass
 
             try:
                 os.close(master_fd)
             except OSError:
+                # File descriptor may already be closed by OS
                 pass
 
     async def read_file(self, path: str) -> bytes:

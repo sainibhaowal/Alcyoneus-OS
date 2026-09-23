@@ -82,9 +82,7 @@ class SIPTelephony:
             SIPConfigurationError: If phone number or credentials are missing when mock=False.
             SIPCallFailedError: If the upstream SIP gateway fails to connect or rejects the call.
         """
-        logger.info(
-            "Initiating SIP call to %s via %s", self.config.phone_number, self.config.sip_domain
-        )
+        logger.info("Initiating SIP call via %s", self.config.sip_domain)
 
         if not self.config.phone_number:
             raise SIPConfigurationError(
@@ -178,7 +176,7 @@ class SIPTelephony:
             SIPCallFailedError: If the hangup request to the gateway fails.
         """
         target_call_id = call_id or self.active_call_id
-        logger.info("Terminating SIP call %s to %s", target_call_id, self.config.phone_number)
+        logger.info("Terminating SIP call %s", target_call_id)
 
         if self.config.mock:
             self.active_call_id = None

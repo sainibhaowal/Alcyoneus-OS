@@ -386,8 +386,6 @@ class ACPInMemoryTransport:
     """Deterministic transport useful for local composition and tests."""
 
     def __init__(self) -> None:
-        import asyncio
-
         self._queue: asyncio.Queue[ACPMessage] = asyncio.Queue()
 
     async def send(self, message: ACPMessage) -> ACPMessage:
@@ -395,8 +393,6 @@ class ACPInMemoryTransport:
         return message
 
     async def receive(self, timeout: float | None = None) -> ACPMessage:
-        import asyncio
-
         if timeout is None:
             return await self._queue.get()
         return await asyncio.wait_for(self._queue.get(), timeout=timeout)

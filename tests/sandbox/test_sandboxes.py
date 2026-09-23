@@ -28,7 +28,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from alcyoneus.sandbox.base import BaseSandbox
 from alcyoneus.sandbox.docker import DockerSandbox
 from alcyoneus.sandbox.errors import ExecTimeoutError, SandboxError, SandboxStartError
 from alcyoneus.sandbox.k8s_sandbox import K8sSandbox

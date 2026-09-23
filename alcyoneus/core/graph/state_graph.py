@@ -50,7 +50,6 @@ from alcyoneus.utils import END, START, CallbackManager
 from alcyoneus.utils.background_task_manager import BackgroundTaskManager
 from alcyoneus.utils.id_generator import BaseIDGenerator, DefaultIDGenerator
 
-from .agent import Agent
 from .base_agent import BaseAgent
 from .edge import Edge
 from .node import Node
@@ -60,6 +59,7 @@ from .tool_node import ToolNode
 if TYPE_CHECKING:
     from alcyoneus.storage.media.storage.base import BaseMediaStore
 
+    from .agent import Agent
     from .compiled_graph import CompiledGraph
 
 

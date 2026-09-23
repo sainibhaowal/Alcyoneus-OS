@@ -40,7 +40,6 @@ from alcyoneus.storage.checkpointer import (
     SqliteCheckpointer,
 )
 from alcyoneus.storage.checkpointer.conformance import (
-    Capability,
     validate_checkpointer,
 )
 

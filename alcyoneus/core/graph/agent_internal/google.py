@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import json
 import logging
+from collections.abc import Callable
 from typing import Any
 
 from .constants import GOOGLE_THINKING_BUDGET_BY_EFFORT
@@ -21,9 +22,7 @@ class AgentGoogleMixin:
     llm_kwargs: dict[str, Any]
     output_type: str | None
     reasoning_config: dict[str, Any] | None
-
-    def _extract_prompt(self, messages: list[dict[str, Any]]) -> str:
-        raise NotImplementedError
+    _extract_prompt: Callable[..., str]
 
     def _convert_to_google_format(
         self,

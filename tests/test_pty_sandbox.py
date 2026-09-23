@@ -69,7 +69,7 @@ class TestUnixPTYSandbox(unittest.IsolatedAsyncioTestCase):
         ticker_task = asyncio.create_task(ticker())
         res = await sb.exec("python3 -c \"import time; time.sleep(0.15); print('done')\"")
         stop_ticks = True
-        await ticker_task
+        _ = await ticker_task
 
         self.assertTrue(res.success)
         self.assertIn("done", res.stdout)

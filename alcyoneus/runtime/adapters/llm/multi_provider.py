@@ -78,8 +78,17 @@ class MultiProvider(BaseConverter):
     def convert_response(self, raw_response: Any) -> dict[str, Any]:  # type: ignore[override]
         return self.default_provider.convert_response(raw_response)  # type: ignore[return-value]
 
-    def convert_streaming_response(self, raw_chunk: Any) -> dict[str, Any] | None:  # type: ignore[override]
-        return self.default_provider.convert_streaming_response(raw_chunk)  # type: ignore[call-arg, return-value]
+    def convert_streaming_response(  # type: ignore[override]
+        self,
+        raw_chunk: Any = None,
+        node_name: str = "",
+        response: Any = None,
+        meta: dict | None = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> dict[str, Any] | None:
+        chunk = response if response is not None else raw_chunk
+        return self.default_provider.convert_streaming_response(chunk, *args, **kwargs)  # type: ignore[call-arg, return-value]
 
 
 __all__ = ["MultiProvider"]

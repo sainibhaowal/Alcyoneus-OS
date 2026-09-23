@@ -22,7 +22,8 @@ F = TypeVar("F", bound=Callable[..., Any])
 def tool(
     _func: F,
     /,
-) -> F: ...
+) -> F:
+    pass
 
 
 @overload
@@ -36,7 +37,8 @@ def tool(
     provider: str | None = None,
     capabilities: list[str] | None = None,
     metadata: dict[str, Any] | None = None,
-) -> Callable[[F], F]: ...
+) -> Callable[[F], F]:
+    pass
 
 
 def tool(
