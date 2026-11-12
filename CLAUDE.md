@@ -3,7 +3,7 @@
 This file documents the **core Python framework** only (`alcyoneus`, the package that lives in this folder).
 
 - Package name (PyPI): `alcyoneus`
-- Version: `1.0.0` (single source of truth: `pyproject.toml`)
+- Version: `1.2.0` (single source of truth: `pyproject.toml`)
 - Requires: Python >= 3.12
 - Importable top-level package: `import alcyoneus as alc`
 

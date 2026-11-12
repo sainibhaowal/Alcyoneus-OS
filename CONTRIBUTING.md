@@ -48,13 +48,11 @@ uv run pytest tests/graph             # one area
 
 - **Formatting & linting:** `ruff` (line length 100, target py312). Most issues
   are auto-fixed by `ruff format` / `ruff check --fix`.
-- **Types:** `mypy` runs in pre-commit. The codebase is on *phased* typing: a set
-  of modules with pre-existing errors is listed under `[[tool.mypy.overrides]]`
-  in `pyproject.toml` with `ignore_errors = true`. New code is type-checked.
-  Improving a listed module's types and removing it from that list is a welcome
-  contribution; please don't add new modules to it.
+- **Types:** `mypy` runs in pre-commit. All source files across the entire codebase
+  are strictly type-checked (`check_untyped_defs = true`) with **zero** `ignore_errors` overrides.
+  All contributions must maintain 0 typing errors (`mypy alcyoneus/`).
 - **Security:** `bandit`.
-- **Coverage:** `pytest` fails under 80% line coverage. New code needs tests.
+- **Coverage:** `pytest` enforces `>= 90%` line coverage (`fail_under = 90`). New code needs tests.
 
 ## Tests
 
